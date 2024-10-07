@@ -3,10 +3,6 @@ const cors = require('cors');
 const app = express();
 
 module.exports = {
-  rules: {
-    'no-unused-vars': 'off',
-    'no-console': 'off',
-  },
   devServer: {
     hot: true
   }
