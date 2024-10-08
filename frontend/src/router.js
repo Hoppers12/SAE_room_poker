@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import Home from './views/Home.vue';
 import About from './views/About.vue';
 import Game from './views/Game.vue'
-
+import SignUp from './views/SignUp.vue';
 const routes = [
     ...['/','/HomePage','/accueil', '/maison'].map(path => ({ path, component: Home })),
     {
@@ -11,6 +11,11 @@ const routes = [
         component: About,
     },
         ...['/game','/play', '/start','/jouer','/jeu'].map(path => ({ path, component: Game })),
+    {
+        path: '/SignUp',
+        name: 'signup',
+        component: SignUp,
+    }
 ];
 
 const router = createRouter({

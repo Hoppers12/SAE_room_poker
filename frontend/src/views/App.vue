@@ -4,6 +4,7 @@
       <router-link to="/" class="nav-link">Accueil</router-link>
       <router-link to="/game" class="nav-link">Jeu</router-link>
       <router-link to="/about" class="nav-link">À propos</router-link>
+      <router-link to="/SignUp" class="nav-link">Se connecter</router-link>
     </nav>
     <router-view />
   </div>
