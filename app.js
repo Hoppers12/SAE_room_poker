@@ -13,11 +13,8 @@ app.get('/', (req, res) => {
   res.json("Bienvenue dans l\'API");
 })
 
-
-
 app.post('/api/users', async (req, res) => {
   const { name, email, password } = req.body;
-
   const newUser = new User({
     name,
     email,

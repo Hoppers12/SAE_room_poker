@@ -4,13 +4,13 @@ module.exports = {
     port: 8000,
     host: 'localhost',
     proxy: {
-      '/': {
+      '/api1': {
         target: 'http://localhost:5000',
         ws: true,
         changeOrigin: true,
         pathRewrite: { '^/api1': '' },
       },
-      '/api': {
+      '/api2': {
         target: 'http://localhost:3000',
         ws: true,
         changeOrigin: true,
