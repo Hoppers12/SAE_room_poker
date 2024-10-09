@@ -1,54 +1,68 @@
 <template>
-  <div class="signup-container">
+  <div class="login-container">
     <div class="form-container">
-      <h1>Créer un Compte</h1>
+      <h1>Connexion</h1>
       <div class="input-group">
-        <input v-model="name" placeholder="Nom" />
         <input v-model="email" placeholder="Email" />
         <input type="password" v-model="password" placeholder="Mot de passe" />
       </div>
-      <button class="btn" @click="createUser">Créer</button>
+      <button class="btn" @click="loginUser">Se connecter</button>
+      <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
     </div>
   </div>
-
 </template>
 
 <script>
 import axios from '../axios';
 
 export default {
-  name: 'SignUp',
+  name: 'LogIn',
   data() {
     return {
-      name: '',
       email: '',
       password: '',
-      data : [],
+      users: [],
+      errorMessage: '',
     };
   },
   methods: {
-    async createUser() {
+    async fetchUsers() {
       try {
-        const response = await axios.post('/users', {
-          name: this.name,
-          email: this.email,
-          password: this.password,
-        });
-        console.log('Utilisateur créé:', response.data);
-        this.$router.push('/LogIn');
+        const response = await axios.get('/users');
+        this.users = response.data;
       } catch (error) {
-
-        console.error('Erreur lors de la création de l’utilisateur:', error);
+        console.error('Erreur lors de la récupération des utilisateurs:', error);
+        this.errorMessage = 'Erreur lors du chargement des utilisateurs';
       }
     },
+    async loginUser() {
+      try {
+        const user = this.users.find(
+          (u) => u.email === this.email && u.password === this.password
+        );
+        if (user) {
+          localStorage.setItem('isLoggedIn', true);
+          localStorage.setItem('user', JSON.stringify(user));
+          window.location.href = '/';
+        } else {
+          this.errorMessage = 'Identifiants incorrects. Veuillez réessayer.';
+        }
+      } catch (error) {
+        console.error('Erreur lors de la connexion:', error);
+        this.errorMessage = 'Une erreur est survenue lors de la connexion.';
+      }
+    },
+  },
+  mounted() {
+    this.fetchUsers();
   },
 };
 </script>
 
 <style scoped>
-.signup-container {
-  max-width: 700px;
-  margin: 50px auto;
+.login-container {
+  max-width: 400px;
+  margin: 100px auto;
   background-color: #f7f8fc;
   border-radius: 12px;
   padding: 40px;
@@ -99,26 +113,9 @@ export default {
   background-color: #0de8ff;
 }
 
-.users-list {
-  margin-top: 40px;
-}
-
-.users-list h2 {
-  font-size: 24px;
-  color: #333;
-}
-
-.users-list ul {
-  list-style: none;
-  padding: 0;
-}
-
-.users-list li {
-  background-color: #ffffff;
-  padding: 10px 15px;
-  margin: 8px 0;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  font-size: 18px;
+.error {
+  color: red;
+  text-align: center;
+  margin-top: 15px;
 }
 </style>
