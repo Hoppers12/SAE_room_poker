@@ -8,7 +8,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-mongoose.connect('mongodb://localhost:27017/usersDB');
+const mongoUrl = process.env.MONGO_URL || 'mongodb://mongo:27017/usersDb';
+mongoose.connect(mongoUrl)
+  .then(() => console.log('Connected to MongoDB'))
+  .catch((err) => console.error('Error connecting to MongoDB', err));
 
 app.get('/', (req, res) => {
   res.json("Bienvenue dans l\'API");

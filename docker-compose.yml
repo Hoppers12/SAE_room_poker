@@ -1,0 +1,39 @@
+services:
+  frontend:
+    image: node:18
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "8000:8000"
+    command: >
+      sh -c "npm install && npm run build && npm run serve"
+    environment:
+      - NODE_ENV=development
+
+  backend:
+    image: node:18
+    working_dir: /app
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    command: >
+      sh -c "npm install && node app.js"
+    environment:
+      - NODE_ENV=development
+      - MONGO_URL=mongodb://mongo:27017/usersDB # Connexion à MongoDB
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:6.0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db # Stockage persistant des données
+
+volumes:
+  mongo-data:
