@@ -5,7 +5,6 @@
       <router-link to="/game" class="nav-link">Jeu</router-link>
       <router-link to="/about" class="nav-link">À propos</router-link>
 
-      <!-- Dropdown Menu à droite -->
       <div class="dropdown">
         <button class="nav-link dropdown-btn">Compte</button>
         <div class="dropdown-content">
@@ -60,8 +59,6 @@ nav {
   background-color: #1e1e2f;
   padding: 15px 20px;
   position: sticky;
-  top: 0;
-  z-index: 100;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -92,25 +89,21 @@ nav {
   transform: translateY(-3px);
 }
 
-/* Contenu du Dropdown */
 .dropdown-content {
   display: none;
   position: absolute;
-  right: 0;
   background-color: #1e1e2f;
-  min-width: 160px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
   border-radius: 12px;
-  z-index: 1;
 }
 
-/* Liens dans le Dropdown */
 .dropdown-link {
   color: #f7f8fc;
   padding: 12px 16px;
+  gap:10px;
   text-decoration: none;
   display: block;
-  text-align: right;
+  text-align: center;
   border-radius: 12px;
   transition: background-color 0.3s;
 }
@@ -119,13 +112,12 @@ nav {
   background-color: #4cc8ed;
 }
 
-/* Bouton de déconnexion dans le dropdown */
 .logout-btn {
   background: none;
   border: none;
   padding: 12px 16px;
   color: #f7f8fc;
-  text-align: right;
+  text-align: center;
   width: 100%;
   cursor: pointer;
   transition: background-color 0.3s;
@@ -136,7 +128,6 @@ nav {
   background-color: #4cc8ed;
 }
 
-/* Général */
 .nav-link {
   color: #f7f8fc;
   text-decoration: none;
