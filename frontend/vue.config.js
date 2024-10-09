@@ -1,5 +1,6 @@
 module.exports = {
   devServer: {
+    hot: true,
     port: 8000,
     host:'localhost',
     proxy: {
@@ -10,6 +11,5 @@ module.exports = {
         pathRewrite: { '^/': '' },
       },
     },
-    hot: true,
   },
 };

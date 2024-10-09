@@ -3,6 +3,8 @@ import Home from './views/Home.vue';
 import About from './views/About.vue';
 import Game from './views/Game.vue'
 import SignUp from './views/SignUp.vue';
+import LogIn from "@/views/LogIn.vue";
+
 const routes = [
     ...['/','/HomePage','/accueil', '/maison'].map(path => ({ path, component: Home })),
     {
@@ -15,6 +17,11 @@ const routes = [
         path: '/SignUp',
         name: 'signup',
         component: SignUp,
+    },
+    {
+        path: '/LogIn',
+        name: 'login',
+        component: LogIn,
     }
 ];
 

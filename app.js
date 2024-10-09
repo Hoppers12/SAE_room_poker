@@ -1,21 +1,24 @@
+<<<<<<< HEAD
 
+=======
+>>>>>>> 3372b960828f2a4c08eaf41c0be57fe1a787c6f5
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
-const User = require('./models/user'); // Utilise le chemin relatif correct
-
+const User = require('./models/user');
+const {join} = require("node:path");
 const app = express();
 
-// Middleware
 app.use(cors());
-app.use(express.json()); // Pour parser le corps des requêtes JSON
+app.use(express.json());
 
-// Connexion à la base de données MongoDB
 mongoose.connect('mongodb://localhost:27017/usersDB');
 
 app.get('/', (req, res) => {
-  res.json("Bienvenue dnas l\'API");
+  res.json("Bienvenue dans l\'API");
 })
+
+
 
 app.post('/users', async (req, res) => {
   const { name, email, password } = req.body;
@@ -41,6 +44,12 @@ app.get('/users', async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+app.use(express.static(join(__dirname, '/frontend/dist')));
+
+app.get('*', (req, res) => {
+    res.sendFile(join(__dirname, '/frontend/dist', 'index.html'));
 });
 
 const port = 3000;
