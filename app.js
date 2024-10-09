@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-
-=======
->>>>>>> 3372b960828f2a4c08eaf41c0be57fe1a787c6f5
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
