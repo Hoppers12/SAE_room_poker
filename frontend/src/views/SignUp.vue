@@ -45,7 +45,7 @@ export default {
   methods: {
     async createUser() {
       try {
-        const response = await axios.post('/users', {
+        const response = await axios.post('/api/users', {
           prenom: this.prenom,
           nom: this.nom,
           dateNaissance: this.dateNaissance,

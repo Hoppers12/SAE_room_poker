@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-
-=======
->>>>>>> 3372b960828f2a4c08eaf41c0be57fe1a787c6f5
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -20,7 +16,7 @@ app.get('/', (req, res) => {
 
 
 
-app.post('/users', async (req, res) => {
+app.post('/api/users', async (req, res) => {
   const { name, email, password } = req.body;
 
   const newUser = new User({
@@ -37,7 +33,7 @@ app.post('/users', async (req, res) => {
   }
 });
 
-app.get('/users', async (req, res) => {
+app.get('/api/users', async (req, res) => {
   try {
     const users = await User.find();
     res.json(users);

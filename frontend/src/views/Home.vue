@@ -32,7 +32,7 @@ html, body {
 }
 
 .content {
-  background-image: url(http://localhost:8000/img/background.ac4b49cc.png);
+  background-image: url(../img/background.png);
   background-repeat: no-repeat;
   background-size: 100vw, 100vh;
   background-color: black;
