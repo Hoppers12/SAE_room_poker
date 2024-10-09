@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+
+
+<body>
+<h1>
+    CCCC
+</h1>
+<script src="socket.io/socket.io.js"></script>
+
+    <script>
+        var socket = io() ; // J'initialise une connexion au serveur websocket
+        var send = function()
+        {
+            var text = document.getElementById('m').value;
+            socket.emit('chat message',text);
+        }
+
+        var recup = function(msg) {
+            var li = document.createElement('li')
+            li.innerText = msg
+            document.getElementById('message').appendChild(li);
+        }
+        socket.on('chat message',recup);
+
+
+    </script>
+
+
+<div>
+    <ul id="message"></ul>
+    <input id="m"/>
+    <div class="zone_saisie">
+        <button onclick="send()">send</button>
+    </div>
+
+</div>
+</body>
+</html>
