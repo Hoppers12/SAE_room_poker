@@ -1,13 +1,13 @@
 module.exports = {
   devServer: {
+    hot: true,
     port: 8000,
     proxy: {
       '/': {
-        target: 'http://backend:3000',
+        target: 'http://localhost:3000',
         changeOrigin: true,
         pathRewrite: { '^/': '' },
       },
     },
-    hot: true,
   },
 };
