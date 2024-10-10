@@ -1,3 +1,4 @@
+
 class Deck {
     constructor() {
         this.cards = [];
@@ -17,6 +18,7 @@ class Deck {
             [this.cards[i], this.cards[j]] = [this.cards[j], this.cards[i]];
         }
     }
+
 
     // Distribue une carte
     deal() {

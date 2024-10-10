@@ -8,6 +8,10 @@
       <div>
         <ul id="chat_connexion"></ul>
       </div>
+      <div>
+        <input id="pseudo_joueur"/> <button @click="send">Send</button>
+      </div>
+
 
     </div>
 
@@ -21,7 +25,15 @@ export default {
   data() {
     return {
       notification:'',
+      socket : null
     };
+  },
+  methods : {
+    // Methode qui envoie le pseudo du joueur au serveur
+    send() {
+      const pseudo = document.getElementById('pseudo_joueur').value
+        this.socket.emit('joinGame', pseudo);
+    }
   },
   mounted() {
 
@@ -29,28 +41,36 @@ export default {
     const ctx = canvas.getContext('2d');
 
 
-    const socket = io('http://localhost:5000', {
+    this.socket = io('http://localhost:5000', {
       transports: ['websocket'], // Utiliser uniquement WebSocket
     });
 
 
-
-
-    socket.on('connect', function() {
+    this.socket.on('connect', function() {
       console.log('Connexion réussie au serveur WebSocket');
     });
 
-    socket.on('connect_error', (err) => {
+    this.socket.on('connect_error', (err) => {
       console.error('Connection failed:', err);
     });
 
-    var receive_user = function (msg) {
+    var receive_user = function (player) {
       var li = document.createElement('li');
-      li.innerText = msg;
+      li.innerText = player.name + ' a rejoint la partie avec ' + player.chips + ' jeton(s)';
       document.getElementById('chat_connexion').appendChild(li);
     }
 
-    socket.on('user connect', receive_user);
+    var leave_user = function(player) {
+      var li = document.createElement('li');
+      li.innerText = player.name + ' a quitté la partie. Il emporte avec lui ' + player.chips + ' jeton(s)';
+      document.getElementById('chat_connexion').appendChild(li);
+    }
+
+
+
+    //Gére la reception d'un new joueur
+    this.socket.on('recevoirJoueur', receive_user);
+    this.socket.on('quitterJoueur',leave_user);
     // Dessiner la table de poker (un ovale)
     function drawPokerTable() {
       ctx.fillStyle = "#006400"; // Couleur verte de la table

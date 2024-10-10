@@ -31,3 +31,6 @@ class Player {
         return this.hand.map(card => card.toString()).join(', ');
     }
 }
+
+// Export de la classe Player
+module.exports = Player;
