@@ -54,7 +54,7 @@ io.on('connection', (socket) => {
                 console.log(player.pseudo);
             });
             */
-             */
+
         });
 
 
