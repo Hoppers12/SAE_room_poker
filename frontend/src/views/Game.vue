@@ -57,12 +57,14 @@ export default {
     var receive_user = function (player) {
       var li = document.createElement('li');
       li.innerText = player.name + ' a rejoint la partie avec ' + player.chips + ' jeton(s)';
+      li.style.color = 'white'; // Définit la couleur du texte en blanc
       document.getElementById('chat_connexion').appendChild(li);
     }
 
     var leave_user = function(player) {
       var li = document.createElement('li');
       li.innerText = player.name + ' a quitté la partie. Il emporte avec lui ' + player.chips + ' jeton(s)';
+      li.style.color = 'white'; // Définit la couleur du texte en blanc
       document.getElementById('chat_connexion').appendChild(li);
     }
 
