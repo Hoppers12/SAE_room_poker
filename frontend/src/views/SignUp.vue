@@ -4,17 +4,18 @@
       <div class="form-container">
         <h1>INSCRIPTION</h1>
         <div class="input-group">
-          <input v-model="prenom" placeholder="Prénom" />
-          <input v-model="nom" placeholder="Nom" />
-          <input v-model="dateNaissance" placeholder="Date de naissance (jj/mm/aaaa)" />
-          <input v-model="ville" placeholder="Ville" />
-          <input v-model="adresse" placeholder="Adresse" />
-          <input v-model="codePostal" placeholder="Code postal" />
-          <input v-model="nationalite" placeholder="Nationalité" />
-          <input v-model="telephone" placeholder="Numéro de téléphone" />
-          <input v-model="pseudo" placeholder="Pseudonyme" />
-          <input v-model="email" placeholder="Email" />
-          <input type="password" v-model="password" placeholder="Mot de passe" />
+          <input v-model="prenom" placeholder="Prénom" required />
+          <input v-model="nom" placeholder="Nom" required/>
+          <input type="date" v-model="dateNaissance" placeholder="Date de naissance" required />
+          <input v-model="ville" placeholder="Ville" required/>
+          <input v-model="adresse" placeholder="Adresse" required/>
+          <input v-model="codePostal" placeholder="Code postal" required/>
+          <input v-model="nationalite" placeholder="Nationalité" required/>
+          <input v-model="telephone" @blur="validateTelephone" placeholder="Numéro de téléphone" required/>
+          <span v-if="telephoneError" class="error-message">{{ telephoneError }}</span>
+          <input v-model="pseudo" placeholder="Pseudonyme" required/>
+          <input v-model="email" placeholder="Email" required/>
+          <input type="password" v-model="password" placeholder="Mot de passe" required/>
         </div>
         <button class="btn" @click="createUser">S'inscrire</button>
       </div>
@@ -22,65 +23,85 @@
   </div>
 </template>
 
+
+
 <script>
-import axios from '../axios'; // Assurez-vous que le chemin est correct
+import axios from '../axios';
+
 
 export default {
   name: 'SignUp',
   data() {
     return {
-      prenom: '',
-      nom: '',
-      dateNaissance: '',
-      ville: '',
-      adresse: '',
-      codePostal: '',
-      nationalite: '',
-      telephone: '',
-      pseudo: '',
-      email: '',
-      password: '',
+      prenom:'',
+      nom:'',
+      dateNaissance:'',
+      ville:'',
+      adresse:'',
+      codePostal:'',
+      nationalite:'',
+      telephone:'',
+      pseudo:'',
+      email:'',
+      password:'',
+      telephoneError:'',
     };
   },
   methods: {
+    async validateTelephone() {
+      const telephoneRegex = /^[0-9]{10}$/;
+      if (!telephoneRegex.test(this.telephone) && this.telephone !== "") {
+        this.telephoneError = "Le numéro de téléphone est invalide.";
+      }
+      else{
+        this.telephoneError = "";
+      }
+      },
+
     async createUser() {
-      try {
-        const response = await axios.post('/api/users', {
-          prenom: this.prenom,
-          nom: this.nom,
-          dateNaissance: this.dateNaissance,
-          ville: this.ville,
-          adresse: this.adresse,
-          codePostal: this.codePostal,
-          nationalite: this.nationalite,
-          telephone: this.telephone,
-          pseudo: this.pseudo,
-          email: this.email,
-          password: this.password,
-        });
-        console.log('Utilisateur créé:', response.data);
-        this.$router.push('/LogIn');
-      } catch (error) {
-        console.error('Erreur lors de la création de l’utilisateur:', error);
+      if (!this.telephoneError) {
+        try {
+          const response = await axios.post('/api/users', {
+            firstname: this.prenom,
+            name: this.nom,
+            birthdate: this.dateNaissance,
+            city: this.ville,
+            address: this.adresse,
+            postCode: this.codePostal,
+            nationality: this.nationalite,
+            phone: this.telephone,
+            pseudo: this.pseudo,
+            email: this.email,
+            password: this.password,
+          });
+          console.log('Utilisateur créé:', response.data);
+          this.$router.push('/LogIn');
+        } catch (error) {
+          console.error('Erreur lors de la création de l’utilisateur:', error);
+        }
+      } else {
+        console.error('Il y a des erreurs dans le formulaire.');
       }
     },
   },
 };
+
 </script>
+
 
 <style scoped>
 .content {
   background-image: url(http://localhost:8000/img/background.ac4b49cc.png);
-    background-repeat: no-repeat;
-    background-color: black;
-    width: auto;
-    height: fit-content;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  background-repeat: no-repeat;
+  background-color: black;
+  width: auto;
+  height: fit-content;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.signup-container{
+.signup-container {
   padding-top: 5vh;
   margin-bottom: 5vh;
   display: flex;
@@ -127,6 +148,11 @@ input::placeholder {
   font-style: italic;
 }
 
+.error-message {
+  color: red;
+  font-size: 14px;
+}
+
 .btn {
   background-color: #e63946; /* Rouge vif */
   color: white;
@@ -144,5 +170,5 @@ input::placeholder {
 .btn:hover {
   background-color: #d62828;
 }
-
 </style>
+

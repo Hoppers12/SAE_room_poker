@@ -38,11 +38,11 @@ export default {
     async loginUser() {
       try {
         const user = this.users.find(
-          (u) => u.email === this.email && u.password === this.password
+            (u) => u.email === this.email && u.password === this.password
         );
         if (user) {
           localStorage.setItem('isLoggedIn', true);
-          localStorage.setItem('user', JSON.stringify(user));
+          localStorage.setItem('id', user._id);
           window.location.href = '/';
         } else {
           this.errorMessage = 'Identifiants incorrects. Veuillez réessayer.';

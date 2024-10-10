@@ -6,7 +6,9 @@
       <router-link to="/about" class="nav-link">À propos</router-link>
 
       <div class="dropdown">
-        <button class="nav-link dropdown-btn">Compte</button>
+        <button class="nav-link dropdown-btn" name="Compte">
+          {{ isLoggedIn ? user.pseudo : 'Compte' }}
+        </button>
         <div class="dropdown-content">
           <router-link to="/SignUp" class="dropdown-link" v-if="!isLoggedIn">S'inscrire</router-link>
           <router-link to="/LogIn" class="dropdown-link" v-if="!isLoggedIn">Se connecter</router-link>
@@ -19,21 +21,30 @@
 </template>
 
 <script>
+import axios from "../axios";
 export default {
   name: 'App',
   data() {
     return {
       isLoggedIn: false,
+      user: [],
     };
   },
   methods: {
-    checkLoginStatus() {
-      this.isLoggedIn = localStorage.getItem('isLoggedIn');
+    async checkLoginStatus() {
+      this.isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+      if (this.isLoggedIn) {
+        const id = localStorage.getItem('id');
+        const userData = await axios.get(`/api/users/${id}`);
+        this.user = userData.data;
+        console.log(this.user)
+      }
     },
     logout() {
       localStorage.removeItem('isLoggedIn');
       localStorage.removeItem('user');
       this.isLoggedIn = false;
+      this.user = null;
       this.$router.push('/');
     },
   },

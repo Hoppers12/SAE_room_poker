@@ -35,7 +35,6 @@ html, body {
   background-image: url(../img/background.png);
   background-repeat: no-repeat;
   background-size: 100vw, 100vh;
-  background-color: black;
   width: 100vw;
   height: 89.8vh;
   display: flex;
@@ -77,10 +76,12 @@ html, body {
   transform: translateY(-3px);
 }
 
-/* Effet lorsque le bouton est cliqué (active) */
 .buttons div:active {
   background-color: #ba181b;
   transform: translateY(0);
+}
+body{
+  background-color: black;
 }
 
 .signin, .login {

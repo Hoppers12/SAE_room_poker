@@ -10,11 +10,11 @@ module.exports = {
         changeOrigin: true,
         pathRewrite: { '^/api1': '' },
       },
-      '/api2': {
+      '/api': {
         target: 'http://localhost:3000',
         ws: true,
         changeOrigin: true,
-        pathRewrite: { '^/api2': '' },
+        pathRewrite: { '^/api': '' },
       },
     },
   },
