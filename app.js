@@ -13,8 +13,22 @@ app.get('/', (req, res) => {
   res.json("Bienvenue dans l\'API");
 })
 
+app.delete('/api/users/:id', async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const result = await User.findByIdAndDelete(userId);
+    if (!result) {
+      return res.status(404).json({message: 'Utilisateur non trouvé'});
+    }
+    res.status(200).json({message: 'Utilisateur supprimé avec succès'});
+  } catch (error) {
+    console.error('Erreur lors de la suppression de l\'utilisateur:', error);
+    res.status(500).json({message: 'Erreur interne du serveur'});
+  }
+})
+
 app.post('/api/users', async (req, res) => {
-  const { id,firstname,name,birthdate,city,address,postCode,nationality,phone,pseudo, email, password } = req.body;
+  const { id,firstname,name,birthdate,city,address,postCode,nationality,phone,pseudo, email, password,isAdmin } = req.body;
   const newUser = new User({
     firstname,
     name,
@@ -27,6 +41,7 @@ app.post('/api/users', async (req, res) => {
     pseudo,
     email,
     password,
+    isAdmin,
   });
 
   try {
@@ -36,6 +51,22 @@ app.post('/api/users', async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
+
+app.put('/api/users/:id', async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const updateData = req.body;
+    const options = { new: true, runValidators: true };
+    const result = await User.findByIdAndUpdate(userId,updateData,options);
+    if (!result) {
+      return res.status(404).json({message: 'Utilisateur non trouvé'});
+    }
+    res.status(200).json({message: 'Utilisateur supprimé avec succès'});
+  } catch (error) {
+    console.error('Erreur lors de la suppression de l\'utilisateur:', error);
+    res.status(500).json({message: 'Erreur interne du serveur'});
+  }
+})
 
 app.get('/api/users', async (req, res) => {
   try {
@@ -72,7 +103,6 @@ app.listen(port, () => {
 });
 
 
-// FICHIER DE CREATION DU SERVEUR
 
 const express2 = require('express');
 const cors2 = require('cors'); // Import CORS
@@ -87,23 +117,20 @@ const server = http.createServer(app2);
 
 const io = socketIo(server, {
   cors: {
-    origin: '*', // Allow all origins
+    origin: '*',
     methods: ['GET', 'POST'],
     allowedHeaders: ['my-custom-header'],
     credentials: true
   },
-  transports: ['websocket'] // Use WebSocket transport
+  transports: ['websocket']
 });
 
 
-// Enable CORS for all requests
 app.use(cors());
 
-//Appel du fichier qui gère les sockets
 const socketHandler
     = require('./socketHandler');
 socketHandler(io);
 
-//Creation du serveur qui permettra de gérer les sockets (port 5000)
 const { createServer } = require('./server');
 createServer();

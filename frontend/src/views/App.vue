@@ -13,7 +13,8 @@
         <div class="dropdown-content">
           <router-link to="/SignUp" class="dropdown-link" v-if="!isLoggedIn">S'inscrire</router-link>
           <router-link to="/LogIn" class="dropdown-link" v-if="!isLoggedIn">Se connecter</router-link>
-          <button class="dropdown-link logout-btn" @click="logout" v-if="isLoggedIn">Se déconnecter</button>
+          <router-link to="/Admin/Account" class="dropdown-link" v-if="isLoggedIn && isAdmin">Gestion des comptes</router-link>
+          <button class="dropdown-link logout-btn" @click="logout" v-if="isLoggedIn ">Se déconnecter</button>
         </div>
       </div>
     </nav>
@@ -33,6 +34,7 @@ export default {
   data() {
     return {
       isLoggedIn: false,
+      isAdmin: false,
       user: [],
     };
   },
@@ -43,8 +45,9 @@ export default {
         const id = localStorage.getItem('id');
         const userData = await axios.get(`/api/users/${id}`);
         this.user = userData.data;
-        console.log(this.user)
+        this.isAdmin = this.user.isAdmin;
       }
+      localStorage.setItem('isAdmin', this.user.isAdmin);
     },
     logout() {
       localStorage.removeItem('isLoggedIn');

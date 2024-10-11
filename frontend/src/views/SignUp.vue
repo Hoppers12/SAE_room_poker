@@ -73,6 +73,7 @@ export default {
             pseudo: this.pseudo,
             email: this.email,
             password: this.password,
+            isAdmin: false,
           });
           console.log('Utilisateur créé:', response.data);
           this.$router.push('/LogIn');
