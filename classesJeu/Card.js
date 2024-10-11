@@ -15,3 +15,4 @@ class Card {
         return `${this.rank}${suitsSymbols[this.suit]}`;
     }
 }
+module.exports = Card;

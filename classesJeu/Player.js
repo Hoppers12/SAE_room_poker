@@ -1,13 +1,22 @@
+const {Error} = require("mongoose");
+
 class Player {
     constructor(name, chips) {
-        this.name = name;
         this.chips = chips; // Jetons du joueur
         this.hand = []; // Cartes du joueur
         this.currentBet = 0; // Mise courante du joueur
-        this.folded = false; // Statut du joueur (s'est couché ou non)
+        this.folded = false;
+        this.name = name; // Statut du joueur (s'est couché ou non)
     }
 
-    // Reçoit une carte
+
+    get getName() {
+        return this.name;
+    }
+
+
+
+// Reçoit une carte
     receiveCard(card) {
         this.hand.push(card);
     }

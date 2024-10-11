@@ -1,4 +1,4 @@
-
+const Card = require('./Card')
 class Deck {
     constructor() {
         this.cards = [];
@@ -25,3 +25,4 @@ class Deck {
         return this.cards.pop();
     }
 }
+module.exports = Deck;

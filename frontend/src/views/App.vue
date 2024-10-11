@@ -1,3 +1,4 @@
+
 <template>
   <div id="app">
     <nav>
@@ -21,6 +22,11 @@
 </template>
 
 <script>
+
+// main.js ou App.vue
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap';
+
 import axios from "../axios";
 export default {
   name: 'App',
