@@ -4,6 +4,7 @@ import About from './views/About.vue';
 import Game from './views/Game.vue'
 import SignUp from './views/SignUp.vue';
 import LogIn from "@/views/LogIn.vue";
+import AdminAccount from "@/views/Admin/Account.vue";
 
 const routes = [
     ...['/','/HomePage','/accueil', '/maison'].map(path => ({ path, component: Home })),
@@ -22,7 +23,13 @@ const routes = [
         path: '/LogIn',
         name: 'login',
         component: LogIn,
+    },
+    {
+        path: '/Admin/Account',
+        name: 'AdminAccount',
+        component: AdminAccount,
     }
+
 ];
 
 const router = createRouter({
