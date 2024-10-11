@@ -1,77 +1,45 @@
+// server.js
+
 const express = require('express');
-const cors = require('cors'); // Import CORS
+const cors = require('cors');
 const http = require('http');
 const socketIo = require('socket.io');
-const Player = require('./classesJeu/Player');
+const socketHandler = require('./socketHandler');
 
+//Fonction qui crée le serveur de socket
+function createServer() {
+    const app = express();
+    const server = http.createServer(app);
 
-const app = express();
-const server = http.createServer(app);
-
-
-
-const io = socketIo(server, {
-    cors: {
-        origin: '*', // Allow all origins
-        methods: ['GET', 'POST'],
-        allowedHeaders: ['my-custom-header'],
-        credentials: true
-    },
-    transports: ['websocket'] // Use WebSocket transport
-});
-
-
-// Enable CORS for all requests
-app.use(cors());
-
-// GESTIO NDE L'ARRIVE DE JOUEURS DANS LA PARTIE
-
-let players = [] //Tableau contenant tous les joueurs présents
-let game = null
-io.on('connection', (socket) => {
-    console.log('A user connected',socket.id);
-
-    // Handle incoming messages from clients
-    socket.on('joinGame', (pseudo) =>
-    {
-        console.log(Player)
-        const newPlayer = new Player(pseudo,1000) ;
-        players.push(newPlayer);
-        io.emit("recevoirJoueur",newPlayer) // Message qui avertit qu'un new joueur arrive en donnant le pseudo
-
-        //Gestion de la deconnexion des joueurs
-        socket.on('disconnect', (socket) =>
-        {
-            console.log('A user disconnected');
-
-            // Supprimer le joueur déconnecté de la liste des joueurs
-            players = players.filter(player => player !== newPlayer);
-            console.log(players)
-            io.emit("quitterJoueur",newPlayer);
-            // Boucle pour afficher les pseudos de tous les joueurs
-            /*
-            players.forEach(player => {
-                console.log(player.pseudo);
-            });
-            */
-
-        });
-
-
+    // Configuration de Socket.io avec CORS
+    const io = socketIo(server, {
+        cors: {
+            origin: '*',
+            methods: ['GET', 'POST'],
+            allowedHeaders: ['my-custom-header'],
+            credentials: true
+        },
+        transports: ['websocket'] // Utiliser le transport WebSocket
     });
 
+    // Activer CORS pour toutes les requêtes
+    app.use(cors());
 
+    // Appel du fichier qui gère les sockets
+    socketHandler(io);
 
+    // Route d'accueil
+    app.get('/', (req, res) => {
+        res.json("Bienvenue dans le serveur");
+    });
 
+    // Démarrer le serveur
+    const PORT = 5000;
+    server.listen(PORT, () => {
+        console.log(`Server is listening on port ${PORT}`);
+    });
 
+    return server;
+}
 
-});
-
-app.get('/', (req, res) => {
-    res.json("Bienvenue dans le serveur");
-});
-
-server.listen(5000, () => {
-    console.log('Server is listening on port 5000');
-});
-
+module.exports ={ createServer } ;

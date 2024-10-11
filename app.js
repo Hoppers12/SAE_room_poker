@@ -70,3 +70,40 @@ const port = 3000;
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
+
+
+// FICHIER DE CREATION DU SERVEUR
+
+const express2 = require('express');
+const cors2 = require('cors'); // Import CORS
+const http = require('http');
+const socketIo = require('socket.io');
+const Player = require('./classesJeu/Player');
+
+
+const app2 = express();
+const server = http.createServer(app2);
+
+
+const io = socketIo(server, {
+  cors: {
+    origin: '*', // Allow all origins
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['my-custom-header'],
+    credentials: true
+  },
+  transports: ['websocket'] // Use WebSocket transport
+});
+
+
+// Enable CORS for all requests
+app.use(cors());
+
+//Appel du fichier qui gère les sockets
+const socketHandler
+    = require('./socketHandler');
+socketHandler(io);
+
+//Creation du serveur qui permettra de gérer les sockets (port 5000)
+const { createServer } = require('./server');
+createServer();
