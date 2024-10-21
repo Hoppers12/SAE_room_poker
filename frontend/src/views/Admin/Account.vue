@@ -16,6 +16,7 @@
           <th>Téléphone</th>
           <th>Email</th>
           <th>Rôle (Admin)</th>
+          <th>Argent</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -54,6 +55,9 @@
           </td>
           <td>
             <input type="checkbox" v-model="user.isAdmin" />
+          </td>
+          <td>
+            <input type="text" v-model="user.money" />
           </td>
           <td>
             <button @click="updateUser(user)">Sauvegarder</button>

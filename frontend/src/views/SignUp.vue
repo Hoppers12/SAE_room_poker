@@ -14,6 +14,7 @@
           <input v-model="telephone" @blur="validateTelephone" placeholder="Numéro de téléphone" required/>
           <span v-if="telephoneError" class="error-message">{{ telephoneError }}</span>
           <input v-model="pseudo" placeholder="Pseudonyme" required/>
+          <span v-if="pseudoError" class="error-message">{{ pseudoError }}</span>
           <input v-model="email" placeholder="Email" required/>
           <input type="password" v-model="password" placeholder="Mot de passe" required/>
         </div>
@@ -45,6 +46,7 @@ export default {
       email:'',
       password:'',
       telephoneError:'',
+      pseudoError:'',
     };
   },
   methods: {
@@ -79,6 +81,7 @@ export default {
           this.$router.push('/LogIn');
         } catch (error) {
           console.error('Erreur lors de la création de l’utilisateur:', error);
+          this.pseudoError = "Pseudo ou email déjà pris"
         }
       } else {
         console.error('Il y a des erreurs dans le formulaire.');
