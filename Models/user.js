@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema({
   pseudo: { type: String},
   email: { type: String,unique: true },
   password: { type: String},
+  money:{ type: Number, default:1000},
   isAdmin: { type: Boolean, default: false },
 });
 

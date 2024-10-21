@@ -1,10 +1,10 @@
 <template>
-  <div class="content">
-    <div class="text">
+  <div :class="{'content': true, 'logged-in': isLoggedIn, 'not-logged-in': !isLoggedIn} ">
+    <div class="text" v-if="!isLoggedIn">
       <p>Rejoignez notre site dès maintenant !</p>
       <p>Jouez au Poker et faites des paris sportifs</p>
     </div>
-    <div class="buttons">
+    <div class="buttons" v-if="!isLoggedIn">
       <div class="login">
         <p>Pas de compte ?<br><router-link to="/SignUp" class="" style="color: white">S'inscrire</router-link></p>
       </div>
@@ -12,12 +12,25 @@
         <p>Déjà un compte ?<br><router-link to="/LogIn" class="" style="color: white">Se connecter</router-link></p>
       </div>
     </div>
+
   </div>
 </template>
 
 <script >
+
+
 export default {
   name: 'HomePage',
+  data(){
+    return {
+      isLoggedIn: false,
+      user:[],
+    };
+  },
+  mounted() {
+    this.isLoggedIn = localStorage.getItem('isLoggedIn');
+
+  }
 }
 
 </script>
@@ -32,9 +45,7 @@ html, body {
 }
 
 .content {
-  background-image: url(../img/background.png);
-  background-repeat: no-repeat;
-  background-size: 100vw, 100vh;
+
   width: 100vw;
   height: 89.8vh;
   display: flex;
@@ -42,6 +53,18 @@ html, body {
   justify-content: space-between;
   align-items: center;
 }
+.logged-in{
+  background-image: url(../img/tablePoker.jpg);
+  background-repeat: no-repeat;
+  background-size: 100vw, 100vh;
+}
+
+.not-logged-in{
+  background-image: url(../img/background.png);
+  background-repeat: no-repeat;
+  background-size: 100vw, 100vh;
+}
+
 .text{
   display: flex;
   align-content: center;

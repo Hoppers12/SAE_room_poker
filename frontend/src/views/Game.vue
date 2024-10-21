@@ -49,6 +49,7 @@ export default {
   },
   methods: {
     send() {
+
       const pseudo = document.getElementById('pseudo_joueur').value;
       this.socket.emit('joinGame', pseudo);
     }
@@ -100,8 +101,8 @@ export default {
     this.socket.on('listeJoueursPartie', print_user_list);
 
     function drawPokerTable() {
-      ctx.fillStyle = "#006400"; // Couleur verte de la table
-      ctx.strokeStyle = "#000"; // Contour noir
+      ctx.fillStyle = "#006400";
+      ctx.strokeStyle = "#000";
       ctx.lineWidth = 10;
 
       ctx.beginPath();
@@ -113,7 +114,8 @@ export default {
     function draw() {
       drawPokerTable();
     }
-
+    const test = localStorage.getItem('id');
+    console.log(test);
     draw();
   }
 };
