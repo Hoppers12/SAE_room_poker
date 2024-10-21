@@ -23,8 +23,8 @@
         </div>
 
         <div class="mb-3">
-          <input id="pseudo_joueur" type="text" class="form-control bg-dark text-white border-light" placeholder="Votre pseudo" />
           <button @click="send" class="btn btn-primary mt-2 w-100">Rejoindre la partie</button>
+          <p v-if="errorMessage" class="error">{{errorMessage}}</p>
         </div>
 
         <div>
@@ -39,18 +39,33 @@
 <script>
 import { io } from "socket.io-client";
 
+import axios from "../axios"
 export default {
   name: 'GamePlay',
   data() {
     return {
       notification: '',
-      socket: null
+      socket: null,
+      user:[],
+      errorMessage : ''
     };
   },
   methods: {
-    send() {
-      const pseudo = document.getElementById('pseudo_joueur').value;
-      this.socket.emit('joinGame', pseudo);
+    async send() {
+      // L'utilisateur est connecté
+      try {
+        const id = localStorage.getItem('id')
+        const userData = await axios.get(`/api/users/${id}`)
+        this.user = userData.data
+        this.socket.emit('joinGame', this.user.pseudo);
+
+      }
+      //L'utilisateur n'est pas connecté
+      catch (e)
+      {
+        this.errorMessage = "Vous devez être connecté pour rejoindre"
+      }
+
     }
   },
   mounted() {
@@ -152,6 +167,10 @@ canvas {
 
 .bg-secondary {
   background-color: #6c757d !important;
+}
+
+.error {
+  color:red;
 }
 </style>
 

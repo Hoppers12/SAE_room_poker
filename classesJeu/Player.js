@@ -1,14 +1,20 @@
-const {Error} = require("mongoose");
+const Card = require('./Card');
 
 class Player {
+    static nextId = 1; // Compteur statique pour générer des ID unique
     constructor(name, chips) {
+        this.id = Player.nextId++; // Assigner un ID unique à chaque nouveau joueur crée
         this.chips = chips; // Jetons du joueur
         this.hand = []; // Cartes du joueur
         this.currentBet = 0; // Mise courante du joueur
         this.folded = false;
-        this.name = name; // Statut du joueur (s'est couché ou non)
+        this.name = name;
     }
 
+
+    get getId() {
+        return this.id ;
+    }
 
     get getName() {
         return this.name;
