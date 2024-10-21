@@ -2,6 +2,7 @@ const Player = require('./classesJeu/Player');
 const PokerGame = require('./classesJeu/PokerGame'); // Vérifie cet import
 let players = []; // Tableau contenant tous les joueurs présents
 let game = null;  // Variable pour stocker la partie
+let playerSockets = {}; // Associer chaque socket.id au joueur
 
 function socketHandler(io) {
     io.on('connection', (socket) => {
@@ -20,6 +21,8 @@ function socketHandler(io) {
                         }
 
                         const newPlayer = new Player(pseudo, 1000);
+                        // Associer le socket.id au joueur nouvellement créé
+                        playerSockets[socket.id] = newPlayer;
                         console.log(players.length);
 
                         // Si c'est le premier joueur à rejoindre, on crée une nouvelle partie
@@ -44,12 +47,18 @@ function socketHandler(io) {
 
             // Gestion de la déconnexion des joueurs
             socket.on('disconnect', () => {
-                console.log('A user disconnected');
+                console.log('A user disconnected', socket.id);
 
-                // Supprimer le joueur déconnecté
-                players = players.filter(player => player !== newPlayer);
-                io.emit("quitterJoueur", newPlayer);
+                // Récupérer le joueur associé à ce socket.id
+                const disconnectedPlayer = playerSockets[socket.id];
 
+                // Supprimer le joueur déconnecté du tableau des joueurs
+                players = players.filter(player => player !== disconnectedPlayer);
+                // Enlever le joueur de la correspondance socket-joueur
+                delete playerSockets[socket.id];
+
+                // Informer les autres joueurs qu'un joueur a quitté la partie
+                io.emit("quitterJoueur", disconnectedPlayer);
                 // Mettre à jour la liste des joueurs dans le jeu
                 game.setPlayers(players);
 
