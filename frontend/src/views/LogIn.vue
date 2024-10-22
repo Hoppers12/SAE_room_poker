@@ -1,4 +1,5 @@
 <template>
+  <div class="content">
   <div class="login-container">
     <div class="form-container">
       <h1>Connexion</h1>
@@ -9,6 +10,7 @@
       <button class="btn" @click="loginUser">Se connecter</button>
       <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
     </div>
+  </div>
   </div>
 </template>
 
@@ -60,10 +62,22 @@ export default {
 </script>
 
 <style scoped>
+
+.content {
+  background-image: url(http://localhost:8000/img/background.ac4b49cc.png);
+  background-repeat: no-repeat;
+  background-color: black;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+
 .login-container {
-  max-width: 400px;
-  margin: 100px auto;
-  background-color: #f7f8fc;
+  width: 400px;
+  background-color: #ffd9ba;
   border-radius: 12px;
   padding: 40px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
@@ -92,14 +106,14 @@ export default {
 }
 
 .input-group input:focus {
-  border-color: #4cc8ed;
+  border-color: #fa1515;
   outline: none;
 }
 
 .btn {
   width: 100%;
   padding: 12px 0;
-  background-color: #4cc8ed;
+  background-color: #ef2128;
   color: white;
   border: none;
   border-radius: 8px;
@@ -110,7 +124,7 @@ export default {
 }
 
 .btn:hover {
-  background-color: #0de8ff;
+  background-color: #ff3b3b;
 }
 
 .error {

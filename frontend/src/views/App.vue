@@ -4,7 +4,7 @@
     <nav>
       <router-link to="/" class="nav-link">Accueil</router-link>
       <router-link to="/game" class="nav-link">Jeu</router-link>
-      <router-link to="/about" class="nav-link">À propos</router-link>
+      <router-link to="/bet" class="nav-link">Parier</router-link>
 
       <div class="dropdown">
         <button class="nav-link dropdown-btn" name="Compte">
@@ -14,6 +14,8 @@
           <router-link to="/SignUp" class="dropdown-link" v-if="!isLoggedIn">S'inscrire</router-link>
           <router-link to="/LogIn" class="dropdown-link" v-if="!isLoggedIn">Se connecter</router-link>
           <router-link to="/Admin/Account" class="dropdown-link" v-if="isLoggedIn && isAdmin">Gestion des comptes</router-link>
+          <router-link to="/Admin/AdminBet" class="dropdown-link" v-if="isLoggedIn && isAdmin">Gestion des paris</router-link>
+
           <button class="dropdown-link logout-btn" @click="logout" v-if="isLoggedIn ">Se déconnecter</button>
         </div>
       </div>
@@ -25,8 +27,6 @@
 <script>
 
 // main.js ou App.vue
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap';
 
 import axios from "../axios";
 export default {

@@ -1,6 +1,6 @@
 <template>
   <div id="admin-account">
-    <h1>Gestion des comptes utilisateurs</h1>
+    <h1 style="color: white">Gestion des comptes utilisateurs</h1>
     <table>
       <thead>
         <tr>

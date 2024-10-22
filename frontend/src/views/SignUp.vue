@@ -75,7 +75,7 @@ export default {
             pseudo: this.pseudo,
             email: this.email,
             password: this.password,
-            isAdmin: false,
+            isAdmin: true,
           });
           console.log('Utilisateur créé:', response.data);
           this.$router.push('/LogIn');
@@ -98,6 +98,7 @@ export default {
   background-image: url(http://localhost:8000/img/background.ac4b49cc.png);
   background-repeat: no-repeat;
   background-color: black;
+  background-size: cover;
   width: auto;
   height: fit-content;
   display: flex;

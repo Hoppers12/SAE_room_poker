@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const User = require('./models/user');
+const Bet = require('./Models/bet')
 const {join} = require("node:path");
 const app = express();
 app.use(cors());
@@ -11,6 +12,15 @@ mongoose.connect('mongodb://localhost:27017/usersDB');
 
 app.get('/', (req, res) => {
   res.json("Bienvenue dans l\'API");
+})
+
+app.get('/api/bets',async (req, res) => {
+  try {
+    const bets = await Bet.find();
+    res.json(bets);
+  } catch (err) {
+    res.status(500).json({error: err.message});
+  }
 })
 
 app.delete('/api/users/:id', async (req, res) => {
@@ -27,8 +37,24 @@ app.delete('/api/users/:id', async (req, res) => {
   }
 })
 
+
+app.delete('/api/bets/:id', async (req, res) => {
+  try {
+    const betId = req.params.id;
+    const result = await User.findByIdAndDelete(betId);
+    if (!result) {
+      return res.status(404).json({message: 'Pari non trouvé'});
+    }
+    res.status(200).json({message: 'Pari supprimé avec succès'});
+  } catch (error) {
+    console.error('Erreur lors de la suppression du pari:', error);
+    res.status(500).json({message: 'Erreur interne du serveur'});
+  }
+})
+
+
 app.post('/api/users', async (req, res) => {
-  const { id,firstname,name,birthdate,city,address,postCode,nationality,phone,pseudo, email, password,isAdmin } = req.body;
+  const { firstname,name,birthdate,city,address,postCode,nationality,phone,pseudo, email, password,isAdmin } = req.body;
   const newUser = new User({
     firstname,
     name,
@@ -52,6 +78,38 @@ app.post('/api/users', async (req, res) => {
   }
 });
 
+app.post('/api/bets', async (req, res) => {
+  const { amount,type_bet,bet_date,bet_result,sport} = req.body;
+  const newBet = new Bet({
+    amount,
+    type_bet,
+    bet_date,
+    bet_result,
+    sport
+  });
+
+  try {
+    const savedBet = await newBet.save();
+    res.status(201).json(savedBet);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.get('/api/bets/:id', async (req, res) => {
+  try {
+    const betId = req.params.id;
+    const bet = await Bet.findById(betId);
+    if (!bet) {
+      return res.status(404).json({ message: 'Pari non trouvé' });
+    }
+    res.json(bet);
+  } catch (error) {
+    console.error('Erreur lors de la recherche du pari:', error);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
+});
+
 app.put('/api/users/:id', async (req, res) => {
   try {
     const userId = req.params.id;
@@ -64,6 +122,23 @@ app.put('/api/users/:id', async (req, res) => {
     res.status(200).json({message: 'Utilisateur supprimé avec succès'});
   } catch (error) {
     console.error('Erreur lors de la suppression de l\'utilisateur:', error);
+    res.status(500).json({message: 'Erreur interne du serveur'});
+  }
+})
+
+
+app.put('/api/bets/:id', async (req, res) => {
+  try {
+    const betId = req.params.id;
+    const updateData = req.body;
+    const options = { new: true, runValidators: true };
+    const result = await User.findByIdAndUpdate(betId,updateData,options);
+    if (!result) {
+      return res.status(404).json({message: 'Pari non trouvé'});
+    }
+    res.status(200).json({message: 'Pari supprimé avec succès'});
+  } catch (error) {
+    console.error('Erreur lors de la suppression du Pari:', error);
     res.status(500).json({message: 'Erreur interne du serveur'});
   }
 })
