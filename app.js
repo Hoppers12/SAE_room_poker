@@ -5,8 +5,11 @@ const User = require('./models/user');
 const Bet = require('./Models/bet')
 const {join} = require("node:path");
 const app = express();
+
 app.use(cors());
 app.use(express.json());
+
+
 
 mongoose.connect('mongodb://localhost:27017/usersDB');
 
@@ -203,8 +206,9 @@ const io = socketIo(server, {
 
 app.use(cors());
 
-const socketHandler
+const {socketHandler,getPlayers}
     = require('./socketHandler');
+
 socketHandler(io);
 
 const { createServer } = require('./server');
