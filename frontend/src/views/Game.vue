@@ -70,13 +70,14 @@ export default {
     }
   },
   mounted() {
+    const {getPlayers} = require('../../../socketHandler');
     const canvas = document.getElementById('pokerTable');
     const ctx = canvas.getContext('2d');
 
-    this.socket = io('http://localhost:5000', {
+    this.socket = io('http:/' +
+        '/localhost:5000', {
       transports: ['websocket'],
     });
-
     this.socket.on('connect', function() {
       console.log('Connexion réussie au serveur WebSocket');
     });
@@ -124,16 +125,39 @@ export default {
       ctx.ellipse(canvas.width / 2, canvas.height / 2, 350, 200, 0, 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
+
     }
 
     function draw() {
       drawPokerTable();
+
+      var players = getPlayers() ;
+      // Dessiner les joueurs autour de la table
+      players.forEach(player => {
+        drawPlayer(player);
+      });
     }
+
+    function drawPlayer(player) {
+      ctx.beginPath();
+      ctx.arc(player.x, player.y, 30, 0, Math.PI * 2);  // Dessiner un cercle pour représenter un joueur
+      ctx.fillText(player.name, player.x - 15, player.y + 5);  // Nom du joueur
+      ctx.stroke();
+    }
+
+
     const test = localStorage.getItem('id');
     console.log(test);
     draw();
+
+    module.exports = {
+      draw
+    };
+
   }
 };
+
+
 </script>
 
 <style scoped>
