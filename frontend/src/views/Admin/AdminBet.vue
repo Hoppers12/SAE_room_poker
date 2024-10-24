@@ -1,8 +1,6 @@
 <template>
   <div id="admin-bets">
     <h1 style="color: white">Gestion des Paris Sportifs</h1>
-
-    <!-- Formulaire pour ajouter un nouveau pari -->
     <div id="add-bet-form">
       <h3>Ajouter un nouveau pari</h3>
       <form @submit.prevent="addNewBet">
@@ -87,7 +85,7 @@ export default {
         alert(`Le pari ${bet._id} a été mis à jour avec succès!`);
       } catch (error) {
         console.error("Error updating bet:", error);
-        alert(`Erreur lors de la mise à jour du pari ${bet._id}.`);
+        alert(`Erreur lors de la mise à jour du pari ${bet._id}`);
       }
     },
     async deleteBet(betId) {
