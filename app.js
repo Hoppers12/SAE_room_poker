@@ -44,7 +44,7 @@ app.delete('/api/users/:id', async (req, res) => {
 app.delete('/api/bets/:id', async (req, res) => {
   try {
     const betId = req.params.id;
-    const result = await User.findByIdAndDelete(betId);
+    const result = await Bet.findByIdAndDelete(betId);
     if (!result) {
       return res.status(404).json({message: 'Pari non trouvé'});
     }
@@ -82,10 +82,10 @@ app.post('/api/users', async (req, res) => {
 });
 
 app.post('/api/bets', async (req, res) => {
-  const { amount,type_bet,bet_date,bet_result,sport} = req.body;
+  const { amount,bet_type,bet_date,bet_result,sport} = req.body;
   const newBet = new Bet({
     amount,
-    type_bet,
+    bet_type,
     bet_date,
     bet_result,
     sport
@@ -135,7 +135,7 @@ app.put('/api/bets/:id', async (req, res) => {
     const betId = req.params.id;
     const updateData = req.body;
     const options = { new: true, runValidators: true };
-    const result = await User.findByIdAndUpdate(betId,updateData,options);
+    const result = await Bet.findByIdAndUpdate(betId,updateData,options);
     if (!result) {
       return res.status(404).json({message: 'Pari non trouvé'});
     }
