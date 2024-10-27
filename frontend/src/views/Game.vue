@@ -73,6 +73,7 @@ export default {
       console.log(player);
       ctx.arc(x, y, 30, 0, Math.PI * 2);
       ctx.fillText(player.name, x - 15, y + 5);
+      ctx.fillText(player.chips + ' jetons', x - 25, y + 50);
       ctx.stroke();
 
     },
