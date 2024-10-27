@@ -13,6 +13,10 @@ function gestionPartie(newPlayer,io)
     {
         players.push(newPlayer);
         game = new PokerGame(players); // Initialiser la partie
+        game.setPlayers(players); // Mettre à jour la liste des joueurs
+        var NbPlayer = getNbPlayers();
+        // Envoi d'un message à tous les clients pour informer de l'arrivée d'un nouveau joueur
+        io.emit("recevoirJoueur", newPlayer,NbPlayer);
     }
     else
     {
@@ -25,9 +29,10 @@ function ajoutNouveauJoueurDansPartie(newPlayer,io)
 {
     players.push(newPlayer);
     game.setPlayers(players); // Mettre à jour la liste des joueurs
+    var NbPlayer = getNbPlayers();
 
     // Envoi d'un message à tous les clients pour informer de l'arrivée d'un nouveau joueur
-    io.emit("recevoirJoueur", newPlayer);
+    io.emit("recevoirJoueur", newPlayer,NbPlayer);
 }
 
 
@@ -98,6 +103,9 @@ function getPlayers() {
     return players;
 }
 
+function getNbPlayers() {
+    return players.length;
+}
 
 module.exports = {
     socketHandler,
