@@ -75,6 +75,8 @@ function ajoutNouveauJoueurDansPartie(newPlayer,io)
     io.emit("recevoirJoueur", newPlayer,players);
 }
 
+
+//Permet de donner de nouvelle coordonnées directement en fonction d'une taille et pas d'un tableau
 function findCoord2(taille) {
     let x, y;
 
@@ -160,9 +162,10 @@ function socketHandler(io) {
                 delete playerSockets[socket.id];
 
 
+                //A chaque fois qu'un joueur se deconnecte, on rééorganise la table en fonction du nb de joueurs restant
                 players.forEach((player,index) => {
                     const [x,y]= findCoord2(index)
-
+                    //On donne des nouvelles coordonnées au joueur
                     player.setX = x;
                     player.setY = y ;
                 });
