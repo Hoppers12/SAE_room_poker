@@ -69,7 +69,6 @@ export default {
     },
     drawPlayer(ctx, player,x=0, y=0) {
       ctx.beginPath();
-      console.log("CC JE SUIS LA ");
       console.log(player);
       ctx.arc(x, y, 30, 0, Math.PI * 2);
       ctx.fillText(player.name, x - 15, y + 5);
@@ -89,6 +88,23 @@ export default {
 
       this.drawPokerTable(ctx, canvas);
 
+    },
+    cleanPlayers(ctx,players) {
+      // Efface tout le contenu du canevas
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+      // Redessine la table
+      this.drawPokerTable(ctx, ctx.canvas);
+
+      console.log('ICI : ',players);
+      if (players.length>0) {
+        // Redessine tous les joueurs sauf celui à effacer
+        players.forEach((player) => {
+
+          this.drawPlayer(ctx, player, player.x, player.y);
+        });
+      }
+
     }
   },
   mounted() {
@@ -98,7 +114,7 @@ export default {
     this.socket.on('connect_error', (err) => console.error('Connection failed:', err));
 
     //Socket qui gère l'ajout d'un nouveau joueur
-    this.socket.on('recevoirJoueur', (player,NbPlayer) =>
+    this.socket.on('recevoirJoueur', (player,players) =>
     {
       const canvas = document.getElementById('pokerTable');
       const ctx = canvas.getContext('2d');
@@ -109,48 +125,20 @@ export default {
       li.innerText = `${player.name} a rejoint la partie avec ${player.chips} jeton(s)`;
       document.getElementById('chat_connexion').appendChild(li);
 
-      var x;
-      var y;
-      // On met les coordonnées des joueurs en fonction du nb de joueurs dans la partie
-      switch(NbPlayer){
-        case 1 :
-          x = 100
-          y = 100
-          break;
-        case 2 :
-          x = 400
-          y = 35
-          break;
-        case 3:
-          x = 700
-          y = 100
-          break;
-        case 4:
-          x = 100
-          y = 500
-          break;
-        case 5:
-          x = 400
-          y = 560
-          break;
-        case 6:
-          x = 700
-          y = 500
-          break;
-        default :
-          console.log("nb joueurs non valide")
-      }
+      this.cleanPlayers(ctx,players) ;
 
-      console.log(x,y)
-      //On dessine le nouveau joueur dans le canva
-      this.drawPlayer(ctx,player,x,y);
+
     });
 
-    this.socket.on('quitterJoueur', (player) => {
+    this.socket.on('quitterJoueur', (player,players) => {
       const li = document.createElement('li');
       li.className = 'list-group-item bg-danger text-white';
       li.innerText = `${player.name} a quitté la partie. Il emporte avec lui ${player.chips} jeton(s)`;
       document.getElementById('chat_connexion').appendChild(li);
+
+      const canvas = document.getElementById('pokerTable');
+      const ctx = canvas.getContext('2d');
+      this.cleanPlayers(ctx,players) ;
     });
 
     this.socket.on('listeJoueursPartie', (user_list) => {

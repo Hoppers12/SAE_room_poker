@@ -1,16 +1,27 @@
 const Card = require('./Card');
 
+
 class Player {
     static nextId = 1; // Compteur statique pour générer des ID unique
-    constructor(name, chips) {
+    constructor(name, chips,p_x,p_y) {
         this.id = Player.nextId++; // Assigner un ID unique à chaque nouveau joueur crée
         this.chips = chips; // Jetons du joueur
         this.hand = []; // Cartes du joueur
         this.currentBet = 0; // Mise courante du joueur
         this.folded = false;
         this.name = name;
+        this.x = p_x ;
+        this.y = p_y ;
+
     }
 
+    set setX(value_x) {
+        this.x = value_x ;
+    }
+
+    set setY(value_y) {
+        this.y = value_y;
+    }
 
     get getId() {
         return this.id ;
