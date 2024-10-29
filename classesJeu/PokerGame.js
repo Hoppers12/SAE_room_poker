@@ -13,6 +13,11 @@ class PokerGame {
         this.players = players;  // Liste des joueurs
     }
 
+    //Fonction qui s'occupe de changer les position des joueurs en décalant vers la gauche (le LJ devient BTN etc ...)
+    changeBlind() {
+
+    }
+
     // Getter pour récupérer la liste des joueurs
     getPlayers() {
         return this.players;

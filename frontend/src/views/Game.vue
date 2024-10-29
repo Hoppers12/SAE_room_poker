@@ -71,10 +71,30 @@ export default {
       ctx.beginPath();
       console.log(player);
       ctx.arc(x, y, 30, 0, Math.PI * 2);
+      ctx.fillText(this.givePosition(player.p_reelle), x - 15, y - 5);
       ctx.fillText(player.name, x - 15, y + 5);
       ctx.fillText(player.chips + ' jetons', x - 25, y + 50);
       ctx.stroke();
 
+    },
+    // Traduit l'indice de la position en son nom réel (0 = BTN, etc ...)
+    givePosition(indexPosition) {
+      switch (indexPosition) {
+        case 0:
+          return 'BTN'
+        case 1:
+          return 'SB'
+        case 2 :
+          return 'BB'
+        case 3 :
+          return 'HJ'
+        case 4 :
+          return 'LJ'
+        case 5:
+          return 'CO'
+        default :
+          return 'Inconnue'
+      }
     },
     //Methode qui retourne la liste de tous les joueurs actuellement dans la partie
     getPlayers()

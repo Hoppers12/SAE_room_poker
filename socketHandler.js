@@ -17,10 +17,12 @@ function gestionPartie(newPlayer,io)
         var NbPlayer = getNbPlayers();
         // Envoi d'un message à tous les clients pour informer de l'arrivée d'un nouveau joueur
         io.emit("recevoirJoueur", newPlayer,players);
+
     }
     else
     {
         ajoutNouveauJoueurDansPartie(newPlayer,io)
+
     }
 }
 
@@ -70,7 +72,7 @@ function ajoutNouveauJoueurDansPartie(newPlayer,io)
     players.push(newPlayer);
     game.setPlayers(players); // Mettre à jour la liste des joueurs
     var NbPlayer = getNbPlayers();
-
+    console.log("GAME : ", game);
     // Envoi d'un message à tous les clients pour informer de l'arrivée d'un nouveau joueur
     io.emit("recevoirJoueur", newPlayer,players);
 }
@@ -113,6 +115,15 @@ function findCoord2(taille) {
     return [x, y]; // Return x and y as an array
 }
 
+//Retourne l'indice de la position du joueur dans la partie (0 = BTN, 1 = SB, 2 = BB, 3 = HJ, 4 = LJ, 5 = CO)
+function findPositionReelle(nbJoueurs)
+{
+
+    // Le nouveau joueur rentre le plus à droite possible donc équivalent au nb de joueurs déjà présent
+    return nbJoueurs ;
+
+}
+
 function socketHandler(io) {
     io.on('connection', (socket) => {
         console.log('A user connected', socket.id);
@@ -131,7 +142,12 @@ function socketHandler(io) {
                         }
                         // On va chercher les coordonnées de là où sera placé le joueur en fonction du nb joueurs restant
                         const [x,y] = findCoord(players);
-                        const newPlayer = new Player(pseudo, 1000,x,y);
+
+                        // Retourne la position réelle que va occuper le joueur rentrant lors de son 1er tour de table
+                        // (0 = BTN, 1 = SB, 2 = BB, 3 = HJ, 4 = LJ, 5 = CO)
+                        const p_reelle = findPositionReelle(players.length)
+
+                        const newPlayer = new Player(pseudo, 1000,x,y,p_reelle);
 
                         // Associer le socket.id au joueur nouvellement créé
                         playerSockets[socket.id] = newPlayer;
@@ -168,6 +184,7 @@ function socketHandler(io) {
                     //On donne des nouvelles coordonnées au joueur
                     player.setX = x;
                     player.setY = y ;
+                    player.setPositionReelle = findPositionReelle(index)
                 });
 
                 // Informer les autres joueurs qu'un joueur a quitté la partie
