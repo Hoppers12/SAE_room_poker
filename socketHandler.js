@@ -16,7 +16,7 @@ function gestionPartie(newPlayer,io)
         game.setPlayers(players); // Mettre à jour la liste des joueurs
         var NbPlayer = getNbPlayers();
         // Envoi d'un message à tous les clients pour informer de l'arrivée d'un nouveau joueur
-        io.emit("recevoirJoueur", newPlayer,players);
+        io.emit("recevoirJoueur", newPlayer,players,game.pot);
 
     }
     else
@@ -188,7 +188,7 @@ function socketHandler(io) {
                 });
 
                 // Informer les autres joueurs qu'un joueur a quitté la partie
-                io.emit("quitterJoueur", disconnectedPlayer,players);
+                io.emit("quitterJoueur", disconnectedPlayer,players,game.pot);
                 console.log(players);
                 // Mettre à jour la liste des joueurs dans le jeu
                 game.setPlayers(players);

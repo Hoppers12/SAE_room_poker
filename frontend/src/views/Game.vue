@@ -77,7 +77,7 @@ export default {
     this.socket.on('connect_error', (err) => console.error('Connection failed:', err));
 
     //Socket qui gère l'ajout d'un nouveau joueur
-    this.socket.on('recevoirJoueur', (player,players) =>
+    this.socket.on('recevoirJoueur', (player,players,pot) =>
     {
       const canvas = document.getElementById('pokerTable');
       const ctx = canvas.getContext('2d');
@@ -88,7 +88,7 @@ export default {
       li.innerText = `${player.name} a rejoint la partie avec ${player.chips} jeton(s)`;
       document.getElementById('chat_connexion').appendChild(li);
 
-      this.$refs.pokerTableRef.cleanPlayers(ctx,players) ;
+      this.$refs.pokerTableRef.cleanPlayersOverride(ctx,players,pot) ;
 
 
     });
@@ -108,7 +108,7 @@ export default {
 
     })
 
-    this.socket.on('quitterJoueur', (player,players) => {
+    this.socket.on('quitterJoueur', (player,players,pot) => {
       const li = document.createElement('li');
       li.className = 'list-group-item bg-danger text-white';
       li.innerText = `${player.name} a quitté la partie. Il emporte avec lui ${player.chips} jeton(s)`;
@@ -116,7 +116,7 @@ export default {
 
       const canvas = document.getElementById('pokerTable');
       const ctx = canvas.getContext('2d');
-      this.$refs.pokerTableRef.cleanPlayers(ctx,players) ;
+      this.$refs.pokerTableRef.cleanPlayersOverride(ctx,players,pot) ;
     });
 
     this.socket.on('listeJoueursPartie', (user_list) => {

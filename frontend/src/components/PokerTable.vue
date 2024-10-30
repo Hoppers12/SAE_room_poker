@@ -38,6 +38,9 @@ export default {
 
       // Sauvegarde du contexte avant d'appliquer des styles spécifiques au texte du pot
       ctx.save();
+      if (pot === undefined) {
+        pot = 0;
+      }
 
       // Style et position du texte du pot
       ctx.fillStyle = "#000";        // Couleur du texte en noir
@@ -84,25 +87,6 @@ export default {
         const y = canvas.height / 2 + Math.sin(angle) * 150;
         this.drawPlayer(ctx, player, x, y);
       });
-    },
-
-    //Efface les canvas et redessine tout lorsqu'un joueur quitte la partie
-    cleanPlayers(ctx,players) {
-      // Efface tout le contenu du canevas
-      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-
-      // Redessine la table
-      this.drawPokerTable(ctx, ctx.canvas,0);
-
-      console.log('ICI : ',players);
-      if (players.length>0) {
-        // Redessine tous les joueurs sauf celui à effacer
-        players.forEach((player) => {
-
-          this.drawPlayer(ctx, player, player.x, player.y);
-        });
-      }
-
     },
     //Efface les canvas et redessine tout lorsqu'un joueur quitte la partie
     cleanPlayersOverride(ctx,players,pot) {
