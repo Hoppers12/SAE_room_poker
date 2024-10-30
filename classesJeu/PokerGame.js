@@ -14,8 +14,20 @@ class PokerGame {
     }
 
     //Fonction qui s'occupe de changer les position des joueurs en décalant vers la gauche (le LJ devient BTN etc ...)
-    changeBlind() {
+    changeBlind(players) {
+        players.forEach((player) => {
+            var nbPlayers = player.length
 
+            // Si la position du joueur +1 est égal au nb de joueurs alors on revient à 0 (ce joueur devient le BTN donc)
+            switch (player.p_reelle) {
+                case (player.p_reelle + 1 === nbPlayers) :
+                    player.p_reelle = 0
+                    break;
+                default :
+                    player.p_reelle ++
+            }
+
+        })
     }
 
     // Getter pour récupérer la liste des joueurs

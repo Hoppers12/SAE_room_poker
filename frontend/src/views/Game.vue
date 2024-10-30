@@ -5,13 +5,8 @@
       </div>
     </div>
     <div class="row mt-4">
-      <div class="col-md-8 d-flex justify-content-center">
-        <div class="bloc_canva position-relative">
-          <canvas id="pokerTable" width="800" height="600" class="border border-light rounded"></canvas>
-          <div class="position-absolute top-50 start-50 translate-middle text-white fw-bold" v-if="notification">
-            {{ notification }}
-          </div>
-        </div>
+      <PokerTable ref="pokerTableRef" :players="players" :notification="notification"/>
+        <button class="w-25 h-10">SUIVANT</button>
       </div>
       <div class="col-md-4">
         <div class="mb-3">
@@ -28,21 +23,26 @@
         </div>
       </div>
     </div>
-  </div>
 </template>
 
 <script>
 import { io } from "socket.io-client";
 import axios from "../axios";
+//Composant qui gère tout ce qui est en rapport avec la table de jeu
+import PokerTable from "../components/PokerTable.vue"
 
 export default {
   name: 'GamePlay',
+  components : {
+    PokerTable
+  },
   data() {
     return {
       notification: '',
       socket: null,
       user: [],
-      errorMessage: ''
+      errorMessage: '',
+      players:[]
     };
   },
   methods: {
@@ -56,75 +56,13 @@ export default {
         this.errorMessage = "Vous devez être connecté pour rejoindre";
       }
 
-      this.startDrawing();
-    },
-    drawPokerTable(ctx, canvas) {
-      ctx.fillStyle = "#006400";
-      ctx.strokeStyle = "#000";
-      ctx.lineWidth = 10;
-      ctx.beginPath();
-      ctx.ellipse(canvas.width / 2, canvas.height / 2, 350, 200, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
-    },
-    drawPlayer(ctx, player,x=0, y=0) {
-      ctx.beginPath();
-      console.log(player);
-      ctx.arc(x, y, 30, 0, Math.PI * 2);
-      ctx.fillText(this.givePosition(player.p_reelle), x - 15, y - 5);
-      ctx.fillText(player.name, x - 15, y + 5);
-      ctx.fillText(player.chips + ' jetons', x - 25, y + 50);
-      ctx.stroke();
-
-    },
-    // Traduit l'indice de la position en son nom réel (0 = BTN, etc ...)
-    givePosition(indexPosition) {
-      switch (indexPosition) {
-        case 0:
-          return 'BTN'
-        case 1:
-          return 'SB'
-        case 2 :
-          return 'BB'
-        case 3 :
-          return 'HJ'
-        case 4 :
-          return 'LJ'
-        case 5:
-          return 'CO'
-        default :
-          return 'Inconnue'
-      }
+      //Appelle la méthode renderTable qui est dans le composant pokerTableRef
+      this.$refs.pokerTableRef.renderTable();
     },
     //Methode qui retourne la liste de tous les joueurs actuellement dans la partie
     getPlayers()
     {
       return this.getPlayers()
-    },
-    startDrawing()
-    {
-      const canvas = document.getElementById('pokerTable');
-      const ctx = canvas.getContext('2d');
-
-      this.drawPokerTable(ctx, canvas);
-
-    },
-    cleanPlayers(ctx,players) {
-      // Efface tout le contenu du canevas
-      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-
-      // Redessine la table
-      this.drawPokerTable(ctx, ctx.canvas);
-
-      console.log('ICI : ',players);
-      if (players.length>0) {
-        // Redessine tous les joueurs sauf celui à effacer
-        players.forEach((player) => {
-
-          this.drawPlayer(ctx, player, player.x, player.y);
-        });
-      }
-
     }
   },
   mounted() {
@@ -145,7 +83,7 @@ export default {
       li.innerText = `${player.name} a rejoint la partie avec ${player.chips} jeton(s)`;
       document.getElementById('chat_connexion').appendChild(li);
 
-      this.cleanPlayers(ctx,players) ;
+      this.$refs.pokerTableRef.cleanPlayers(ctx,players) ;
 
 
     });
@@ -158,7 +96,7 @@ export default {
 
       const canvas = document.getElementById('pokerTable');
       const ctx = canvas.getContext('2d');
-      this.cleanPlayers(ctx,players) ;
+      this.$refs.pokerTableRef.cleanPlayers(ctx,players) ;
     });
 
     this.socket.on('listeJoueursPartie', (user_list) => {
@@ -172,7 +110,7 @@ export default {
       });
     });
 
-    this.startDrawing();
+    this.$refs.pokerTableRef.renderTable();
   }
 };
 </script>
