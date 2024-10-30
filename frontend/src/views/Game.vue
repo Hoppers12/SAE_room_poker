@@ -6,7 +6,7 @@
     </div>
     <div class="row mt-4">
       <PokerTable ref="pokerTableRef" :players="players" :notification="notification"/>
-        <button class="w-25 h-10">SUIVANT</button>
+        <button @click="begin" class="w-25 h-10">SUIVANT</button>
       </div>
       <div class="col-md-4">
         <div class="mb-3">
@@ -59,6 +59,11 @@ export default {
       //Appelle la méthode renderTable qui est dans le composant pokerTableRef
       this.$refs.pokerTableRef.renderTable();
     },
+    //Methode qui débute la partie
+    async begin() {
+      this.socket.emit('beginGame')
+
+    },
     //Methode qui retourne la liste de tous les joueurs actuellement dans la partie
     getPlayers()
     {
@@ -87,6 +92,21 @@ export default {
 
 
     });
+
+    //Met à jour l'affichage avec la nouvelle valeur du pot et des stacks
+    this.socket.on("updatePot&Stack",(players,pot)=>
+    {
+      const canvas = document.getElementById('pokerTable');
+      const ctx = canvas.getContext('2d');
+      this.$refs.pokerTableRef.cleanPlayersOverride(ctx,players,pot);
+
+      //On crée la notif lorsque un joueur pose les blindes
+      const li = document.createElement('li');
+      li.className = 'list-group-item bg-info text-white';
+      li.innerText = `Une blinde a été posée, le pot est maintenant de : ${pot}`;
+      document.getElementById('chat_connexion').appendChild(li);
+
+    })
 
     this.socket.on('quitterJoueur', (player,players) => {
       const li = document.createElement('li');

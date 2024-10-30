@@ -53,6 +53,13 @@ class Player {
         this.currentBet += amount;
     }
 
+    putBlind(amount) {
+        if (amount > this.chips) {
+            //Faire tapis
+        }
+        this.chips -= amount ;
+        this.currentBet += amount;
+    }
     // Se coucher (fold)
     fold() {
         this.folded = true;

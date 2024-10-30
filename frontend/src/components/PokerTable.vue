@@ -27,27 +27,40 @@ export default {
   },
   methods: {
     //Dessine la table
-    drawPokerTable(ctx, canvas) {
-      ctx.fillStyle = "#006400";
-      ctx.strokeStyle = "#000";
+    drawPokerTable(ctx, canvas, pot) {
+      ctx.fillStyle = "#006400"; // Couleur de fond de la table
+      ctx.strokeStyle = "#000";   // Couleur du contour
       ctx.lineWidth = 10;
       ctx.beginPath();
       ctx.ellipse(canvas.width / 2, canvas.height / 2, 350, 200, 0, 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
+
+      // Sauvegarde du contexte avant d'appliquer des styles spécifiques au texte du pot
+      ctx.save();
+
+      // Style et position du texte du pot
+      ctx.fillStyle = "#000";        // Couleur du texte en noir
+      ctx.font = "24px Arial";       // Taille et style de la police
+      ctx.textAlign = "center";      // Alignement horizontal centré
+      ctx.textBaseline = "middle";   // Alignement vertical centré
+      ctx.fillText(`Pot : ${pot}`, canvas.width / 2, canvas.height / 2); // Texte centré
+
+      // Restauration du contexte après avoir dessiné le texte du pot
+      ctx.restore();
     },
 
-    //Dessine le joueur sur la table avec son pseudo, sa positio et ses jetons
-    drawPlayer(ctx, player, x, y) {
-      ctx.beginPath();
-      ctx.arc(x, y, 30, 0, Math.PI * 2);
-      ctx.fillStyle = "black";
-      ctx.fillText(this.givePosition(player.p_reelle), x - 15, y - 5);
-      ctx.fillText(player.name, x - 15, y + 5);
-      ctx.fillText(`${player.chips} jetons`, x - 25, y + 50);
-      ctx.stroke();
-    },
-    //Retourne sous forme de chaine de caractère la position du joueur
+      //Dessine le joueur sur la table avec son pseudo, sa position et ses jetons
+      drawPlayer(ctx, player, x, y) {
+        ctx.beginPath();
+        ctx.arc(x, y, 30, 0, Math.PI * 2);
+        ctx.fillStyle = "black";
+        ctx.fillText(this.givePosition(player.p_reelle), x - 15, y - 5);
+        ctx.fillText(player.name, x - 15, y + 5);
+        ctx.fillText(`${player.chips} jetons`, x - 25, y + 50);
+        ctx.stroke();
+      },
+      //Retourne sous forme de chaine de caractère la position du joueur
     givePosition(indexPosition) {
       switch (indexPosition) {
         case 0: return 'BTN';
@@ -63,7 +76,7 @@ export default {
     renderTable() {
       const canvas = document.getElementById('pokerTable');
       const ctx = canvas.getContext('2d');
-      this.drawPokerTable(ctx, canvas);
+      this.drawPokerTable(ctx, canvas,0);
       this.players.forEach((player, index) => {
         // Place players around the table (basic example)
         const angle = (2 * Math.PI * index) / this.players.length;
@@ -79,7 +92,25 @@ export default {
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
       // Redessine la table
-      this.drawPokerTable(ctx, ctx.canvas);
+      this.drawPokerTable(ctx, ctx.canvas,0);
+
+      console.log('ICI : ',players);
+      if (players.length>0) {
+        // Redessine tous les joueurs sauf celui à effacer
+        players.forEach((player) => {
+
+          this.drawPlayer(ctx, player, player.x, player.y);
+        });
+      }
+
+    },
+    //Efface les canvas et redessine tout lorsqu'un joueur quitte la partie
+    cleanPlayersOverride(ctx,players,pot) {
+      // Efface tout le contenu du canevas
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+      // Redessine la table
+      this.drawPokerTable(ctx, ctx.canvas,pot);
 
       console.log('ICI : ',players);
       if (players.length>0) {

@@ -204,6 +204,32 @@ function socketHandler(io) {
             io.emit("listeJoueursPartie", listeJoueursPartie);
 
         });
+
+        //Reception du socket émit par le front lors du click sur le bouton
+        socket.on('beginGame', () => {
+            console.log("La partie va commencer")
+            const nbPlayers = players.length
+            const amount_SB = 0.5
+            const amount_BB = 1
+
+            // SB et BB posent leurs blindes
+            players.forEach((player) => {
+
+                console.log(player.name , player.p_reelle)
+                if (player.p_reelle === 1) {
+                    game.bet(player,amount_SB)
+
+
+                }// Sil y a que 2 joueurs le BTN pose la BB
+                else if (player.p_reelle === 2 || (player.p_reelle === 0 && nbPlayers === 2))
+                {
+                    game.bet(player,amount_BB)
+                }
+                console.log('Le pot est de : ' , game.getPot())
+                //J'envoie au front la liste des joueurs et le nouveau pot
+                io.emit("updatePot&Stack",players,game.getPot())
+            })
+        })
     });
 
 }
