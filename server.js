@@ -5,7 +5,7 @@ const cors = require('cors');
 const http = require('http');
 const socketIo = require('socket.io');
 const {socketHandler,getPlayers}
-    = require('./socketHandler');
+    = require('./backend/socketHandler');
 
 
 //Fonction qui crée le serveur de socket

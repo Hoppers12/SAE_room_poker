@@ -186,7 +186,7 @@ const express2 = require('express');
 const cors2 = require('cors'); // Import CORS
 const http = require('http');
 const socketIo = require('socket.io');
-const Player = require('./classesJeu/Player');
+const Player = require('./backend/classesJeu/Player');
 
 
 const app2 = express();
@@ -207,7 +207,7 @@ const io = socketIo(server, {
 app.use(cors());
 
 const {socketHandler,getPlayers}
-    = require('./socketHandler');
+    = require('./backend/socketHandler');
 
 socketHandler(io);
 

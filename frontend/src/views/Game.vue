@@ -87,7 +87,7 @@ export default {
       li.className = 'list-group-item bg-success text-white';
       li.innerText = `${player.name} a rejoint la partie avec ${player.chips} jeton(s)`;
       document.getElementById('chat_connexion').appendChild(li);
-
+      console.log('Liste des joueurs dans la vue :' ,players) ;
       this.$refs.pokerTableRef.cleanPlayersOverride(ctx,players,pot) ;
 
 
