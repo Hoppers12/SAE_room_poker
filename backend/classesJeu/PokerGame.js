@@ -13,17 +13,22 @@ class PokerGame {
         this.players = players;  // Liste des joueurs
     }
 
+    getGame() {
+        return this
+    }
+
     getPot() {
         return this.pot
     }
     //Fonction qui s'occupe de changer les position des joueurs en décalant vers la gauche (le LJ devient BTN etc ...)
     changeBlind(players) {
         players.forEach((player) => {
-            var nbPlayers = player.length
-
+            var nbPlayers = players.length
+            console.log('p_reelle',player.p_reelle, 'nbPlayers : ', nbPlayers)
             // Si la position du joueur +1 est égal au nb de joueurs alors on revient à 0 (ce joueur devient le BTN donc)
-            switch (player.p_reelle) {
-                case (player.p_reelle + 1 === nbPlayers) :
+            switch (player.p_reelle +1)
+            {
+                case (nbPlayers) :
                     player.p_reelle = 0
                     break;
                 default :

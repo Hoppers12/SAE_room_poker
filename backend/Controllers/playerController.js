@@ -81,11 +81,12 @@ function findCoord2(taille) {
 //Retourne l'indice de la position du joueur dans la partie (0 = BTN, 1 = SB, 2 = BB, 3 = HJ, 4 = LJ, 5 = CO)
 function findPositionReelle(nbJoueurs)
 {
-
     // Le nouveau joueur rentre le plus à droite possible donc équivalent au nb de joueurs déjà présent
     return nbJoueurs ;
 
 }
+
+
 
 
 module.exports = {

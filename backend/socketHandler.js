@@ -19,8 +19,6 @@ function socketHandler(io) {
             // On crée un nouveau joueur après que le client ait rentré son pseudo
                     try
                     {
-
-
                         // On vérifie si le pseudo du joueur n'est pas déjà autour de la table
                         gameController.getPlayers().forEach((player) => {
                             console.log("joueur : " ,player.getName)
@@ -98,7 +96,8 @@ function socketHandler(io) {
         });
 
         //Reception du socket émit par le front lors du click sur le bouton
-        socket.on('beginGame', () => {
+        socket.on('beginGame', () =>
+        {
             console.log("La partie va commencer")
 
             const amount_SB = 0.5
@@ -107,6 +106,24 @@ function socketHandler(io) {
             // SB et BB posent leurs blindes
             blinds.putBlinds(amount_SB,amount_BB,gameController.getPlayers(),gameController.getGame());
             console.log('Le pot est de : ' ,gameController.getPot())
+
+            //J'envoie au front la liste des joueurs et le nouveau pot
+            io.emit("updatePot&Stack",gameController.getPlayers(),gameController.getPot())
+        });
+
+        //Fais changer les places reelles pr passer au tour suivant (btn devient SB etc)
+        socket.on('nextTour', () => {
+
+            gameController.getGame().changeBlind(gameController.getPlayers())
+
+            io.emit('updatePositionReelle',gameController.getPlayers(),gameController.getPot())
+            const amount_SB = 0.5
+            const amount_BB = 1
+
+            // SB et BB posent leurs blindes
+            blinds.putBlinds(amount_SB,amount_BB,gameController.getPlayers(),gameController.getGame());
+            console.log('Le pot est de : ' ,gameController.getPot())
+
             //J'envoie au front la liste des joueurs et le nouveau pot
             io.emit("updatePot&Stack",gameController.getPlayers(),gameController.getPot())
         })

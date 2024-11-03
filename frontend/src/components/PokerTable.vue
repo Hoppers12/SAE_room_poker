@@ -96,7 +96,6 @@ export default {
       // Redessine la table
       this.drawPokerTable(ctx, ctx.canvas,pot);
 
-      console.log('ICI : ',players);
       if (players.length>0) {
         // Redessine tous les joueurs sauf celui à effacer
         players.forEach((player) => {

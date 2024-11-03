@@ -21,6 +21,9 @@ class Player {
         this.p_reelle = position;
     }
 
+    get getPositionReelle() {
+        return this.p_reelle;
+    }
     set setX(value_x) {
         this.x = value_x ;
     }

@@ -6,7 +6,7 @@
     </div>
     <div class="row mt-4">
       <PokerTable ref="pokerTableRef" :players="players" :notification="notification"/>
-        <button @click="begin" class="w-25 h-10">SUIVANT</button>
+      <button @click="next" class="w-25 h-10">TOUR SUIVANT</button>
       </div>
       <div class="col-md-4">
         <div class="mb-3">
@@ -64,6 +64,10 @@ export default {
       this.socket.emit('beginGame')
 
     },
+    //Méthode qui fait passer à un nouveau tour (nouveau preflop, flop turn etc ...)
+    async next() {
+      this.socket.emit('nextTour')
+    },
     //Methode qui retourne la liste de tous les joueurs actuellement dans la partie
     getPlayers()
     {
@@ -106,6 +110,13 @@ export default {
       li.innerText = `Une blinde a été posée, le pot est maintenant de : ${pot}`;
       document.getElementById('chat_connexion').appendChild(li);
 
+    })
+
+    this.socket.on('updatePositionReelle',(players,pot) =>
+    {
+      const canvas = document.getElementById('pokerTable');
+      const ctx = canvas.getContext('2d');
+      this.$refs.pokerTableRef.cleanPlayersOverride(ctx,players,pot) ;
     })
 
     this.socket.on('quitterJoueur', (player,players,pot) => {
