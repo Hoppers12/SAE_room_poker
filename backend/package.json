@@ -1,0 +1,28 @@
+{
+  "name": "sae_room_poker",
+  "version": "1.0.0",
+  "description": "��#\u0000 \u0000S\u0000A\u0000E\u0000_\u0000r\u0000o\u0000o\u0000m\u0000_\u0000p\u0000o\u0000k\u0000e\u0000r\u0000\r\u0000 \u0000",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@mongodb-js/saslprep": "^1.1.9",
+    "axios": "^1.7.7",
+    "body-parser": "^1.20.3",
+    "bootstrap": "^5.3.3",
+    "cors": "^2.8.5",
+    "engine.io": "^4.1.2",
+    "engine.io-parser": "^4.0.3",
+    "express": "^4.21.0",
+    "mongodb-connection-string-url": "^3.0.1",
+    "mongoose": "^8.8.0",
+    "socket.io": "^4.4.0",
+    "socket.io-parser": "^4.0.4",
+    "telnet": "^0.0.1",
+    "uuid": "^10.0.0"
+  }
+}
