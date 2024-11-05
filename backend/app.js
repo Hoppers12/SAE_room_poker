@@ -3,6 +3,10 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const User = require('./Models/user');
 const Bet = require('./Models/bet')
+const Bet_history = require('./Models/bet_history')
+const Odd = require('./Models/odds')
+const Notification = require('./Models/notifications')
+const Sport = require('./Models/sports')
 const {join} = require("node:path");
 const app = express();
 
@@ -13,6 +17,15 @@ app.use(express.json());
 
 mongoose.connect('mongodb://bdd:27017/usersDB');
 
+
+app.get('/api/sports', async (req,res) =>{
+  try{
+    const sports = await Sport.find();
+    res.json(sports)
+  } catch (err){
+    res.status(500).json({error: err.message})
+  }
+})
 app.get('/', (req, res) => {
   res.json("Bienvenue dans l\'API");
 })
@@ -23,6 +36,35 @@ app.get('/api/bets',async (req, res) => {
     res.json(bets);
   } catch (err) {
     res.status(500).json({error: err.message});
+  }
+})
+
+app.get('/api/betHistory',async (req, res) => {
+  try {
+    const bets = await Bet_history.find();
+    res.json(bets);
+  } catch (err) {
+    res.status(500).json({error: err.message});
+  }
+})
+
+
+
+app.get('/api/notifications',async (req,res)=>{
+  try{
+    const notifications = await Notification.find();
+    res.json(notifications)
+  } catch(err){
+    res.status(500).json({error : err.message})
+  }
+})
+
+app.get('api/odds',async (req,res)=>{
+  try{
+    const Odds = await Odd.find();
+    res.json(Odds)
+  } catch(err){
+    res.status(500).json({error : err.message})
   }
 })
 

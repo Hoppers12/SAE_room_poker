@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const {Mongoose} = require("mongoose");
 
 
 const betSchema = new mongoose.Schema({
@@ -6,7 +7,7 @@ const betSchema = new mongoose.Schema({
     bet_type: { type: String},
     bet_date:{type:Date},
     bet_result: { type: String},
-    sport: { type: String},
+    sport: [{ type:mongoose.Schema.Types.ObjectId, ref: 'Sport'}],
 });
 
 

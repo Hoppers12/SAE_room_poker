@@ -13,8 +13,10 @@ const userSchema = new mongoose.Schema({
   pseudo: { type: String, unique: true },
   email: { type: String,unique: true },
   password: { type: String},
-  money:{ type: Number, default:1000},
+  money:{ type: Number, default:10000},
   isAdmin: { type: Boolean, default: false },
+  bets: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Bet' }],
+  bet_history : [{type: mongoose.Schema.Types.ObjectId, ref: 'bet_history'}]
 });
 
 
