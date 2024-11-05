@@ -52,8 +52,10 @@ export default {
     logout() {
       localStorage.removeItem('isLoggedIn');
       localStorage.removeItem('user');
+      localStorage.removeItem('isAdmin')
       this.isLoggedIn = false;
       this.user = null;
+      this.isAdmin = false;
       this.$router.push('/');
     },
   },

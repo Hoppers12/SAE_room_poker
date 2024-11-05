@@ -1,5 +1,5 @@
 <template>
-  <div class="container mt-5">
+  <div class="container mt-5" v-if="isLogged">
     <div class="row">
       <div class="col-12 text-center">
       </div>
@@ -23,26 +23,28 @@
         </div>
       </div>
     </div>
+
 </template>
 
 <script>
 import { io } from "socket.io-client";
 import axios from "../axios";
-//Composant qui gère tout ce qui est en rapport avec la table de jeu
-import PokerTable from "../components/PokerTable.vue"
+import PokerTable from "../components/PokerTable.vue";
+import { nextTick } from "vue";
 
 export default {
   name: 'GamePlay',
-  components : {
+  components: {
     PokerTable
   },
   data() {
     return {
+      isLogged: false,
       notification: '',
       socket: null,
       user: [],
       errorMessage: '',
-      players:[]
+      players: []
     };
   },
   methods: {
@@ -56,78 +58,73 @@ export default {
         this.errorMessage = "Vous devez être connecté pour rejoindre";
       }
 
-      //Appelle la méthode renderTable qui est dans le composant pokerTableRef
-      this.$refs.pokerTableRef.renderTable();
+      // Attempt to call renderTable() only after confirming the ref is set
+      if (this.$refs.pokerTableRef) {
+        this.$refs.pokerTableRef.renderTable();
+      }
     },
-    //Methode qui débute la partie
     async begin() {
-      this.socket.emit('beginGame')
-
+      this.socket.emit('beginGame');
     },
-    //Méthode qui fait passer à un nouveau tour (nouveau preflop, flop turn etc ...)
+    async checkStatus() {
+      this.isLogged = localStorage.getItem('isLoggedIn') === 'true';
+    },
     async next() {
-      this.socket.emit('nextTour')
+      this.socket.emit('nextTour');
     },
-    //Methode qui retourne la liste de tous les joueurs actuellement dans la partie
-    getPlayers()
-    {
-      return this.getPlayers()
+    getPlayers() {
+      return this.getPlayers();
     }
   },
-  mounted() {
+  async mounted() {
+    this.checkStatus();
     this.socket = io('http://localhost:5000', { transports: ['websocket'] });
 
     this.socket.on('connect', () => console.log('Connexion réussie au serveur WebSocket'));
     this.socket.on('connect_error', (err) => console.error('Connection failed:', err));
 
-    //Socket qui gère l'ajout d'un nouveau joueur
-    this.socket.on('recevoirJoueur', (player,players,pot) =>
-    {
+    this.socket.on('recevoirJoueur', (player, players, pot) => {
       const canvas = document.getElementById('pokerTable');
       const ctx = canvas.getContext('2d');
-
-      //On crée la notif lorsque un nouveau joueur rejoint
       const li = document.createElement('li');
       li.className = 'list-group-item bg-success text-white';
       li.innerText = `${player.name} a rejoint la partie avec ${player.chips} jeton(s)`;
       document.getElementById('chat_connexion').appendChild(li);
-      console.log('Liste des joueurs dans la vue :' ,players) ;
-      this.$refs.pokerTableRef.cleanPlayersOverride(ctx,players,pot) ;
-
-
+      if (this.$refs.pokerTableRef) {
+        this.$refs.pokerTableRef.cleanPlayersOverride(ctx, players, pot);
+      }
     });
 
-    //Met à jour l'affichage avec la nouvelle valeur du pot et des stacks
-    this.socket.on("updatePot&Stack",(players,pot)=>
-    {
+    this.socket.on("updatePot&Stack", (players, pot) => {
       const canvas = document.getElementById('pokerTable');
       const ctx = canvas.getContext('2d');
-      this.$refs.pokerTableRef.cleanPlayersOverride(ctx,players,pot);
-
-      //On crée la notif lorsque un joueur pose les blindes
+      if (this.$refs.pokerTableRef) {
+        this.$refs.pokerTableRef.cleanPlayersOverride(ctx, players, pot);
+      }
       const li = document.createElement('li');
       li.className = 'list-group-item bg-info text-white';
       li.innerText = `Une blinde a été posée, le pot est maintenant de : ${pot}`;
       document.getElementById('chat_connexion').appendChild(li);
+    });
 
-    })
-
-    this.socket.on('updatePositionReelle',(players,pot) =>
-    {
+    this.socket.on('updatePositionReelle', (players, pot) => {
       const canvas = document.getElementById('pokerTable');
       const ctx = canvas.getContext('2d');
-      this.$refs.pokerTableRef.cleanPlayersOverride(ctx,players,pot) ;
-    })
+      if (this.$refs.pokerTableRef) {
+        this.$refs.pokerTableRef.cleanPlayersOverride(ctx, players, pot);
+      }
+    });
 
-    this.socket.on('quitterJoueur', (player,players,pot) => {
+    this.socket.on('quitterJoueur', (player, players, pot) => {
       const li = document.createElement('li');
       li.className = 'list-group-item bg-danger text-white';
       li.innerText = `${player.name} a quitté la partie. Il emporte avec lui ${player.chips} jeton(s)`;
       document.getElementById('chat_connexion').appendChild(li);
-
       const canvas = document.getElementById('pokerTable');
       const ctx = canvas.getContext('2d');
-      this.$refs.pokerTableRef.cleanPlayersOverride(ctx,players,pot) ;
+      if (this.$refs.pokerTableRef) {
+        this.$refs.pokerTableRef.cleanPlayersOverride(ctx, players, pot);
+      }
     });
 
     this.socket.on('listeJoueursPartie', (user_list) => {
@@ -141,10 +138,15 @@ export default {
       });
     });
 
-    this.$refs.pokerTableRef.renderTable();
+    // Wait for next DOM update to confirm refs are set, then call renderTable()
+    await nextTick();
+    if (this.$refs.pokerTableRef) {
+      this.$refs.pokerTableRef.renderTable();
+    }
   }
 };
 </script>
+
 
 <style scoped>
 h1 {
