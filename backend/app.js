@@ -7,12 +7,12 @@ const Bet_history = require('./Models/bet_history')
 const Odd = require('./Models/odds')
 const Notification = require('./Models/notifications')
 const Sport = require('./Models/sports')
+const Team = require('./Models/team')
 const {join} = require("node:path");
 const app = express();
 
 app.use(cors());
 app.use(express.json());
-
 
 
 mongoose.connect('mongodb://bdd:27017/usersDB');
@@ -26,6 +26,7 @@ app.get('/api/sports', async (req,res) =>{
     res.status(500).json({error: err.message})
   }
 })
+
 app.get('/', (req, res) => {
   res.json("Bienvenue dans l\'API");
 })
@@ -48,8 +49,6 @@ app.get('/api/betHistory',async (req, res) => {
   }
 })
 
-
-
 app.get('/api/notifications',async (req,res)=>{
   try{
     const notifications = await Notification.find();
@@ -59,10 +58,19 @@ app.get('/api/notifications',async (req,res)=>{
   }
 })
 
-app.get('api/odds',async (req,res)=>{
+app.get('/api/odds',async (req,res)=>{
   try{
     const Odds = await Odd.find();
     res.json(Odds)
+  } catch(err){
+    res.status(500).json({error : err.message})
+  }
+})
+
+app.get('/api/teams',async (req,res)=>{
+  try{
+    const Teams = await Team.find();
+    res.json(Teams)
   } catch(err){
     res.status(500).json({error : err.message})
   }

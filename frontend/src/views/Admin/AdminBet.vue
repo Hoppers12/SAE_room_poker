@@ -2,26 +2,32 @@
   <div id="admin-bets">
     <h1 style="color: white">Gestion des Paris Sportifs</h1>
     <div id="add-bet-form">
-      <h3>Ajouter un nouveau pari</h3>
-      <form @submit.prevent="addNewBet">
-        <label for="amount">Montant</label>
-        <input type="text" v-model="newBet.amount" required />
+  <h3>Ajouter un nouveau pari</h3>
+  <form @submit.prevent="addNewBet">
+    <label for="amount">Montant</label>
+    <input type="text" v-model="newBet.amount" required />
 
-        <label for="bet_type">Type de Pari</label>
-        <input type="text" v-model="newBet.bet_type" required />
+    <label for="bet_type">Type de Pari</label>
+    <input type="text" v-model="newBet.bet_type" required />
 
-        <label for="bet_date">Date du Pari</label>
-        <input type="date" v-model="newBet.bet_date" required />
+    <label for="bet_date">Date du Pari</label>
+    <input type="date" v-model="newBet.bet_date" required />
 
-        <label for="bet_result">Résultat</label>
-        <input type="text" v-model="newBet.bet_result" required />
+    <label for="bet_result">Résultat</label>
+    <input type="text" v-model="newBet.bet_result" required />
 
-        <label for="sport">Sport</label>
-        <input type="text" v-model="newBet.sport" required />
+    <label for="sport">Sport</label>
+    <select v-model="newBet.sport" required>
+      <option disabled value="">Sélectionnez un sport</option>
+      <option v-for="sport in sports" :key="sport.id" :value="sport.name">
+        {{ sport.name }}
+      </option>
+    </select>
 
-        <button type="submit">Ajouter le pari</button>
-      </form>
-    </div>
+    <button type="submit">Ajouter le pari</button>
+  </form>
+</div>
+
 
     <table>
       <thead>
@@ -61,6 +67,7 @@ export default {
   data() {
     return {
       bets: [],
+      sports:[],
       newBet: {
         amount: '',
         bet_type: '',
@@ -74,7 +81,9 @@ export default {
     async fetchBets() {
       try {
         const response = await axios.get("/api/bets");
+        const sports = await axios.get("/api/sports")
         this.bets = response.data;
+        this.sports = sports.data;
       } catch (error) {
         console.error("Error fetching bets:", error);
       }
@@ -163,6 +172,29 @@ table {
   background-color: #f7f8fc;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
+
+#add-bet-form select {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  background-color: #ffffff;
+  color: #000000;
+  font-size: 16px;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+}
+
+#add-bet-form select:focus {
+  border-color: #4cc8ed;
+  outline: none;
+  box-shadow: 0 0 5px rgba(76, 200, 237, 0.5);
+}
+
 
 th, td {
   padding: 12px 15px;

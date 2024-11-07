@@ -15,8 +15,8 @@ const userSchema = new mongoose.Schema({
   password: { type: String},
   money:{ type: Number, default:10000},
   isAdmin: { type: Boolean, default: false },
-  bets: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Bet' }],
-  bet_history : [{type: mongoose.Schema.Types.ObjectId, ref: 'bet_history'}]
+  bets: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Bet' ,default : []} ],
+  bet_history : [{type: mongoose.Schema.Types.ObjectId, ref: 'bet_history' ,default :[]}]
 });
 
 
