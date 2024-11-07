@@ -17,7 +17,7 @@
 
 <script>
 export default {
-  name: 'AboutUs',
+  name: 'ShowBet',
 }
 </script>
 

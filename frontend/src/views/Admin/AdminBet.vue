@@ -1,33 +1,46 @@
 <template>
   <div id="admin-bets">
     <h1 style="color: white">Gestion des Paris Sportifs</h1>
+
     <div id="add-bet-form">
-  <h3>Ajouter un nouveau pari</h3>
-  <form @submit.prevent="addNewBet">
-    <label for="amount">Montant</label>
-    <input type="text" v-model="newBet.amount" required />
+      <h3>Ajouter un nouveau pari</h3>
+      <form @submit.prevent="addNewBet">
 
-    <label for="bet_type">Type de Pari</label>
-    <input type="text" v-model="newBet.bet_type" required />
+        <label for="bet_date">Date du Pari</label>
+        <input type="date" v-model="newBet.bet_date" required />
 
-    <label for="bet_date">Date du Pari</label>
-    <input type="date" v-model="newBet.bet_date" required />
+        <label for="bet_expire_date">Date d'Expiration du Pari (Par défaut une semaine)</label>
+        <input type="date" v-model="newBet.bet_expire_date" />
 
-    <label for="bet_result">Résultat</label>
-    <input type="text" v-model="newBet.bet_result" required />
+        <label for="sport">Sport</label>
+        <select v-model="newBet.sport" required>
+          <option disabled value="">Sélectionnez un sport</option>
+          <option v-for="sport in sports" :key="sport._id" :value="sport.name">
+            {{ sport.name }}
+          </option>
+        </select>
 
-    <label for="sport">Sport</label>
-    <select v-model="newBet.sport" required>
-      <option disabled value="">Sélectionnez un sport</option>
-      <option v-for="sport in sports" :key="sport.id" :value="sport.name">
-        {{ sport.name }}
-      </option>
-    </select>
+        <div v-if="newBet.sport">
+          <label for="team">Equipe</label>
+          <select v-model="newBet.team" required>
+            <option disabled value="">Sélectionnez l'équipe du pari</option>
+            <option v-for="team in filteredTeams" :key="team._id" :value="team.name">
+              {{ team.name }}
+            </option>
+          </select>
+        </div>
 
-    <button type="submit">Ajouter le pari</button>
-  </form>
-</div>
+        <label for="bet_odds">Cotes</label>
+        <select v-model="odds._id" required>
+          <option disabled value="">Sélectionnez une cote</option>
+          <option v-for="option in odds" :key="option._id" :value="option._id">
+            {{ option.odds_value }} - {{ option.odds_type }}
+          </option>
+        </select>
 
+        <button type="submit">Ajouter le pari</button>
+      </form>
+    </div>
 
     <table>
       <thead>
@@ -36,19 +49,37 @@
         <th>Montant</th>
         <th>Type de Pari</th>
         <th>Date du Pari</th>
-        <th>Résultat</th>
+        <th>Date d'Expiration</th>
         <th>Sport</th>
+        <th>Cotes</th>
         <th>Actions</th>
       </tr>
       </thead>
       <tbody>
       <tr v-for="bet in bets" :key="bet._id">
         <td>{{ bet._id }}</td>
-        <td><input type="text" v-model="bet.amount" /></td>
+        <td><input type="number" v-model="bet.amount" /></td>
         <td><input type="text" v-model="bet.bet_type" /></td>
         <td><input type="date" v-model="bet.bet_date" /></td>
+        <td><input type="date" v-model="bet.bet_expire_date" /></td>
         <td><input type="text" v-model="bet.bet_result" /></td>
-        <td><input type="text" v-model="bet.sport" /></td>
+        <td>
+          <select v-model="bet.sport" multiple>
+            <option v-for="sport in sports" :key="sport._id" :value="sport._id">
+              {{ sport.name }}
+            </option>
+          </select>
+        </td>
+        <td>
+          <div v-for="(odd, index) in bet.bet_odds" :key="index">
+            <select v-model="odd._id" required>
+              <option disabled value="">Sélectionnez une cote</option>
+              <option v-for="option in odds" :key="option._id" :value="option._id">
+                {{ option.odds_value }} - {{ option.odds_type }}
+              </option>
+            </select>
+          </div>
+        </td>
         <td>
           <button @click="updateBet(bet)">Sauvegarder</button>
           <button @click="deleteBet(bet._id)" class="delete-btn">Supprimer</button>
@@ -67,23 +98,36 @@ export default {
   data() {
     return {
       bets: [],
-      sports:[],
+      sports: [],
+      odds: [],
+      teams: [],
       newBet: {
-        amount: '',
-        bet_type: '',
+        amount: 0,
         bet_date: '',
-        bet_result: '',
+        bet_expire_date: '',
         sport: '',
+        bet_odds: [],
+        team: '',
       }
     };
+  },
+  computed: {
+    filteredTeams() {
+      return this.teams.filter(team => team.sport === this.newBet.sport);
+    }
   },
   methods: {
     async fetchBets() {
       try {
         const response = await axios.get("/api/bets");
-        const sports = await axios.get("/api/sports")
+        const sports = await axios.get("/api/sports");
+        const odds = await axios.get("/api/odds");
+        const teams = await axios.get("/api/teams");
         this.bets = response.data;
         this.sports = sports.data;
+        this.odds = odds.data;
+        this.teams = teams.data;
+        console.log(this.teams);
       } catch (error) {
         console.error("Error fetching bets:", error);
       }
@@ -114,11 +158,12 @@ export default {
         const response = await axios.post("/api/bets", this.newBet);
         this.bets.push(response.data);
         this.newBet = {
-          amount: '',
-          bet_type: '',
+          amount: 0,
           bet_date: '',
-          bet_result: '',
-          sport: ''
+          bet_expire_date: '',
+          sport: '',
+          bet_odds: [],
+          team: '',
         };
         alert("Nouveau pari ajouté avec succès!");
       } catch (error) {

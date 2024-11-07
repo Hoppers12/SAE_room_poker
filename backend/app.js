@@ -8,6 +8,7 @@ const Odd = require('./Models/odds')
 const Notification = require('./Models/notifications')
 const Sport = require('./Models/sports')
 const Team = require('./Models/team')
+const Players = require('./Models/player')
 const {join} = require("node:path");
 const app = express();
 
@@ -29,6 +30,16 @@ app.get('/api/sports', async (req,res) =>{
 
 app.get('/', (req, res) => {
   res.json("Bienvenue dans l\'API");
+})
+
+
+app.get('/api/players',async (req, res) => {
+  try {
+    const players = await Players.find();
+    res.json(players);
+  } catch (err) {
+    res.status(500).json({error: err.message});
+  }
 })
 
 app.get('/api/bets',async (req, res) => {
