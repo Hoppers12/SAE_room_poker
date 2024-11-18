@@ -64,9 +64,9 @@ export default {
 
         if (player.hand.length > 0) {
           // Vérifie si player.hand contient des cartes avant de dessiner
-          ctx.fillText(`${player.hand[0].rank} de ${player.hand[0].suit}`, x - 75, y + 50);
+          ctx.fillText(`${player.hand[0].rank} de ${player.hand[0].suit}`, x - 25, y + 60);
           if (player.hand.length > 1) {
-            ctx.fillText(`${player.hand[1].rank} de ${player.hand[1].suit}`, x + 75, y + 50);
+            ctx.fillText(`${player.hand[1].rank} de ${player.hand[1].suit}`, x -25, y + 70);
           }
         }
 
