@@ -143,11 +143,11 @@ app.post('/api/users', async (req, res) => {
 });
 
 app.post('/api/bets', async (req, res) => {
-  const { amount,bet_type,bet_date,bet_result,sport} = req.body;
+  const { bet_date,bet_odds,team,bet_result,sport} = req.body;
   const newBet = new Bet({
-    amount,
-    bet_type,
     bet_date,
+    bet_odds,
+    team,
     bet_result,
     sport
   });
