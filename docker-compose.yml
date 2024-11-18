@@ -7,7 +7,6 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    restart: always
 
   backend:
     build:
@@ -18,7 +17,6 @@ services:
     volumes:
       - ./backend:/app
       - /app/node_modules
-    restart: always
 
   bdd:
     image: mongo:6.0

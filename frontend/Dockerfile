@@ -1,16 +1,20 @@
-FROM node:16-alpine
+FROM node:16
 
 WORKDIR /app
 
-# Copie du package.json et installation des dépendances
-COPY package.json package-lock.json ./
+RUN npm install -g nodemon
+
+# Copy package.json and package-lock.json
+COPY package*.json /app/
+
+# Install dependencies
 RUN npm install
 
-# Copie du contenu de l'application frontend
+# Copy the rest of the application code
 COPY . .
 
-# Expose le port pour le frontend
+# Expose the port for the frontend
 EXPOSE 8000
 
-# Commande de démarrage du frontend
-CMD ["npm", "run", "serve"]
+# Command to start the frontend
+CMD ["nodemon", "--watch", ".", "-L", "--ext", "js,vue,json", "--exec", "npm", "run", "serve"]
