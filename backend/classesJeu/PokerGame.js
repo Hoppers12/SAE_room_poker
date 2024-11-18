@@ -50,6 +50,7 @@ class PokerGame {
 
     // Distribuer deux cartes à chaque joueur
     dealCards() {
+
         for (let i = 0; i < 2; i++) {
             this.players.forEach(player => {
                 player.receiveCard(this.deck.deal());
