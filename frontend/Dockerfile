@@ -3,7 +3,7 @@ FROM node:16-alpine
 WORKDIR /app
 
 # Copie du package.json et installation des dépendances
-COPY package.json package.json
+COPY package.json package-lock.json ./
 RUN npm install
 
 # Copie du contenu de l'application frontend

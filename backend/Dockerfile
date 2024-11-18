@@ -1,17 +1,18 @@
 FROM node:16-alpine
 
+# Définit le répertoire de travail
 WORKDIR /app
 
-# Copie du package.json et installation des dépendances
-COPY package.json package.json
+# Copie uniquement les fichiers nécessaires pour installer les dépendances
+COPY package.json package-lock.json ./
 RUN npm install
 
-# Copie de l'application backend
+# Copie le reste du code de l'application
 COPY . .
 
-# Expose les ports
+# Expose les ports nécessaires
 EXPOSE 3000
 EXPOSE 5000
 
-# Commande de démarrage
+# Commande par défaut pour démarrer l'application
 CMD ["node", "app.js"]

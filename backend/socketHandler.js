@@ -3,11 +3,10 @@ const PokerGame = require('./classesJeu/PokerGame'); // Vérifie cet import
 const gameController = require('./Controllers/gameController');
 const blinds = require('./utils/blind');
 const playerController = require('./Controllers/playerController');
+const Card = require("./classesJeu/Card");
 
 
 let playerSockets = {}; // Associer chaque socket.id au joueur
-
-
 
 
 
@@ -124,10 +123,15 @@ function socketHandler(io) {
             blinds.putBlinds(amount_SB,amount_BB,gameController.getPlayers(),gameController.getGame());
             console.log('Le pot est de : ' ,gameController.getPot())
 
+            //Distribue 2 cartes à chaque joueur
+            gameController.getGame().dealCards();
+
+
             //J'envoie au front la liste des joueurs et le nouveau pot
             io.emit("updatePot&Stack",gameController.getPlayers(),gameController.getPot())
         })
     });
+
 
 }
 

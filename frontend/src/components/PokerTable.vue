@@ -61,6 +61,8 @@ export default {
         ctx.fillText(this.givePosition(player.p_reelle), x - 15, y - 5);
         ctx.fillText(player.name, x - 15, y + 5);
         ctx.fillText(`${player.chips} jetons`, x - 25, y + 50);
+        ctx.fillText(`${player.hand[0]}`, x - 75, y + 50);
+        ctx.fillText("COUCOUUUUUUUUUUUU",x-75,y+50)
         ctx.stroke();
       },
       //Retourne sous forme de chaine de caractère la position du joueur
