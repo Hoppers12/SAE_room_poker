@@ -42,8 +42,12 @@ class Player {
 
 
 
-// Reçoit une carte
+// Reçoit une carte après avoir supprimé les cartes du tour précédent
     receiveCard(card) {
+        if (this.hand.length >= 2) {
+            this.hand.pop()
+            this.hand.pop()
+        }
         this.hand.push(card);
     }
 

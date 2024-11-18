@@ -53,7 +53,7 @@ export default {
       ctx.restore();
     },
 
-      //Dessine le joueur sur la table avec son pseudo, sa position et ses jetons
+      //Dessine le joueur sur la table avec son pseudo, sa position et ses jetons et ses cartes
       drawPlayer(ctx, player, x, y) {
         ctx.beginPath();
         ctx.arc(x, y, 30, 0, Math.PI * 2);
@@ -61,8 +61,15 @@ export default {
         ctx.fillText(this.givePosition(player.p_reelle), x - 15, y - 5);
         ctx.fillText(player.name, x - 15, y + 5);
         ctx.fillText(`${player.chips} jetons`, x - 25, y + 50);
-        ctx.fillText(`${player.hand[0]}`, x - 75, y + 50);
-        ctx.fillText("COUCOUUUUUUUUUUUU",x-75,y+50)
+
+        if (player.hand.length > 0) {
+          // Vérifie si player.hand contient des cartes avant de dessiner
+          ctx.fillText(`${player.hand[0].rank} de ${player.hand[0].suit}`, x - 25, y + 60);
+          if (player.hand.length > 1) {
+            ctx.fillText(`${player.hand[1].rank} de ${player.hand[1].suit}`, x -25, y + 70);
+          }
+        }
+
         ctx.stroke();
       },
       //Retourne sous forme de chaine de caractère la position du joueur
