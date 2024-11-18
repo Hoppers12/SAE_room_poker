@@ -61,7 +61,14 @@ export default {
         ctx.fillText(this.givePosition(player.p_reelle), x - 15, y - 5);
         ctx.fillText(player.name, x - 15, y + 5);
         ctx.fillText(`${player.chips} jetons`, x - 25, y + 50);
-        ctx.fillText(`${player.hand[0].rank} de ${player.hand[0].suit}`, x - 75, y + 50);
+
+        if (player.hand.length > 0) {
+          // Vérifie si player.hand contient des cartes avant de dessiner
+          ctx.fillText(`${player.hand[0].rank} de ${player.hand[0].suit}`, x - 75, y + 50);
+          if (player.hand.length > 1) {
+            ctx.fillText(`${player.hand[1].rank} de ${player.hand[1].suit}`, x + 75, y + 50);
+          }
+        }
 
         ctx.stroke();
       },
