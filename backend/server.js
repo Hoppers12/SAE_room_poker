@@ -21,7 +21,7 @@ function createServer() {
             allowedHeaders: ['my-custom-header'],
             credentials: true
         },
-        transports: ['websocket'] // Utiliser le transport WebSocket
+        transports: ['websocket']
     });
 
     // Activer CORS pour toutes les requêtes

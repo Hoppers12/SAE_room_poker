@@ -8,3 +8,4 @@ const betSchema = new mongoose.Schema({
 
 const Bet = mongoose.model('bet_history', betSchema);
 module.exports = Bet;
+

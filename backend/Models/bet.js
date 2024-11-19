@@ -8,6 +8,7 @@ const betSchema = new mongoose.Schema({
     team:{type:mongoose.Schema.Types.ObjectId, ref: 'Team'},
     bet_result: { type: String},
     sport: [{type:mongoose.Schema.Types.ObjectId, ref: 'Sport'}],
+    matches: [{type:mongoose.Schema.Types.ObjectId, ref: 'Match'}],
 });
 
 

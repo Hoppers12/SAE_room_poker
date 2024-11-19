@@ -30,6 +30,16 @@
           </select>
         </div>
 
+        <div v-if="newBet.team">
+          <label for="matches">Match</label>
+          <select v-model="newBet.matches" required>
+            <option disabled value="">Sélectionnez le match correspondant au pari</option>
+            <option v-for="matches in filteredMatches(newBet.team)" :key="matches._id" :value="matches._id">
+              {{ matches.match_name }}
+            </option>
+          </select>
+        </div>
+
 
         <label for="bet_odds">Cotes</label>
         <select v-model="newBet.bet_odds" required>
@@ -51,6 +61,7 @@
         <th>Date d'Expiration</th>
         <th>Sport</th>
         <th>Equipe</th>
+        <th>Match</th>
         <th>Cotes</th>
         <th>Actions</th>
       </tr>
@@ -72,6 +83,14 @@
             <option disabled value="">Sélectionnez une équipe</option>
             <option v-for="team in filteredTeams(bet.sport)" :key="team._id" :value="team._id">
               {{ team.name }}
+            </option>
+          </select>
+        </td>
+        <td>
+          <select v-model="bet.matches">
+            <option disabled value="">Sélectionnez un match</option>
+            <option v-for="match in filteredMatches(bet.team)" :key="match._id" :value="match._id">
+              {{ match.match_name }}
             </option>
           </select>
         </td>
@@ -107,12 +126,14 @@ export default {
       sports: [],
       odds: [],
       teams: [],
+      matches:[],
       newBet: {
         bet_date: '',
         bet_expire_date: '',
         sport: '',
         bet_odds: '',
         team: '',
+        matches: '',
       }
     };
   },
@@ -123,7 +144,16 @@ export default {
         return this.teams.filter(team => team.sport === sportId);
       };
 
-    }
+    },
+    filteredMatches() {
+      return (teamId) => {
+        if (!teamId) return [];
+        const now = new Date();
+        return this.matches.filter(match =>
+            (match.home_team === teamId || match.away_team === teamId) && new Date(match.match_date) > now
+        );
+      };
+    },
 
   },
   methods: {
@@ -138,7 +168,7 @@ export default {
         const sports = await axios.get("/api/sports");
         const odds = await axios.get("/api/odds");
         const teams = await axios.get("/api/teams");
-
+        const matches = await axios.get("/api/matches");
         this.bets = bets.data.map(bet => ({
           ...bet,
           bet_date: bet.bet_date ? new Date(bet.bet_date).toISOString().split('T')[0] : '',
@@ -146,11 +176,12 @@ export default {
           sport: Array.isArray(bet.sport) ? bet.sport[0] : bet.sport,
           team: Array.isArray(bet.team) ? bet.team[0] : bet.team,
           bet_odds: bet.bet_odds || [],
+          matches: Array.isArray(bet.matches) ? bet.matches[0] : bet.matches,
         }));
         this.sports = sports.data;
         this.odds = odds.data;
         this.teams = teams.data;
-
+        this.matches = matches.data;
       } catch (error) {
         console.error("Error fetching bets:", error);
       }
@@ -189,6 +220,7 @@ export default {
           sport: '',
           bet_odds: '',
           team: '',
+          matches: '',
         };
         alert("Nouveau pari ajouté avec succès!");
       } catch (error) {
