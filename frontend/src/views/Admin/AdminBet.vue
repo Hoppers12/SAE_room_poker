@@ -15,7 +15,7 @@
         <label for="sport">Sport</label>
         <select v-model="newBet.sport" required>
           <option disabled value="">Sélectionnez un sport</option>
-          <option v-for="sport in sports" :key="sport._id" :value="sport.name">
+          <option v-for="sport in sports" :key="sport._id" :value="sport._id">
             {{ sport.name }}
           </option>
         </select>
@@ -24,14 +24,15 @@
           <label for="team">Equipe</label>
           <select v-model="newBet.team" required>
             <option disabled value="">Sélectionnez l'équipe du pari</option>
-            <option v-for="team in filteredTeams" :key="team._id" :value="team.name">
+            <option v-for="team in filteredTeams(newBet.sport)" :key="team._id" :value="team._id">
               {{ team.name }}
             </option>
           </select>
         </div>
 
+
         <label for="bet_odds">Cotes</label>
-        <select v-model="odds._id" required>
+        <select v-model="newBet.bet_odds" required>
           <option disabled value="">Sélectionnez une cote</option>
           <option v-for="option in odds" :key="option._id" :value="option._id">
             {{ option.odds_value }} - {{ option.odds_type }}
@@ -42,15 +43,14 @@
       </form>
     </div>
 
-    <table>
+    <table v-if="bets.length">
       <thead>
       <tr>
         <th>Bet ID</th>
-        <th>Montant</th>
-        <th>Type de Pari</th>
         <th>Date du Pari</th>
         <th>Date d'Expiration</th>
         <th>Sport</th>
+        <th>Equipe</th>
         <th>Cotes</th>
         <th>Actions</th>
       </tr>
@@ -58,27 +58,32 @@
       <tbody>
       <tr v-for="bet in bets" :key="bet._id">
         <td>{{ bet._id }}</td>
-        <td><input type="number" v-model="bet.amount" /></td>
-        <td><input type="text" v-model="bet.bet_type" /></td>
         <td><input type="date" v-model="bet.bet_date" /></td>
         <td><input type="date" v-model="bet.bet_expire_date" /></td>
-        <td><input type="text" v-model="bet.bet_result" /></td>
         <td>
-          <select v-model="bet.sport" multiple>
+          <select v-model="bet.sport">
             <option v-for="sport in sports" :key="sport._id" :value="sport._id">
               {{ sport.name }}
             </option>
           </select>
         </td>
         <td>
-          <div v-for="(odd, index) in bet.bet_odds" :key="index">
-            <select v-model="odd._id" required>
-              <option disabled value="">Sélectionnez une cote</option>
-              <option v-for="option in odds" :key="option._id" :value="option._id">
-                {{ option.odds_value }} - {{ option.odds_type }}
-              </option>
-            </select>
-          </div>
+          <select v-model="bet.team">
+            <option disabled value="">Sélectionnez une équipe</option>
+            <option v-for="team in filteredTeams(bet.sport)" :key="team._id" :value="team._id">
+              {{ team.name }}
+            </option>
+          </select>
+        </td>
+        <td>
+          <select v-model="bet.bet_odds" multiple>
+            <option v-for="option in odds" :key="option._id" :value="option._id">
+              {{ option.odds_value }} - {{ option.odds_type }}
+            </option>
+          </select>
+          <span v-if="!bet.bet_odds.length">
+        {{ bet.bet_odds.map(getOddsDescription).join(', ') }}
+      </span>
         </td>
         <td>
           <button @click="updateBet(bet)">Sauvegarder</button>
@@ -86,6 +91,7 @@
         </td>
       </tr>
       </tbody>
+
     </table>
   </div>
 </template>
@@ -102,32 +108,49 @@ export default {
       odds: [],
       teams: [],
       newBet: {
-        amount: 0,
         bet_date: '',
         bet_expire_date: '',
         sport: '',
-        bet_odds: [],
+        bet_odds: '',
         team: '',
       }
     };
   },
   computed: {
     filteredTeams() {
-      return this.teams.filter(team => team.sport === this.newBet.sport);
+      return (sportId) => {
+        if (!sportId) return [];
+        return this.teams.filter(team => team.sport === sportId);
+      };
+
     }
+
   },
   methods: {
+    async getOddsDescription(oddsId) {
+      const odd = this.odds.find(o => o._id === oddsId);
+      return odd ? `${odd.odds_value} - ${odd.odds_type}` : "Cote inconnue";
+    },
+
     async fetchBets() {
       try {
-        const response = await axios.get("/api/bets");
+        const bets = await axios.get("/api/bets");
         const sports = await axios.get("/api/sports");
         const odds = await axios.get("/api/odds");
         const teams = await axios.get("/api/teams");
-        this.bets = response.data;
+
+        this.bets = bets.data.map(bet => ({
+          ...bet,
+          bet_date: bet.bet_date ? new Date(bet.bet_date).toISOString().split('T')[0] : '',
+          bet_expire_date: bet.bet_expire_date ? new Date(bet.bet_expire_date).toISOString().split('T')[0] : '',
+          sport: Array.isArray(bet.sport) ? bet.sport[0] : bet.sport,
+          team: Array.isArray(bet.team) ? bet.team[0] : bet.team,
+          bet_odds: bet.bet_odds || [],
+        }));
         this.sports = sports.data;
         this.odds = odds.data;
         this.teams = teams.data;
-        console.log(this.teams);
+
       } catch (error) {
         console.error("Error fetching bets:", error);
       }
@@ -155,14 +178,16 @@ export default {
     },
     async addNewBet() {
       try {
+        if (!this.newBet.bet_expire_date) {
+          this.newBet.bet_expire_date = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        }
         const response = await axios.post("/api/bets", this.newBet);
         this.bets.push(response.data);
         this.newBet = {
-          amount: 0,
           bet_date: '',
           bet_expire_date: '',
           sport: '',
-          bet_odds: [],
+          bet_odds: '',
           team: '',
         };
         alert("Nouveau pari ajouté avec succès!");
@@ -239,7 +264,6 @@ table {
   outline: none;
   box-shadow: 0 0 5px rgba(76, 200, 237, 0.5);
 }
-
 
 th, td {
   padding: 12px 15px;
