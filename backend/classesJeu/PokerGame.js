@@ -50,7 +50,8 @@ class PokerGame {
 
     // Distribuer deux cartes à chaque joueur
     dealCards() {
-
+        this.deck.resetListCard(); // On remet toutes les cartes dans le paquet
+        this.deck.shuffle();  // Mélange le deck au début de chaque tour
         for (let i = 0; i < 2; i++) {
             this.players.forEach(player => {
                 player.receiveCard(this.deck.deal());

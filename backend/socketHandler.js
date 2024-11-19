@@ -78,7 +78,8 @@ function socketHandler(io) {
                 });
 
                 // Informer les autres joueurs qu'un joueur a quitté la partie
-                io.emit("quitterJoueur", disconnectedPlayer,gameController.getPlayers(),gameController.getPot);
+                io.emit("quitterJoueur", disconnectedPlayer, gameController.getPlayers(), gameController.getPot());
+
                 console.log(gameController.getPlayers());
                 // Mettre à jour la liste des joueurs dans le jeu
                 gameController.setPlayers(gameController.getPlayers());
@@ -112,7 +113,6 @@ function socketHandler(io) {
 
         //Fais changer les places reelles pr passer au tour suivant (btn devient SB etc)
         socket.on('nextTour', () => {
-
             gameController.getGame().changeBlind(gameController.getPlayers())
 
             io.emit('updatePositionReelle',gameController.getPlayers(),gameController.getPot())
