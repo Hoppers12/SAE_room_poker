@@ -3,10 +3,8 @@ FROM node:16
 WORKDIR /app
 
 RUN npm install -g nodemon
-
 # Copy package.json and package-lock.json
 COPY package*.json /app/
-
 # Install dependencies
 RUN npm install
 
