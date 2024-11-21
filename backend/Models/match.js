@@ -16,6 +16,7 @@ const Match = mongoose.model('Match', matchSchema);
 async function insertDefaultMatches() {
     const count = await Match.countDocuments();
     if (count === 0) {
+
         const teams = await Team.find();
         const sports = await Sport.find();
         const teamMap = {};
