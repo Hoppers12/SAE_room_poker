@@ -8,6 +8,8 @@
       >
         {{ notification }}
       </div>
+
+
     </div>
   </div>
 </template>
@@ -72,6 +74,25 @@ export default {
 
         ctx.stroke();
       },
+
+    drawCard(x, y,card) {
+      const canvas = document.getElementById('pokerTable');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      img.src = `https://deckofcardsapi.com/static/img/${card}.png`;// URL de l'image de la carte souhaitée
+
+
+      img.onload = () => {
+        const cardWidth = 50; // Largeur de la carte
+        const cardHeight = 70; // Hauteur de la carte
+        ctx.drawImage(img, x, y, cardWidth, cardHeight);
+      };
+
+      img.onerror = () => {
+        console.error("Erreur lors du chargement de l'image de la carate.");
+      };
+    } ,
+
       //Retourne sous forme de chaine de caractère la position du joueur
     givePosition(indexPosition) {
       switch (indexPosition) {
@@ -122,6 +143,7 @@ export default {
   },
   mounted() {
     this.renderTable();
+
   }
 };
 </script>

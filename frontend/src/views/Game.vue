@@ -7,6 +7,7 @@
     <div class="row mt-4">
       <PokerTable ref="pokerTableRef" :players="players" :notification="notification"/>
       <button @click="next" class="w-25 h-10">TOUR SUIVANT</button>
+      <button @click="nextStreet" class="w-25 h-10">STREET SUIVANTE</button>
       </div>
       <div class="col-md-4">
         <div class="mb-3">
@@ -70,17 +71,27 @@ export default {
       this.isLogged = localStorage.getItem('isLoggedIn') === 'true';
     },
     async next() {
+      const players = this.getPlayers()
+      const player = players[0]
+      console.log('joueur ind0', player)
+
+
       this.socket.emit('nextTour');
+
+
+    },
+    async nextStreet() {
+      this.socket.emit('nextStreet');
     },
     getPlayers() {
-      return this.getPlayers();
+      return this.players
     }
   },
   async mounted() {
     this.checkStatus();
     this.socket = io('http://localhost:5000', { transports: ['websocket'] });
 
-    this.socket.on('connect', () => console.log('Connexion réussie au serveur WebSocket'));
+    this.socket.on('connect', () => console.log('Connexion réussie au serveur WebSockect'));
     this.socket.on('connect_error', (err) => console.error('Connection failed:', err));
 
     this.socket.on('recevoirJoueur', (player, players, pot) => {
@@ -101,6 +112,39 @@ export default {
       if (this.$refs.pokerTableRef) {
         this.$refs.pokerTableRef.cleanPlayersOverride(ctx, players, pot);
       }
+
+      // on fait la conversion pr transformer la forme de la carte en la premeire lettre en anglais pr 
+      // que ça corresponde à l'url de l'API
+      const suitMap = {
+          'coeur': 'H',   // Hearts
+          'carreau': 'D', // Diamonds
+          'pique': 'S',   // Spades
+          'trèfle': 'C'   // Clubs
+      };
+
+      // Pour chaque joueur on va cherche la carte, on la traduit et on l'ajoute dans l'url de l'api
+      // Puis on la dessine à côté de lui
+      players.forEach(player => {
+          var carte1Rank = player.hand[0].rank
+          var carte2Rank = player.hand[1].rank
+          var carte1Suit = player.hand[0].suit
+          var carte2Suit = player.hand[1].suit
+          //Si la carte est un 10 on transf en 0 car l'API le veut pr son url 
+          if (carte1Rank == '10') {
+            carte1Rank = '0' ;
+          }
+          if (carte2Rank == '10') {
+            carte2Rank = '0' ;
+          }
+
+          const cardCode1 = `${carte1Rank}${suitMap[carte1Suit]}`;
+          const cardCode2 = `${carte2Rank}${suitMap[carte2Suit]}`;
+          // On dessine les nouvelles cartes du joueur sur la table
+          this.$refs.pokerTableRef.drawCard(player.x+30,player.y+30,cardCode1)
+          this.$refs.pokerTableRef.drawCard(player.x+70,player.y+30,cardCode2)
+      });
+
+
       const li = document.createElement('li');
       li.className = 'list-group-item bg-info text-white';
       li.innerText = `Une blinde a été posée, le pot est maintenant de : ${pot}`;

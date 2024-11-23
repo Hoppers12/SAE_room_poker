@@ -129,7 +129,11 @@ function socketHandler(io) {
 
             //J'envoie au front la liste des joueurs et le nouveau pot
             io.emit("updatePot&Stack",gameController.getPlayers(),gameController.getPot())
+        });
+        socket.on('nextStreet',() => {
+            console.log('passage à la prochaine STREET')
         })
+
     });
 
 
