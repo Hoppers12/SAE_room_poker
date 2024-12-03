@@ -3,6 +3,15 @@
     <div class="header">
       <h1>Paris Disponibles</h1>
     </div>
+    <div :class="{'selected-bets-menu': true, 'open': !isMenuOpen}">
+      <h2>Paris Sélectionnés</h2>
+      <ul>
+        <li v-for="(bet, index) in this.newBet" :key="index">
+          {{ bet.bet_odds }}
+        </li>
+      </ul>
+    </div>
+
     <div v-if="bets.length" class="bet-sections">
       <div class="bet-column" v-for="sport in uniqueSports" :key="sport">
         <h2 class="sport-title">{{ sport }}</h2>
@@ -19,14 +28,15 @@
           </p>
           <div class="bet-odds">
             <button
-                v-for="odd in bet.bet_odds"
-                :key="odd.odds_type"
+                v-for="(value, type) in { home: bet.matches[0].odds[0].home, draw: bet.matches[0].odds[0].draw, away: bet.matches[0].odds[0].away }"
+                :key="type"
                 class="bet-odds-btn"
-                @click="selectBet(odd)"
-            >
-              {{ odd.odds_value }}
+                @click="selectBet({ type, value })">
+              {{ type }}: {{ value }}
             </button>
           </div>
+
+
         </div>
       </div>
     </div>
@@ -35,6 +45,7 @@
     </div>
   </div>
 </template>
+
 
 <script>
 import axios from '../axios';
@@ -46,6 +57,17 @@ export default {
       bets: [],
       matches: [],
       teams: [],
+      listeBets: [],
+      isMenuOpen: false,
+      newBet: {
+        bet_date: '',
+        bet_expire_date: '',
+        sport: '',
+        bet_odds: [],
+        team: '',
+        matches: '',
+      }
+
     };
   },
   computed: {
@@ -102,9 +124,17 @@ export default {
     filteredBetsBySport(sport) {
       return this.bets.filter((bet) => bet.sport[0].name === sport);
     },
-    selectBet(odd) {
-      console.log('Cote sélectionnée :', odd);
-      // Ajoutez ici l'action à effectuer lors du clic sur une cote
+    selectBet(selectedOdd) {
+      if (selectedOdd.value === undefined || selectedOdd.value === 'N/A') {
+        console.warn('Valeur de cote invalide');
+        return;
+      }
+      if(this.newBet.bet_odds.find(odd => odd === selectedOdd.value)) {
+        console.warn('Cote déjà sélectionnée');
+        return;
+      }
+      this.newBet.bet_odds.push( selectedOdd.value);
+      console.log(this.newBet);
     },
   },
   async mounted() {
@@ -199,6 +229,60 @@ export default {
 
 .bet-odds-btn:hover {
   background-color: #e0a800;
+}
+
+
+/* Bouton pour ouvrir/fermer la liste */
+.menu-button {
+  position: absolute;
+  right: 10px;
+  background-color: #ffc107;
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+  font-size: 1.2rem;
+  color: #1c2028;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.menu-button:hover {
+  background-color: #e0a800;
+}
+
+/* Menu déroulant */
+.selected-bets-menu {
+  position: absolute;
+  right: 10px;
+  background-color: #1c2028;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  color: #fff;
+  max-width: 300px;
+  z-index: 10;
+}
+
+.selected-bets-menu h2 {
+  margin: 0 0 10px;
+  font-size: 1.2rem;
+  color: #ffc107;
+}
+
+.selected-bets-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.selected-bets-menu li {
+  padding: 5px 0;
+  font-size: 1rem;
+  border-bottom: 1px solid #2a2f37;
+}
+
+.selected-bets-menu li:last-child {
+  border-bottom: none;
 }
 
 </style>

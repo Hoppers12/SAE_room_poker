@@ -41,13 +41,16 @@
         </div>
 
 
-        <label for="bet_odds">Cotes</label>
-        <select v-model="newBet.bet_odds" required>
-          <option disabled value="">Sélectionnez une cote</option>
-          <option v-for="option in odds" :key="option._id" :value="option._id">
-            {{ option.odds_value }} - {{ option.odds_type }}
-          </option>
-        </select>
+        <div v-if="newBet.matches && getOddsForMatch(newBet.matches).length">
+          <label for="bet_odds">Cotes</label>
+          <select v-model="newBet.bet_odds" required>
+            <option disabled value="">Sélectionnez une cote</option>
+            <option v-for="(odd, index) in getOddsForMatch(newBet.matches)" :key="index" :value="odd">
+              {{ formatOdds(odd) }}
+            </option>
+          </select>
+        </div>
+
 
         <button type="submit">Ajouter le pari</button>
       </form>
@@ -95,15 +98,14 @@
           </select>
         </td>
         <td>
-          <select v-model="bet.bet_odds" multiple>
-            <option v-for="option in odds" :key="option._id" :value="option._id">
-              {{ option.odds_value }} - {{ option.odds_type }}
+          <select v-if="bet.matches && getOddsForMatch(bet.matches).length" v-model="bet.bet_odds" multiple>
+            <option disabled value="">Sélectionnez les côtes</option>
+            <option v-for="odd in getOddsForMatch(bet.matches)" :key="odd._id" :value="odd">
+              {{ formatOdds(odd) }}
             </option>
           </select>
-          <span v-if="!bet.bet_odds.length">
-        {{ bet.bet_odds.map(getOddsDescription).join(', ') }}
-      </span>
         </td>
+
         <td>
           <button @click="updateBet(bet)">Sauvegarder</button>
           <button @click="deleteBet(bet._id)" class="delete-btn">Supprimer</button>
@@ -124,17 +126,17 @@ export default {
     return {
       bets: [],
       sports: [],
-      odds: [],
       teams: [],
       matches:[],
       newBet: {
         bet_date: '',
         bet_expire_date: '',
         sport: '',
-        bet_odds: '',
+        bet_odds: [],
         team: '',
         matches: '',
       }
+
     };
   },
   computed: {
@@ -150,42 +152,48 @@ export default {
         if (!teamId) return [];
         const now = new Date();
         return this.matches.filter(match =>
-            (match.home_team === teamId || match.away_team === teamId) && new Date(match.match_date) > now
+            (match.home_team === teamId || match.away_team === teamId) &&
+            new Date(match.match_date) > now
         );
       };
     },
-
   },
   methods: {
-    async getOddsDescription(oddsId) {
-      const odd = this.odds.find(o => o._id === oddsId);
-      return odd ? `${odd.odds_value} - ${odd.odds_type}` : "Cote inconnue";
+    getOddsForMatch(matchId) {
+      const match = this.matches.find(m => m._id === matchId);
+      return match && match.odds ? match.odds : [];
     },
 
+
+    formatOdds(odd) {
+      return `Home: ${odd.home}, Draw: ${odd.draw}, Away: ${odd.away}`;
+    },
     async fetchBets() {
       try {
-        const bets = await axios.get("/api/bets");
-        const sports = await axios.get("/api/sports");
-        const odds = await axios.get("/api/odds");
-        const teams = await axios.get("/api/teams");
-        const matches = await axios.get("/api/matches");
+        const [bets, sports, teams, matches] = await Promise.all([
+          axios.get("/api/bets"),
+          axios.get("/api/sports"),
+          axios.get("/api/teams"),
+          axios.get("/api/matches"),
+        ]);
         this.bets = bets.data.map(bet => ({
           ...bet,
           bet_date: bet.bet_date ? new Date(bet.bet_date).toISOString().split('T')[0] : '',
           bet_expire_date: bet.bet_expire_date ? new Date(bet.bet_expire_date).toISOString().split('T')[0] : '',
-          sport: Array.isArray(bet.sport) ? bet.sport[0] : bet.sport,
-          team: Array.isArray(bet.team) ? bet.team[0] : bet.team,
+          sport: Array.isArray(bet.sport) ? bet.sport[0]._id : bet.sport._id,
+          team: Array.isArray(bet.team) ? bet.team[0]._id : bet.team._id,
+          matches: Array.isArray(bet.matches) ? bet.matches[0]._id : bet.matches._id,
           bet_odds: bet.bet_odds || [],
-          matches: Array.isArray(bet.matches) ? bet.matches[0] : bet.matches,
         }));
+
         this.sports = sports.data;
-        this.odds = odds.data;
         this.teams = teams.data;
         this.matches = matches.data;
       } catch (error) {
         console.error("Error fetching bets:", error);
       }
     },
+
     async updateBet(bet) {
       try {
         await axios.put(`/api/bets/${bet._id}`, bet);
@@ -212,8 +220,18 @@ export default {
         if (!this.newBet.bet_expire_date) {
           this.newBet.bet_expire_date = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
         }
-        const response = await axios.post("/api/bets", this.newBet);
+        const odds = this.newBet.bet_odds;
+        const payload = {
+          ...this.newBet,
+          bet_odds: odds ? {
+            home: odds.home,
+            draw: odds.draw,
+            away: odds.away,
+          } : null,
+        };
+        const response = await axios.post("/api/bets", payload);
         this.bets.push(response.data);
+
         this.newBet = {
           bet_date: '',
           bet_expire_date: '',
