@@ -75,7 +75,7 @@ export default {
   justify-content: space-between; /* Espacement équivalent entre les blocs */
   gap: 40px; /* Espacement supplémentaire entre les blocs */
   padding: 0;
-  margin-left:5%;
+
 }
 
 .bloc-header li {
@@ -112,6 +112,7 @@ export default {
   align-items: center;
   z-index:1;
   display:flex;
+  justify-content: center;
   top:0;
 }
 

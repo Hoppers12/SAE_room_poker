@@ -1,8 +1,8 @@
 <template>
     <nav>
-      <router-link to="/" class="nav-link">Accueil</router-link>
-      <router-link to="/game" class="nav-link">Jeu</router-link>
-      <router-link to="/bet" class="nav-link">Parier</router-link>
+      <router-link to="/" class="nav-link">ACCUEIL</router-link>
+      <router-link to="/game" class="nav-link">JEU</router-link>
+      <router-link to="/bet" class="nav-link">PARIER</router-link>
   
       <div class="dropdown">
         <button class="nav-link dropdown-btn" name="Compte">
@@ -63,21 +63,30 @@
   <style scoped>
   /* NavBar styles */
   nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #1e1e2f;
-    padding: 15px 20px;
-    position: sticky;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  }
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+    background: linear-gradient(
+        to right, 
+        rgba(0, 0, 0, 0.3), 
+        rgba(230, 57, 70, 0.3)
+    ); /* Dégradé noir à rouge avec transparence */
+  padding: 15px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: background 0.3s ease;
+}
   
-  /* Droite de la NavBar */
+  
+  /* Dropdown container */
   .dropdown {
     position: relative;
     display: inline-block;
   }
   
+  /* Dropdown button styles */
   .dropdown-btn {
     background: none;
     border: none;
@@ -87,7 +96,7 @@
     cursor: pointer;
     padding: 10px 20px;
     border-radius: 25px;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, transform 0.2s;
   }
   
   .dropdown:hover .dropdown-content {
@@ -95,35 +104,38 @@
   }
   
   .dropdown-btn:hover {
-    background-color: #4cc8ed;
+    background-color: #e63946; /* Red hover effect */
     transform: translateY(-3px);
   }
   
+  /* Dropdown content styles */
   .dropdown-content {
     display: none;
     position: absolute;
-    background-color: #1e1e2f;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    background-color: #000000; /* Black dropdown background */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     border-radius: 12px;
     left: 50%;
     transform: translateX(-50%);
   }
   
+  /* Dropdown links */
   .dropdown-link {
     color: #f7f8fc;
     padding: 12px 16px;
-    gap: 10px;
     text-decoration: none;
     display: block;
     text-align: center;
-    border-radius: 12px;
+    border-radius: 8px;
     transition: background-color 0.3s;
   }
   
   .dropdown-link:hover {
-    background-color: #4cc8ed;
+    background-color: #e63946;
+    color: #ffffff; /* White text on hover */
   }
   
+  /* Logout button */
   .logout-btn {
     background: none;
     border: none;
@@ -133,13 +145,14 @@
     width: 100%;
     cursor: pointer;
     transition: background-color 0.3s;
-    border-radius: 12px;
+    border-radius: 8px;
   }
   
   .logout-btn:hover {
-    background-color: #4cc8ed;
+    background-color: #e63946;
   }
   
+  /* Navigation links */
   .nav-link {
     color: #f7f8fc;
     text-decoration: none;
@@ -151,12 +164,14 @@
   }
   
   .nav-link:hover {
-    background-color: #4cc8ed;
+    background-color: #e63946; /* Red hover effect */
     transform: translateY(-3px);
   }
   
+  /* Active navigation link */
   .nav-link.router-link-exact-active {
-    background-color: #4cc8ed;
+    background-color: #e63946; /* Active link with red background */
+    color: #ffffff; /* White text for active link */
   }
   </style>
   
