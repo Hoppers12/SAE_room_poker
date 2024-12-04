@@ -13,6 +13,14 @@
       </div>
     </div>
 
+    <div class="header-inner" v-if="isLoggedIn">
+        <ul class="bloc-header">
+          <li> PROFIL </li>
+          <li> POKER </li>
+          <li> PARIS SPORTIF </li>
+        </ul>
+    </div>
+
   </div>
 </template>
 
@@ -37,6 +45,56 @@ export default {
 
 <style>
 
+.bloc-header {
+  text-decoration: none;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.header-inner {
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  width:15%;
+  height:15%;
+  left: 0;
+  top:25%;
+  z-index:50;
+  z-index:2;
+}
+
+.bloc-header {
+  list-style-type: none; /* Supprimer les puces de liste */
+  display: flex;
+  flex-direction: column; /* Afficher les blocs en colonne */
+  justify-content: space-between; /* Espacement équivalent entre les blocs */
+  gap: 40px; /* Espacement supplémentaire entre les blocs */
+  padding: 0;
+  margin: 0;
+}
+
+.bloc-header li {
+  background-color: rgba(230, 57, 70, 0.8); /* Rouge avec transparence */
+  color: white; /* Couleur du texte */
+  text-align: center; /* Centrer le texte dans chaque bloc */
+  padding: 2em; /* Ajouter de l'espace à l'intérieur des blocs */
+  border-radius: 15px; /* Bords arrondis */
+  font-family: 'Montserrat', sans-serif; /* Police stylée */
+  font-weight: bold;
+  font-size: 18px; /* Taille du texte */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Ombre légère pour l'effet de profondeur */
+  transition: transform 0.3s ease, background-color 0.3s ease; /* Animation au survol */
+  cursor: pointer; /* Curseur de clic */
+}
+
+
+.bloc-header li:hover {
+  background-color: rgba(214, 40, 40, 0.9); /* Changer légèrement la couleur au survol */
+  transform: scale(1.05); /* Zoom au survol */
+}
+
+.bloc-header li:active {
+  transform: scale(1); /* Réinitialisation lors du clic */
+}
 
 html, body {
   height: 100%;
@@ -45,24 +103,29 @@ html, body {
 }
 
 .content {
-
+  position:absolute;
   width: 100vw;
-  height: 89.8vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  height: 100vh;
   align-items: center;
+  z-index:1;
+  display:flex;
+  top:0;
 }
+
 .logged-in{
-  background-image: url(../img/tablePoker.jpg);
+  background-image: url(../img/background.png);
   background-repeat: no-repeat;
   background-size: 100vw, 100vh;
+  position:fixed;
+  z-index: 0; /* Gardez-le derrière le contenu */
 }
 
 .not-logged-in{
   background-image: url(../img/background.png);
   background-repeat: no-repeat;
   background-size: 100vw, 100vh;
+  position:fixed;
+  z-index: 0; /* Gardez-le derrière le contenu */
 }
 
 .text{
@@ -105,6 +168,7 @@ html, body {
 }
 body{
   background-color: black;
+
 }
 
 .signin, .login {
@@ -135,9 +199,12 @@ body{
 }
 
 body{
-
+  margin:0;
+  padding:0;  
 }
-
+nav {
+  display:none;
+}
 nav a {
   margin: 0 0;
 }
