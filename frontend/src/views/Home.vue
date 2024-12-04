@@ -1,7 +1,7 @@
 <template>
   <body>
 
-    <div :class="{'content': true, 'logged-in': isLoggedIn, 'not-logged-in': !isLoggedIn} ">
+    <div :class="{'content': isLoggedIn,'logged-in': isLoggedIn, 'not-logged-in': !isLoggedIn} ">
       <div class="text" v-if="!isLoggedIn">
         <p>Rejoignez notre site dès maintenant !</p>
         <p>Jouez au Poker et faites des paris sportifs</p>
@@ -130,6 +130,15 @@ export default {
   background-size: 100vw, 100vh;
   position:fixed;
   z-index: 0; /* Gardez-le derrière le contenu */
+  position:absolute;
+  width: 100vw;
+  height: 100vh;
+  align-items: center;
+  z-index:1;
+  display:flex;
+  flex-direction: column;
+  justify-content: center;
+  top:0;
 }
 
 .text{
