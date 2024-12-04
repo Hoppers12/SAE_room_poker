@@ -1,4 +1,5 @@
 <template>
+  <NavBar/>
   <div>
     <div class="content">
       <div class="profile-content" v-if="Object.keys(user).length > 0">
@@ -21,6 +22,8 @@
 
 <script>
 import axios from "../axios";
+import NavBar from '../components/Navbar.vue'; // Import du composant NavBar
+
 export default {
   name: "MyProfile",
   data() {
@@ -37,8 +40,12 @@ export default {
       } catch (error) {
         console.error("Erreur lors de la récupération des données:", error);
       }
-    },
+    }
+
   },
+  components: {
+      NavBar
+    },
   mounted() {
     this.fetchUser();
   },

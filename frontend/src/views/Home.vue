@@ -33,11 +33,14 @@
 
 export default {
   name: 'HomePage',
+  components: {
+  },
   data(){
     return {
       isLoggedIn: false,
       user:[],
     };
+  
   },
   mounted() {
     this.isLoggedIn = localStorage.getItem('isLoggedIn');
@@ -72,7 +75,7 @@ export default {
   justify-content: space-between; /* Espacement équivalent entre les blocs */
   gap: 40px; /* Espacement supplémentaire entre les blocs */
   padding: 0;
-  margin: 0;
+  margin-left:5%;
 }
 
 .bloc-header li {
@@ -203,6 +206,8 @@ body{
   padding:0;  
   z-index:-1;
 }
+
+
 
 nav a {
   margin: 0 0;

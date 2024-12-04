@@ -1,4 +1,5 @@
 <template>
+  <NavBar/>
   <div id="bet-page">
     <div class="header">
       <h1>Paris Disponibles</h1>
@@ -49,6 +50,7 @@
 
 <script>
 import axios from '../axios';
+import NavBar from '../components/Navbar.vue'; // Import du composant NavBar
 
 export default {
   name: 'ShowBet',
@@ -74,6 +76,9 @@ export default {
     uniqueSports() {
       return [...new Set(this.bets.map((bet) => bet.sport[0].name))];
     },
+  },
+  components: {
+    NavBar
   },
   methods: {
     async fetchMatches() {

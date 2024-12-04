@@ -1,4 +1,5 @@
 <template>
+  <NavBar/>
   <div class="container mt-5" v-if="isLogged">
     <div class="row">
       <div class="col-12 text-center">
@@ -32,11 +33,12 @@ import { io } from "socket.io-client";
 import axios from "../axios";
 import PokerTable from "../components/PokerTable.vue";
 import { nextTick } from "vue";
-
+import NavBar from '../components/Navbar.vue'; // Import du composant NavBar
 export default {
   name: 'GamePlay',
   components: {
-    PokerTable
+    PokerTable,
+    NavBar
   },
   data() {
     return {
