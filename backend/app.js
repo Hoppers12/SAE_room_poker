@@ -16,14 +16,13 @@ app.use(express.json());
 
 
 mongoose.connect('mongodb://bdd:27017/usersDB');
-
 app.get('/api/matches', async (req,res)=>{
-    try{
-        const matches = await Match.find();
-        res.json(matches);
-    } catch(err){
-        res.status(500).json({error : err.message});
-    }
+  try{
+    const matches = await Match.find();
+    res.json(matches);
+  } catch(err){
+    res.status(500).json({error : err.message});
+  }
 })
 
 
@@ -52,7 +51,7 @@ app.get('/api/players',async (req, res) => {
 
 app.get('/api/bets',async (req, res) => {
   try {
-    const bets = await Bet.find().populate('bet_odds').populate('team').populate('sport').populate('matches').exec();
+    const bets = await Bet.find().populate('team').populate('sport').populate('matches').exec();
     res.json(bets);
   } catch (err) {
     res.status(500).json({error: err.message});
@@ -77,14 +76,7 @@ app.get('/api/notifications',async (req,res)=>{
   }
 })
 
-app.get('/api/odds',async (req,res)=>{
-  try{
-    const Odds = await Odd.find();
-    res.json(Odds)
-  } catch(err){
-    res.status(500).json({error : err.message})
-  }
-})
+
 
 app.get('/api/teams',async (req,res)=>{
   try{
@@ -151,27 +143,28 @@ app.post('/api/users', async (req, res) => {
 });
 
 app.post('/api/matches', async (req, res) => {
-    const { home_team,away_team,result,id_sport,match_date } = req.body;
-    const newMatch = new Match({
-        home_team,
-        away_team,
-        result,
-        id_sport,
-        match_date
-    });
-    try {
-        const savedMatch = await newMatch.save();
-        res.status(201).json(savedMatch);
-    } catch (err) {
-        res.status(400).json({ error: err.message });
-    }
+  const { home_team,away_team,match_name,result,id_sport,match_date,odds } = req.body;
+  const newMatch = new Match({
+    home_team,
+    away_team,
+    match_name,
+    result,
+    id_sport,
+    match_date,
+    odds
+  });
+  try {
+    const savedMatch = await newMatch.save();
+    res.status(201).json(savedMatch);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 });
 
 app.post('/api/bets', async (req, res) => {
-  const { bet_date,bet_odds,team,bet_result,sport,matches} = req.body;
+  const { bet_date,team,bet_result,sport,matches} = req.body;
   const newBet = new Bet({
     bet_date,
-    bet_odds,
     team,
     bet_result,
     sport,
@@ -259,7 +252,7 @@ app.get('/api/users/:id', async (req, res) => {
 app.use(express.static(join(__dirname, '/frontend/dist')));
 
 app.get('*', (req, res) => {
-    res.sendFile(join(__dirname, '/frontend/dist', 'index.html'));
+  res.sendFile(join(__dirname, '/frontend/dist', 'index.html'));
 });
 
 const port = 3000;
