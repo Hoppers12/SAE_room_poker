@@ -2,10 +2,6 @@
   <body>
 
     <div :class="{'content': isLoggedIn,'logged-in': isLoggedIn, 'not-logged-in': !isLoggedIn} ">
-      <div class="text" v-if="!isLoggedIn">
-        <p>Rejoignez notre site dès maintenant !</p>
-        <p>Jouez au Poker et faites des paris sportifs</p>
-      </div>
       <div class="buttons" v-if="!isLoggedIn">
         <div class="login">
           <p>Pas de compte ?<br><router-link to="/SignUp" class="" style="color: white">S'inscrire</router-link></p>
@@ -17,7 +13,7 @@
 
       <div class="header-inner" v-if="isLoggedIn">
           <ul class="bloc-header">
-            <router-link to="/Profile" class="nav-link"> <li>Profile</li></router-link>
+            <router-link to="/Profile" class="nav-link"> <li>Profil</li></router-link>
             <router-link to="/game" class="nav-link"> <li>Poker</li></router-link>
             <router-link to="/bet" class="nav-link"> <li>Paris sportifs</li></router-link>
           </ul>
@@ -147,6 +143,8 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
+  background-color:#ba181b;
+
 }
 
 .buttons{
