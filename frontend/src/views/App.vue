@@ -13,8 +13,10 @@
         <div class="dropdown-content">
           <router-link to="/SignUp" class="dropdown-link" v-if="!isLoggedIn">S'inscrire</router-link>
           <router-link to="/LogIn" class="dropdown-link" v-if="!isLoggedIn">Se connecter</router-link>
+          <router-link to="/Profile" class="dropdown-link" v-if="isLoggedIn">Mon profil</router-link>
           <router-link to="/Admin/Account" class="dropdown-link" v-if="isLoggedIn && isAdmin">Gestion des comptes</router-link>
           <router-link to="/Admin/AdminBet" class="dropdown-link" v-if="isLoggedIn && isAdmin">Gestion des paris</router-link>
+
 
           <button class="dropdown-link logout-btn" @click="logout" v-if="isLoggedIn ">Se déconnecter</button>
         </div>
@@ -25,9 +27,6 @@
 </template>
 
 <script>
-
-// main.js ou App.vue
-
 import axios from "../axios";
 export default {
   name: 'App',
@@ -117,7 +116,10 @@ nav {
   background-color: #1e1e2f;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
   border-radius: 12px;
+  left: 50%;
+  transform: translateX(-50%);
 }
+
 
 .dropdown-link {
   color: #f7f8fc;

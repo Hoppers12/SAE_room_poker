@@ -4,7 +4,6 @@ const mongoose = require('mongoose');
 const User = require('./Models/user');
 const Bet = require('./Models/bet')
 const Bet_history = require('./Models/bet_history')
-const Odd = require('./Models/odds')
 const Notification = require('./Models/notifications')
 const Sport = require('./Models/sports')
 const Team = require('./Models/team')
