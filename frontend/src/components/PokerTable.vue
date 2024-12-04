@@ -89,7 +89,7 @@ export default {
       };
 
       img.onerror = () => {
-        console.error("Erreur lors du chargement de l'image de la carate.");
+        console.error("Erreur lors du chargement de l'image de la carte.");
       };
     } ,
 

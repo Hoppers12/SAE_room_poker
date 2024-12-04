@@ -10,6 +10,7 @@ const betSchema = new mongoose.Schema({
     matches: [{type:mongoose.Schema.Types.ObjectId, ref: 'Match'}],
 });
 
+
 const Bet = mongoose.model('Bet', betSchema);
 module.exports = Bet;
 
