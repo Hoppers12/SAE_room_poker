@@ -60,7 +60,7 @@
             <input type="text" v-model="user.money" />
           </td>
           <td>
-            <button @click="updateUser(user)">Sauvegarder</button>
+            <button @click="updateUser(user)" class="save-btn">Sauvegarder</button>
             <button @click="deleteUser(user._id)" class="delete-btn">Supprimer</button>
           </td>
         </tr>
@@ -123,8 +123,10 @@ export default {
 
 <style>
 #admin-account {
+  background: #0e121a;
   padding: 20px;
   font-family: 'Inter', sans-serif;
+  text-align: center;
 }
 
 h1 {
@@ -144,6 +146,8 @@ th, td {
   padding: 12px 15px;
   text-align: left;
   border-bottom: 1px solid #ddd;
+  background: #2a2a40 ;
+  color: white;
 }
 
 th {

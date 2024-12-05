@@ -4,11 +4,18 @@
     <nav>
       <router-link to="/" class="nav-link">Accueil</router-link>
       <router-link to="/game" class="nav-link">Jeu</router-link>
-      <router-link to="/bet" class="nav-link">Parier</router-link>
-
       <div class="dropdown">
         <button class="nav-link dropdown-btn" name="Compte">
-          {{ isLoggedIn ? user.pseudo : 'Compte' }}
+          Paris
+        </button>
+        <div class="dropdown-content">
+          <router-link to="/bet" class="dropdown-link">Parier</router-link>
+          <router-link to="/BetResume" class="dropdown-link" v-if="isLoggedIn">Mes paris</router-link>
+        </div>
+      </div>
+      <div class="dropdown">
+        <button class="nav-link dropdown-btn" name="Compte">
+          {{isLoggedIn ? user.pseudo : 'Compte'}}
         </button>
         <div class="dropdown-content">
           <router-link to="/SignUp" class="dropdown-link" v-if="!isLoggedIn">S'inscrire</router-link>
@@ -16,13 +23,11 @@
           <router-link to="/Profile" class="dropdown-link" v-if="isLoggedIn">Mon profil</router-link>
           <router-link to="/Admin/Account" class="dropdown-link" v-if="isLoggedIn && isAdmin">Gestion des comptes</router-link>
           <router-link to="/Admin/AdminBet" class="dropdown-link" v-if="isLoggedIn && isAdmin">Gestion des paris</router-link>
-
-
           <button class="dropdown-link logout-btn" @click="logout" v-if="isLoggedIn ">Se déconnecter</button>
         </div>
       </div>
     </nav>
-    <router-view />
+    <router-view/>
   </div>
 </template>
 
@@ -83,11 +88,12 @@ nav {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Droite de la NavBar */
+
 .dropdown {
   position: relative;
   display: inline-block;
 }
+
 
 .dropdown-btn {
   background: none;
@@ -98,17 +104,19 @@ nav {
   cursor: pointer;
   padding: 10px 20px;
   border-radius: 25px;
-  transition: background-color 0.3s;
-}
-
-.dropdown:hover .dropdown-content {
-  display: block;
+  transition: background-color 0.3s, transform 0.2s; /* Ajout de transition pour homogénéiser le rendu */
 }
 
 .dropdown-btn:hover {
   background-color: #4cc8ed;
   transform: translateY(-3px);
 }
+
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
 
 .dropdown-content {
   display: none;
@@ -124,13 +132,14 @@ nav {
 .dropdown-link {
   color: #f7f8fc;
   padding: 12px 16px;
-  gap:10px;
+  gap: 10px;
   text-decoration: none;
   display: block;
   text-align: center;
   border-radius: 12px;
   transition: background-color 0.3s;
 }
+
 
 .dropdown-link:hover {
   background-color: #4cc8ed;

@@ -7,6 +7,7 @@ import LogIn from "@/views/LogIn.vue";
 import AdminAccount from "@/views/Admin/Account.vue";
 import AdminBet from "@/views/Admin/AdminBet.vue";
 import Profile from "@/views/Profile.vue";
+import BetResume from "@/views/BetResume.vue";
 
 const routes = [
     ...['/','/HomePage','/accueil', '/maison'].map(path => ({ path, component: Home })),
@@ -30,6 +31,11 @@ const routes = [
         path: '/Admin/Account',
         name: 'AdminAccount',
         component: AdminAccount,
+    },
+    {
+        path: '/BetResume',
+        name: 'BetResume',
+        component: BetResume,
     },
     {
         path: '/Admin/AdminBet',

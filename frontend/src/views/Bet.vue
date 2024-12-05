@@ -112,6 +112,7 @@ export default {
       }
 
       try {
+
         const userId = localStorage.getItem('id');
         const userBetsResponse = await axios.get(`/api/betUser/${userId}`);
         const userBets = userBetsResponse.data;
@@ -128,6 +129,10 @@ export default {
           return;
         }
         const totalOdds = this.newBet.reduce((acc, bet) => acc * bet.selectedOdd, 1);
+        if(totalOdds <= 0){
+          alert("Mise invalide ou solde insuffisant !");
+          return;
+        }
         const betsData = this.newBet.map(bet => ({
           matchId: bet.matchId,
           homeTeam: bet.homeTeam,
@@ -277,7 +282,7 @@ export default {
   font-size: 1rem;
   font-weight: bold;
   color: #fff;
-  background-color: #28a745; /* Vert */
+  background-color: #28a745;
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -365,18 +370,6 @@ export default {
 
 .bet-odds-btn:hover {
   background-color: #e0a800;
-}
-
-.selected-bets-menu {
-  position: absolute;
-  right: 10px;
-  background-color: #1c2028;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-  color: #fff;
-  max-width: 300px;
-  z-index: 10;
 }
 
 .selected-bets-menu h2 {
@@ -488,7 +481,7 @@ export default {
   font-size: 1rem;
   font-weight: bold;
   color: #fff;
-  background-color: #28a745; /* Green */
+  background-color: #28a745;
   border: none;
   border-radius: 5px;
   cursor: pointer;

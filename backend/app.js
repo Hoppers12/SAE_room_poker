@@ -52,6 +52,20 @@ app.get('/api/betUser/:id', async (req, res) => {
         res.status(500).json({ message: 'Erreur serveur' });
     }
 });
+
+app.delete('/api/betUser/:id', async (req, res) => {
+    try {
+        const betUserId = req.params.id;
+        const result = await BetUser.findByIdAndDelete(betUserId);
+        if (!result) {
+        return res.status(404).json({ message: 'Pari utilisateur non trouvé' });
+        }
+        res.status(200).json({ message: 'Pari utilisateur supprimé avec succès' });
+    } catch (error) {
+        console.error('Erreur lors de la suppression du pari utilisateur:', error);
+        res.status(500).json({ message: 'Erreur interne du serveur' });
+    }
+});
 app.post('/api/betUser', async (req, res) => {
   try {
     const { userId, bets, stake, totalOdds } = req.body;
