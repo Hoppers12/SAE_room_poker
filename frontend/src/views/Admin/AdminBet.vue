@@ -6,8 +6,8 @@
       <h3>Ajouter un nouveau pari</h3>
       <form @submit.prevent="addNewBet">
 
-        <label for="bet_date">Date du Pari</label>
-        <input type="date" v-model="newBet.bet_date" required />
+        <label for="bet_date">Date du Pari (Par défaut aujourd'hui)</label>
+        <input type="date" v-model="newBet.bet_date" />
 
         <label for="bet_expire_date">Date d'Expiration du Pari (Par défaut une semaine)</label>
         <input type="date" v-model="newBet.bet_expire_date" />
@@ -197,7 +197,7 @@ export default {
     async updateBet(bet) {
       try {
         await axios.put(`/api/bets/${bet._id}`, bet);
-        alert(`Le pari ${bet._id} a été mis à jour avec succès!`);
+        window.location.reload();
       } catch (error) {
         console.error("Error updating bet:", error);
         alert(`Erreur lors de la mise à jour du pari ${bet._id}`);
@@ -208,7 +208,7 @@ export default {
         try {
           await axios.delete(`/api/bets/${betId}`);
           this.bets = this.bets.filter(bet => bet._id !== betId);
-          alert("Pari supprimé avec succès.");
+          window.location.reload();
         } catch (error) {
           console.error("Error deleting bet:", error);
           alert("Erreur lors de la suppression du pari.");
@@ -217,30 +217,39 @@ export default {
     },
     async addNewBet() {
       try {
+
+        if (!this.newBet.bet_date) {
+          this.newBet.bet_date = new Date().toISOString().split('T')[0];
+        }
         if (!this.newBet.bet_expire_date) {
           this.newBet.bet_expire_date = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
         }
-        const odds = this.newBet.bet_odds;
-        const payload = {
-          ...this.newBet,
-          bet_odds: odds ? {
-            home: odds.home,
-            draw: odds.draw,
-            away: odds.away,
-          } : null,
-        };
-        const response = await axios.post("/api/bets", payload);
-        this.bets.push(response.data);
+        if (this.bets.find(bet => bet.matches === this.newBet.matches)) {
+          alert("Ce pari existe déjà");
+        }
+        else{
+          const odds = this.newBet.bet_odds;
+          const payload = {
+            ...this.newBet,
+            bet_odds: odds ? {
+              home: odds.home,
+              draw: odds.draw,
+              away: odds.away,
+            } : null,
+          };
+          const response = await axios.post("/api/bets", payload);
+          this.bets.push(response.data);
 
-        this.newBet = {
-          bet_date: '',
-          bet_expire_date: '',
-          sport: '',
-          bet_odds: '',
-          team: '',
-          matches: '',
-        };
-        alert("Nouveau pari ajouté avec succès!");
+          this.newBet = {
+            bet_date: '',
+            bet_expire_date: '',
+            sport: '',
+            bet_odds: '',
+            team: '',
+            matches: '',
+          };
+          window.location.reload();
+        }
       } catch (error) {
         console.error("Error adding new bet:", error);
         alert("Erreur lors de l'ajout du pari.");

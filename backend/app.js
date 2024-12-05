@@ -8,6 +8,8 @@ const Notification = require('./Models/notifications')
 const Sport = require('./Models/sports')
 const Team = require('./Models/team')
 const Players = require('./Models/player')
+const BetUser = require('./Models/bet_user');
+
 const {join} = require("node:path");
 const app = express();
 
@@ -26,6 +28,48 @@ app.get('/api/matches', async (req,res)=>{
 })
 
 
+
+app.get('/api/betUser', async (req, res) => {
+    try {
+        const betUsers = await BetUser.find();
+        res.json(betUsers);
+    } catch (error) {
+        console.error('Erreur lors de la récupération des paris utilisateur:', error);
+        res.status(500).json({ message: 'Erreur interne du serveur' });
+    }
+});
+
+app.get('/api/betUser/:id', async (req, res) => {
+    try {
+        const betUserId = req.params.id;
+        const betUser = await BetUser.find({ userId: betUserId });
+        if (!betUser) {
+        return res.status(404).json({ message: 'Pari utilisateur non trouvé' });
+        }
+        res.json(betUser);
+    } catch (error) {
+        console.error('Erreur lors de la recherche du pari utilisateur:', error);
+        res.status(500).json({ message: 'Erreur serveur' });
+    }
+});
+app.post('/api/betUser', async (req, res) => {
+  try {
+    const { userId, bets, stake, totalOdds } = req.body;
+    const potentialGain = (stake * totalOdds).toFixed(2);
+    const newBetUser = new BetUser({
+      userId,
+      bets,
+      stake,
+      totalOdds,
+      potentialGain,
+    });
+    const savedBetUser = await newBetUser.save();
+    res.status(201).json(savedBetUser);
+  } catch (error) {
+    console.error('Erreur lors de la création du pari utilisateur:', error);
+    res.status(500).json({ message: 'Erreur interne du serveur' });
+  }
+});
 app.get('/api/sports', async (req,res) =>{
   try{
     const sports = await Sport.find();
