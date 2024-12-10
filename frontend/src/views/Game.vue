@@ -9,8 +9,11 @@
     <div class="row mt-4">
       <PokerTable ref="pokerTableRef" :players="players" :notification="notification"/>
       <button @click="next" class="w-25 h-10">TOUR SUIVANT</button>
-      <button @click="nextStreet" class="w-25 h-10">STREET SUIVANTE</button>
-      </div>
+      <button @click="nextPlayer" class="w-25 h-10">STREET SUIVANTE</button>
+      <button  class="w-25 h-10 action-buttons">FOLD</button>
+      <button  class="w-25 h-10 action-buttons">CHECK</button>
+      <button  class="w-25 h-10 action-buttons">RAISE</button>
+      </div>  
       <div class="col-md-4">
         <div class="mb-3">
           <h2 class="h4 text-light">Connexion</h2>
@@ -58,10 +61,10 @@ export default {
   methods: {
     async send() {
       try {
-        const id = localStorage.getItem('id');
-        const userData = await axios.get(`/api/users/${id}`);
+        const id = await this.getLocalPlayerId()
+        const userData = await axios.get(`/api/users/${id}`)
         this.user = userData.data;
-        this.socket.emit('joinGame', this.user.pseudo);
+        this.socket.emit('joinGame', this.user.pseudo,id);
       } catch (e) {
         this.errorMessage = "Vous devez être connecté pour rejoindre";
       }
@@ -78,17 +81,19 @@ export default {
       this.isLogged = localStorage.getItem('isLoggedIn') === 'true';
     },
     async next() {
-      const players = this.getPlayers()
-      const player = players[0]
-      console.log('joueur ind0', player)
-
 
       this.socket.emit('nextTour');
 
 
+
     },
-    async nextStreet() {
-      this.socket.emit('nextStreet');
+    //Obtenir son id local du joueur connecté actuellement
+    async getLocalPlayerId() {
+      return localStorage.getItem('id');
+    },
+    //Informe au serveur qu'un joueur vient de finir de jouer
+    async nextPlayer() {
+      this.socket.emit('nextPlayer');
     },
     getPlayers() {
       return this.players
@@ -119,7 +124,7 @@ export default {
       if (this.$refs.pokerTableRef) {
         this.$refs.pokerTableRef.cleanPlayersOverride(ctx, players, pot);
       }
-
+      console.log("PLAYERS  DANS GAME.VUE: ", players)
       // on fait la conversion pr transformer la forme de la carte en la premeire lettre en anglais pr 
       // que ça corresponde à l'url de l'API
       const suitMap = {
@@ -189,6 +194,18 @@ export default {
       });
     });
 
+    //Affiche les boutons pour que le joueur d'id current turn joue
+    this.socket.on('tourJoueur', async (currentTurn) => {
+      var playerLocalId = await this.getLocalPlayerId()
+      console.log("playerLOcalId et currentTurn", playerLocalId, currentTurn)
+      // Si le joueur connecté correspond au joueur qui doit jouer alors on lui affiche ses boutons
+      if (playerLocalId == currentTurn) {
+        showActionButtons()
+      }else {
+        hideActionButtons()
+      }
+
+    })
     // Wait for next DOM update to confirm refs are set, then call renderTable()
     await nextTick();
     if (this.$refs.pokerTableRef) {
@@ -196,6 +213,21 @@ export default {
     }
   }
 };
+
+// Fonctions pour afficher/masquer les boutons de jeu
+function showActionButtons() {
+  const buttons = document.querySelectorAll(".action-buttons"); // Retourne un NodeList
+    buttons.forEach(button => {
+        button.style.display = "block";
+    });
+}
+
+function hideActionButtons() {
+  const buttons = document.querySelectorAll(".action-buttons"); // Retourne un NodeList
+    buttons.forEach(button => {
+        button.style.display = "none";
+    });
+}
 </script>
 
 
@@ -209,6 +241,7 @@ h1 {
 }
 canvas {
   border: 2px solid #28a745;
+  background-color:white;
 }
 .bloc_canva {
   position: relative;

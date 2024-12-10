@@ -9,12 +9,11 @@ const Card = require("./classesJeu/Card");
 let playerSockets = {}; // Associer chaque socket.id au joueur
 
 
-
 function socketHandler(io) {
     io.on('connection', (socket) => {
         console.log('A user connected', socket.id);
 
-        socket.on('joinGame', (pseudo) => {
+        socket.on('joinGame', (pseudo,id) => {
             // On crée un nouveau joueur après que le client ait rentré son pseudo
                     try
                     {
@@ -35,7 +34,8 @@ function socketHandler(io) {
                         // (0 = BTN, 1 = SB, 2 = BB, 3 = HJ, 4 = LJ, 5 = CO)
                         const p_reelle = playerController.findPositionReelle(gameController.getPlayers().length)
 
-                        const newPlayer = new Player(pseudo, 1000,x,y,p_reelle);
+                        //On donne au joueur l'id correspondant à son ID local
+                        const newPlayer = new Player(id,pseudo, 1000,x,y,p_reelle);
 
                         // Associer le socket.id au joueur nouvellement créé
                         playerSockets[socket.id] = newPlayer;
@@ -113,14 +113,15 @@ function socketHandler(io) {
 
         //Fais changer les places reelles pr passer au tour suivant (btn devient SB etc)
         socket.on('nextTour', () => {
-            gameController.getGame().changeBlind(gameController.getPlayers())
-
-            io.emit('updatePositionReelle',gameController.getPlayers(),gameController.getPot())
+            var players = gameController.getPlayers() ;
+            gameController.getGame().changeBlind(players)
+            console.log("PLAYERS DANS SOCKETHANDLER2: ",players)
+            io.emit('updatePositionReelle',players,gameController.getPot())
             const amount_SB = 0.5
             const amount_BB = 1
 
             // SB et BB posent leurs blindes
-            blinds.putBlinds(amount_SB,amount_BB,gameController.getPlayers(),gameController.getGame());
+            blinds.putBlinds(amount_SB,amount_BB,players,gameController.getGame());
             console.log('Le pot est de : ' ,gameController.getPot())
 
             //Distribue 2 cartes à chaque joueur
@@ -130,8 +131,19 @@ function socketHandler(io) {
             //J'envoie au front la liste des joueurs et le nouveau pot
             io.emit("updatePot&Stack",gameController.getPlayers(),gameController.getPot())
         });
-        socket.on('nextStreet',() => {
-            console.log('passage à la prochaine STREET')
+        socket.on('nextPlayer',() => {
+            console.log('passage au prochain joueur')
+            var players = gameController.getPlayers() ;
+            // J'envois au front l'ordre de jouer pour chaque joueur présent en donnant l'id du joueur qui doit jouer
+            
+            players.forEach((player,index) =>
+                {
+                    console.log('player unique :  ', player)
+                    var currentTurn = player.id
+                    io.emit("tourJoueur",currentTurn)
+                });
+
+
         })
 
     });

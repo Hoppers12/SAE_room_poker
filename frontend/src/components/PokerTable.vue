@@ -156,6 +156,7 @@ export default {
 }
 canvas {
   border: 2px solid #28a745;
+  background-color:white;
 }
 .bloc_canva {
   position: relative;
