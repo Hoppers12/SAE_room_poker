@@ -1,39 +1,42 @@
 <template>
-  <div :class="{'content': true, 'logged-in': isLoggedIn, 'not-logged-in': !isLoggedIn} ">
-    <div class="text" v-if="!isLoggedIn">
-      <p>Rejoignez notre site dès maintenant !</p>
-      <p>Jouez au Poker et faites des paris sportifs</p>
-    </div>
-    <div class="buttons" v-if="!isLoggedIn">
-      <div class="login">
-        <p>Pas de compte ?<br><router-link to="/SignUp" class="" style="color: white">S'inscrire</router-link></p>
-      </div>
-      <div class="signin">
-        <p>Déjà un compte ?<br><router-link to="/LogIn" class="" style="color: white">Se connecter</router-link></p>
-      </div>
-    </div>
+  <body>
 
-    <div class="header-inner" v-if="isLoggedIn">
-        <ul class="bloc-header">
-          <li> PROFIL </li>
-          <li> POKER </li>
-          <li> PARIS SPORTIF </li>
-        </ul>
-    </div>
+    <div :class="{'content': isLoggedIn,'logged-in': isLoggedIn, 'not-logged-in': !isLoggedIn} ">
+      <div class="buttons" v-if="!isLoggedIn">
+        <div class="login">
+          <p>Pas de compte ?<br><router-link to="/SignUp" class="" style="color: white">S'inscrire</router-link></p>
+        </div>
+        <div class="signin">
+          <p>Déjà un compte ?<br><router-link to="/LogIn" class="" style="color: white">Se connecter</router-link></p>
+        </div>
+      </div>
 
-  </div>
+      <div class="header-inner" v-if="isLoggedIn">
+          <ul class="bloc-header">
+            <router-link to="/Profile" class="nav-link"> <li>Profil</li></router-link>
+            <router-link to="/game" class="nav-link"> <li>Poker</li></router-link>
+            <router-link to="/bet" class="nav-link"> <li>Paris sportifs</li></router-link>
+          </ul>
+      </div>
+
+    </div>
+  </body>
 </template>
 
-<script >
+
+<script>
 
 
 export default {
   name: 'HomePage',
+  components: {
+  },
   data(){
     return {
       isLoggedIn: false,
       user:[],
     };
+  
   },
   mounted() {
     this.isLoggedIn = localStorage.getItem('isLoggedIn');
@@ -58,7 +61,6 @@ export default {
   height:15%;
   left: 0;
   top:25%;
-  z-index:50;
   z-index:2;
 }
 
@@ -69,7 +71,7 @@ export default {
   justify-content: space-between; /* Espacement équivalent entre les blocs */
   gap: 40px; /* Espacement supplémentaire entre les blocs */
   padding: 0;
-  margin: 0;
+
 }
 
 .bloc-header li {
@@ -84,6 +86,7 @@ export default {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Ombre légère pour l'effet de profondeur */
   transition: transform 0.3s ease, background-color 0.3s ease; /* Animation au survol */
   cursor: pointer; /* Curseur de clic */
+  text-decoration: none;
 }
 
 
@@ -96,11 +99,7 @@ export default {
   transform: scale(1); /* Réinitialisation lors du clic */
 }
 
-html, body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
+ 
 
 .content {
   position:absolute;
@@ -109,6 +108,7 @@ html, body {
   align-items: center;
   z-index:1;
   display:flex;
+  justify-content: center;
   top:0;
 }
 
@@ -126,6 +126,15 @@ html, body {
   background-size: 100vw, 100vh;
   position:fixed;
   z-index: 0; /* Gardez-le derrière le contenu */
+  position:absolute;
+  width: 100vw;
+  height: 100vh;
+  align-items: center;
+  z-index:1;
+  display:flex;
+  flex-direction: column;
+  justify-content: center;
+  top:0;
 }
 
 .text{
@@ -134,6 +143,8 @@ html, body {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
+  background-color:#ba181b;
+
 }
 
 .buttons{
@@ -201,11 +212,13 @@ body{
 body{
   margin:0;
   padding:0;  
+  z-index:-1;
 }
-nav {
-  display:none;
-}
+
+
+
 nav a {
   margin: 0 0;
 }
+
 </style>

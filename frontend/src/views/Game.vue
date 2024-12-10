@@ -1,5 +1,7 @@
 <template>
-  <div class="container mt-5" v-if="isLogged">
+  <NavBar/>
+  <div class="back">
+    <div class="container mt-5" v-if="isLogged">
     <div class="row">
       <div class="col-12 text-center">
       </div>
@@ -25,6 +27,10 @@
       </div>
     </div>
 
+
+  </div>
+  
+  
 </template>
 
 <script>
@@ -32,11 +38,12 @@ import { io } from "socket.io-client";
 import axios from "../axios";
 import PokerTable from "../components/PokerTable.vue";
 import { nextTick } from "vue";
-
+import NavBar from '../components/Navbar.vue'; // Import du composant NavBar
 export default {
   name: 'GamePlay',
   components: {
-    PokerTable
+    PokerTable,
+    NavBar
   },
   data() {
     return {
@@ -220,6 +227,16 @@ canvas {
 }
 .error {
   color: red;
+}
+
+.back {
+  background-image: url(../img/background.png);
+  background-repeat: no-repeat;
+  background-size: 100vw, 100vh;
+  position:fixed;
+  z-index: 0; /* Gardez-le derrière le contenu */
+  width:100vw;
+  height:100vh;
 }
 </style>
 

@@ -75,6 +75,7 @@
 
 <script>
 import axios from '../axios';
+import NavBar from '../components/Navbar.vue'; // Import du composant NavBar
 
 export default {
   name: 'ShowBet',
@@ -98,6 +99,9 @@ export default {
     canPlaceBet() {
       return this.stake > 0 && this.stake <= this.user.money;
     },
+  },
+  components: {
+    NavBar
   },
   methods: {
     async fetchUserBalance() {

@@ -201,6 +201,7 @@ app.post('/api/users', async (req, res) => {
 });
 
 app.post('/api/matches', async (req, res) => {
+
   const { home_team,away_team,match_name,result,id_sport,match_date,odds } = req.body;
   const newMatch = new Match({
     home_team,
@@ -217,6 +218,7 @@ app.post('/api/matches', async (req, res) => {
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
+
 });
 
 app.post('/api/bets', async (req, res) => {

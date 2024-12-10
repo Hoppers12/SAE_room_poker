@@ -1,6 +1,7 @@
 
 <template>
   <div id="app">
+
     <nav>
       <router-link to="/" class="nav-link">Accueil</router-link>
       <router-link to="/game" class="nav-link">Jeu</router-link>
@@ -28,13 +29,17 @@
       </div>
     </nav>
     <router-view/>
+
   </div>
 </template>
 
 <script>
 import axios from "../axios";
+
 export default {
   name: 'App',
+  components: {
+  },
   data() {
     return {
       isLoggedIn: false,
@@ -71,11 +76,6 @@ export default {
 
 <style scoped>
 
-body {
-  margin: 0;
-  font-family: 'Inter', sans-serif;
-  background-color: #f4f7fa;
-}
 
 /* NavBar */
 nav {
@@ -87,6 +87,7 @@ nav {
   position: sticky;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
+
 
 
 .dropdown {
