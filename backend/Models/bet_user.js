@@ -19,5 +19,4 @@ const betUserSchema = new mongoose.Schema({
 });
 
 const BetUser = mongoose.model('BetUser', betUserSchema);
-
 module.exports = BetUser;

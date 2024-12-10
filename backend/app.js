@@ -9,6 +9,11 @@ const Sport = require('./Models/sports')
 const Team = require('./Models/team')
 const Players = require('./Models/player')
 const BetUser = require('./Models/bet_user');
+const {createServer} = require('./server');
+require('./scheduler');
+
+
+
 
 const {join} = require("node:path");
 const app = express();
@@ -351,6 +356,5 @@ const {socketHandler,getPlayers}
 
 socketHandler(io);
 
-const { createServer } = require('./server');
 const Match = require("./Models/match");
 createServer();
