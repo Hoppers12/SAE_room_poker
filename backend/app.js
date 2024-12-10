@@ -8,6 +8,8 @@ const Notification = require('./Models/notifications')
 const Sport = require('./Models/sports')
 const Team = require('./Models/team')
 const Players = require('./Models/player')
+const BetUser = require('./Models/bet_user');
+
 const {join} = require("node:path");
 const app = express();
 
@@ -17,15 +19,71 @@ app.use(express.json());
 
 mongoose.connect('mongodb://bdd:27017/usersDB');
 app.get('/api/matches', async (req,res)=>{
-    try{
-        const matches = await Match.find();
-        res.json(matches);
-    } catch(err){
-        res.status(500).json({error : err.message});
-    }
+  try{
+    const matches = await Match.find();
+    res.json(matches);
+  } catch(err){
+    res.status(500).json({error : err.message});
+  }
 })
 
 
+
+app.get('/api/betUser', async (req, res) => {
+    try {
+        const betUsers = await BetUser.find();
+        res.json(betUsers);
+    } catch (error) {
+        console.error('Erreur lors de la récupération des paris utilisateur:', error);
+        res.status(500).json({ message: 'Erreur interne du serveur' });
+    }
+});
+
+app.get('/api/betUser/:id', async (req, res) => {
+    try {
+        const betUserId = req.params.id;
+        const betUser = await BetUser.find({ userId: betUserId });
+        if (!betUser) {
+        return res.status(404).json({ message: 'Pari utilisateur non trouvé' });
+        }
+        res.json(betUser);
+    } catch (error) {
+        console.error('Erreur lors de la recherche du pari utilisateur:', error);
+        res.status(500).json({ message: 'Erreur serveur' });
+    }
+});
+
+app.delete('/api/betUser/:id', async (req, res) => {
+    try {
+        const betUserId = req.params.id;
+        const result = await BetUser.findByIdAndDelete(betUserId);
+        if (!result) {
+        return res.status(404).json({ message: 'Pari utilisateur non trouvé' });
+        }
+        res.status(200).json({ message: 'Pari utilisateur supprimé avec succès' });
+    } catch (error) {
+        console.error('Erreur lors de la suppression du pari utilisateur:', error);
+        res.status(500).json({ message: 'Erreur interne du serveur' });
+    }
+});
+app.post('/api/betUser', async (req, res) => {
+  try {
+    const { userId, bets, stake, totalOdds } = req.body;
+    const potentialGain = (stake * totalOdds).toFixed(2);
+    const newBetUser = new BetUser({
+      userId,
+      bets,
+      stake,
+      totalOdds,
+      potentialGain,
+    });
+    const savedBetUser = await newBetUser.save();
+    res.status(201).json(savedBetUser);
+  } catch (error) {
+    console.error('Erreur lors de la création du pari utilisateur:', error);
+    res.status(500).json({ message: 'Erreur interne du serveur' });
+  }
+});
 app.get('/api/sports', async (req,res) =>{
   try{
     const sports = await Sport.find();
@@ -143,22 +201,24 @@ app.post('/api/users', async (req, res) => {
 });
 
 app.post('/api/matches', async (req, res) => {
-    const { home_team,away_team,match_name,result,id_sport,match_date,odds } = req.body;
-    const newMatch = new Match({
-        home_team,
-        away_team,
-        match_name,
-        result,
-        id_sport,
-        match_date,
-        odds
-    });
-    try {
-        const savedMatch = await newMatch.save();
-        res.status(201).json(savedMatch);
-    } catch (err) {
-        res.status(400).json({ error: err.message });
-    }
+
+  const { home_team,away_team,match_name,result,id_sport,match_date,odds } = req.body;
+  const newMatch = new Match({
+    home_team,
+    away_team,
+    match_name,
+    result,
+    id_sport,
+    match_date,
+    odds
+  });
+  try {
+    const savedMatch = await newMatch.save();
+    res.status(201).json(savedMatch);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+
 });
 
 app.post('/api/bets', async (req, res) => {
@@ -252,7 +312,7 @@ app.get('/api/users/:id', async (req, res) => {
 app.use(express.static(join(__dirname, '/frontend/dist')));
 
 app.get('*', (req, res) => {
-    res.sendFile(join(__dirname, '/frontend/dist', 'index.html'));
+  res.sendFile(join(__dirname, '/frontend/dist', 'index.html'));
 });
 
 const port = 3000;

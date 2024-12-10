@@ -1,17 +1,17 @@
 <template>
   <div id="admin-bets">
-    <h1 style="color: white">Gestion des Paris Sportifs</h1>
-
+    <div class="title">
+      <h1 style="color: white">Gestion des Paris Sportifs</h1>
+    </div>
     <div id="add-bet-form">
-      <h3>Ajouter un nouveau pari</h3>
+      <div class="title">
+        <h3>Ajouter un nouveau pari</h3>
+      </div>
       <form @submit.prevent="addNewBet">
-
-        <label for="bet_date">Date du Pari</label>
-        <input type="date" v-model="newBet.bet_date" required />
-
+        <label for="bet_date">Date du Pari (Par défaut aujourd'hui)</label>
+        <input type="date" v-model="newBet.bet_date" />
         <label for="bet_expire_date">Date d'Expiration du Pari (Par défaut une semaine)</label>
         <input type="date" v-model="newBet.bet_expire_date" />
-
         <label for="sport">Sport</label>
         <select v-model="newBet.sport" required>
           <option disabled value="">Sélectionnez un sport</option>
@@ -19,7 +19,6 @@
             {{ sport.name }}
           </option>
         </select>
-
         <div v-if="newBet.sport">
           <label for="team">Equipe</label>
           <select v-model="newBet.team" required>
@@ -29,7 +28,6 @@
             </option>
           </select>
         </div>
-
         <div v-if="newBet.team">
           <label for="matches">Match</label>
           <select v-model="newBet.matches" required>
@@ -39,8 +37,6 @@
             </option>
           </select>
         </div>
-
-
         <div v-if="newBet.matches && getOddsForMatch(newBet.matches).length">
           <label for="bet_odds">Cotes</label>
           <select v-model="newBet.bet_odds" required>
@@ -107,7 +103,7 @@
         </td>
 
         <td>
-          <button @click="updateBet(bet)">Sauvegarder</button>
+          <button @click="updateBet(bet)" class="save-btn">Sauvegarder</button>
           <button @click="deleteBet(bet._id)" class="delete-btn">Supprimer</button>
         </td>
       </tr>
@@ -197,7 +193,7 @@ export default {
     async updateBet(bet) {
       try {
         await axios.put(`/api/bets/${bet._id}`, bet);
-        alert(`Le pari ${bet._id} a été mis à jour avec succès!`);
+        window.location.reload();
       } catch (error) {
         console.error("Error updating bet:", error);
         alert(`Erreur lors de la mise à jour du pari ${bet._id}`);
@@ -208,7 +204,7 @@ export default {
         try {
           await axios.delete(`/api/bets/${betId}`);
           this.bets = this.bets.filter(bet => bet._id !== betId);
-          alert("Pari supprimé avec succès.");
+          window.location.reload();
         } catch (error) {
           console.error("Error deleting bet:", error);
           alert("Erreur lors de la suppression du pari.");
@@ -217,30 +213,39 @@ export default {
     },
     async addNewBet() {
       try {
+
+        if (!this.newBet.bet_date) {
+          this.newBet.bet_date = new Date().toISOString().split('T')[0];
+        }
         if (!this.newBet.bet_expire_date) {
           this.newBet.bet_expire_date = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
         }
-        const odds = this.newBet.bet_odds;
-        const payload = {
-          ...this.newBet,
-          bet_odds: odds ? {
-            home: odds.home,
-            draw: odds.draw,
-            away: odds.away,
-          } : null,
-        };
-        const response = await axios.post("/api/bets", payload);
-        this.bets.push(response.data);
+        if (this.bets.find(bet => bet.matches === this.newBet.matches)) {
+          alert("Ce pari existe déjà");
+        }
+        else{
+          const odds = this.newBet.bet_odds;
+          const payload = {
+            ...this.newBet,
+            bet_odds: odds ? {
+              home: odds.home,
+              draw: odds.draw,
+              away: odds.away,
+            } : null,
+          };
+          const response = await axios.post("/api/bets", payload);
+          this.bets.push(response.data);
 
-        this.newBet = {
-          bet_date: '',
-          bet_expire_date: '',
-          sport: '',
-          bet_odds: '',
-          team: '',
-          matches: '',
-        };
-        alert("Nouveau pari ajouté avec succès!");
+          this.newBet = {
+            bet_date: '',
+            bet_expire_date: '',
+            sport: '',
+            bet_odds: '',
+            team: '',
+            matches: '',
+          };
+          window.location.reload();
+        }
       } catch (error) {
         console.error("Error adding new bet:", error);
         alert("Erreur lors de l'ajout du pari.");
@@ -254,7 +259,13 @@ export default {
 </script>
 
 <style>
+
+.title{
+  text-align: center;
+}
+
 #admin-bets {
+  background:#0e121a;
   padding: 20px;
   font-family: 'Inter', sans-serif;
 }
@@ -322,7 +333,7 @@ th, td {
 }
 
 th {
-  background-color: #8b3a62;
+  background-color: #b32737;
   color: white;
   font-weight: bold;
 }
@@ -338,13 +349,17 @@ button {
   padding: 8px 12px;
   background-color: #4cc8ed;
   border: none;
-  border-radius: 5px;
+  border-radius: 10px;
   color: white;
   cursor: pointer;
   transition: background-color 0.3s;
 }
 
-button:hover {
+.save-btn{
+  background-color: #4cc8ed;
+  border-radius: 5px;
+}
+.save-btn:hover{
   background-color: #3aa9d9;
 }
 
