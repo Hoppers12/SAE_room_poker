@@ -68,8 +68,8 @@
   align-items: center;
     background: linear-gradient(
         to right, 
-        rgba(0, 0, 0, 0.3), 
-        rgba(230, 57, 70, 0.3)
+        rgba(0, 0, 0, 0),
+        rgba(230, 57, 70, 0)
     ); /* Dégradé noir à rouge avec transparence */
   padding: 15px 20px;
   position: sticky;

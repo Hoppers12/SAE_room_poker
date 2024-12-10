@@ -2,32 +2,6 @@
 <template>
   <div id="app">
 
-    <nav>
-      <router-link to="/" class="nav-link">Accueil</router-link>
-      <router-link to="/game" class="nav-link">Jeu</router-link>
-      <div class="dropdown">
-        <button class="nav-link dropdown-btn" name="Compte">
-          Paris
-        </button>
-        <div class="dropdown-content">
-          <router-link to="/bet" class="dropdown-link">Parier</router-link>
-          <router-link to="/BetResume" class="dropdown-link" v-if="isLoggedIn">Mes paris</router-link>
-        </div>
-      </div>
-      <div class="dropdown">
-        <button class="nav-link dropdown-btn" name="Compte">
-          {{isLoggedIn ? user.pseudo : 'Compte'}}
-        </button>
-        <div class="dropdown-content">
-          <router-link to="/SignUp" class="dropdown-link" v-if="!isLoggedIn">S'inscrire</router-link>
-          <router-link to="/LogIn" class="dropdown-link" v-if="!isLoggedIn">Se connecter</router-link>
-          <router-link to="/Profile" class="dropdown-link" v-if="isLoggedIn">Mon profil</router-link>
-          <router-link to="/Admin/Account" class="dropdown-link" v-if="isLoggedIn && isAdmin">Gestion des comptes</router-link>
-          <router-link to="/Admin/AdminBet" class="dropdown-link" v-if="isLoggedIn && isAdmin">Gestion des paris</router-link>
-          <button class="dropdown-link logout-btn" @click="logout" v-if="isLoggedIn ">Se déconnecter</button>
-        </div>
-      </div>
-    </nav>
     <router-view/>
 
   </div>

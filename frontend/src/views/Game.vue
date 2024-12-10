@@ -237,6 +237,7 @@ canvas {
   z-index: 0; /* Gardez-le derrière le contenu */
   width:100vw;
   height:100vh;
+  top:0;
 }
 </style>
 
