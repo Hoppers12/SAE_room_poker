@@ -1,4 +1,5 @@
 <template>
+  <NavBar/>
   <div id="bet-page" v-if="isLoggedIn">
     <div class="header">
       <h1>Paris Disponibles</h1>
