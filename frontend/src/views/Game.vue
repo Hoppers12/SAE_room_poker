@@ -9,10 +9,10 @@
     <div class="row mt-4">
       <PokerTable ref="pokerTableRef" :players="players" :notification="notification"/>
       <button @click="next" class="w-25 h-10">TOUR SUIVANT</button>
-      <button @click="nextPlayer" class="w-25 h-10">STREET SUIVANTE</button>
-      <button  class="w-25 h-10 action-buttons">FOLD</button>
-      <button  class="w-25 h-10 action-buttons">CHECK</button>
-      <button  class="w-25 h-10 action-buttons">RAISE</button>
+      <button @click="nextPlayer" class="w-25 h-10">PLAYER SUIVANT</button>
+      <button  @click="handleAction('fold')" class="w-25 h-10 action-buttons">FOLD</button>
+      <button  @click="handleAction('check')" class="w-25 h-10 action-buttons">CHECK</button>
+      <button  @click="handleAction('raise')" class="w-25 h-10 action-buttons">RAISE</button>
       </div>  
       <div class="col-md-4">
         <div class="mb-3">
@@ -24,6 +24,7 @@
           <p v-if="errorMessage" class="error">{{errorMessage}}</p>
         </div>
         <div>
+          <p class="bg-white w-3 text-black "> Au tour de : {{playerActifName}}</p>
           <h2 class="h4 text-light">Liste des joueurs présents</h2>
           <ul id="liste_joueurs" class="list-group bg-secondary text-white border-light"></ul>
         </div>
@@ -55,7 +56,8 @@ export default {
       socket: null,
       user: [],
       errorMessage: '',
-      players: []
+      players: [],
+      playerActifName : ''
     };
   },
   methods: {
@@ -97,7 +99,24 @@ export default {
     },
     getPlayers() {
       return this.players
-    }
+    },
+
+  // Nouvelle méthode pour gérer les actions, elle valide au serveur que le joueur a bien joué (tourTermine)
+  async handleAction(action) {
+    const playerLocalId = await this.getLocalPlayerId();
+
+    // Affiche un message dans la console pour le debug
+    console.log(`Action effectuée : ${action} par le joueur ${playerLocalId}`);
+
+ 
+    //this.socket.emit("tourTermine", playerLocalId, action);
+    this.socket.emit("tourTermine", playerLocalId,action);
+    console.log("Événement tourTermine émis :", playerLocalId);
+
+
+    // Cache les boutons après l'action
+    hideActionButtons();
+  },
   },
   async mounted() {
     this.checkStatus();
@@ -124,7 +143,7 @@ export default {
       if (this.$refs.pokerTableRef) {
         this.$refs.pokerTableRef.cleanPlayersOverride(ctx, players, pot);
       }
-      console.log("PLAYERS  DANS GAME.VUE: ", players)
+
       // on fait la conversion pr transformer la forme de la carte en la premeire lettre en anglais pr 
       // que ça corresponde à l'url de l'API
       const suitMap = {
@@ -194,10 +213,12 @@ export default {
       });
     });
 
-    //Affiche les boutons pour que le joueur d'id current turn joue
-    this.socket.on('tourJoueur', async (currentTurn) => {
+    //Affiche les boutons pour que le joueur d'id current turn joue et efface sur l'écran de l'ancien joueur actif
+    this.socket.on('tourJoueur', async (currentTurn, PlayerCurrentName) => {
+
       var playerLocalId = await this.getLocalPlayerId()
       console.log("playerLOcalId et currentTurn", playerLocalId, currentTurn)
+      this.playerActifName = PlayerCurrentName
       // Si le joueur connecté correspond au joueur qui doit jouer alors on lui affiche ses boutons
       if (playerLocalId == currentTurn) {
         showActionButtons()
@@ -205,7 +226,9 @@ export default {
         hideActionButtons()
       }
 
+
     })
+
     // Wait for next DOM update to confirm refs are set, then call renderTable()
     await nextTick();
     if (this.$refs.pokerTableRef) {
