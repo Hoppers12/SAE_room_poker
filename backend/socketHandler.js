@@ -7,6 +7,9 @@ const Card = require("./classesJeu/Card");
 
 var index_current_player = 0
 let playerSockets = {}; // Associer chaque socket.id au joueur
+var idQuiOntFold = [] ;
+// 0 si préflop, 1 : flop, 2 : Turn, 3 : River
+var streetCourante = 0 ;
 
 
 function socketHandler(io) {
@@ -134,17 +137,55 @@ function socketHandler(io) {
 
         socket.on('tourTermine',(player_finish_play_id,action)=> {
             console.log("Le tour est terminé, le joueur : ", player_finish_play_id, " a choisi de : ", action)
+
+            if(action == "fold") {
+                //On ajoute l'id du joueur qui a fold dans le tableau des joueurs qui ont fold
+                idQuiOntFold.push(player_finish_play_id)
+                console.log("Le joueur a passé son tour, il est donc exclu jusqu'à la prochaine main")
+            }else if(action == "check") {
+                console.log("Le joueur a check, il attend de voir les actions des autres joueurs") 
+            }else if(action == "raise") {
+                console.log("Le joueur a decider de raise (miser)")
+            }
             console.log("JOUEUR SUIVANT 2 :")
             index_current_player += 1
 
             const players = gameController.getPlayers();
-            const players_id = players.map(player => player.id);
-            
-            if (players.length >= index_current_player +1) {
+            var players_id ;
+            // Si il y a un joueur qui a fold on l'exclu du prochain tour 
+            if (idQuiOntFold != []) {
+
+                players_id = players
+                .filter(player => !idQuiOntFold.includes(player.id)) // Exclure les joueurs dont l'ID est dans idQuiOntFold
+                .map(player => player.id); // Extraire les ID restants
+              
+            //Sinon on ajoute tous les joueurs
+            } else {
+                players_id = players.map(player = player.id)
+            }
+
+            console.log("playersid : ", players_id)
+            console.log("players : ", players)
+            console.log("index_current_player : ", index_current_player)
+            console.log("players.length : ", players.length)
+
+            // Si il reste des joueurs qui doivent jouer 
+            if (players_id.length >= index_current_player +1) 
+                {
+                console.log("Joueur qui doit jouer mtn ", players_id[index_current_player])
                 //On envoie l'id du joueur qui doit jouer maintenant
                 io.emit('tourJoueur',players_id[index_current_player],players[index_current_player].name)
-            }else {
-                console.log("Tour de table fini")
+            }
+            else if (players_id != []) 
+                //Si des joueurs n'ont pas fold au tour d'avant, on recommence au début du tableau pr les faire rejoeur
+                {
+                console.log("Des joueurs qui ne se sont pas couchés peuvent rejouer")
+                index_current_player = 0
+                io.emit('tourJoueur',players_id[index_current_player],players[index_current_player].name)
+            }
+            else
+             {
+                console.log("Main terminé, on redistribue pour passer au prochain tour")
                 index_current_player = 0
             }
 
