@@ -66,6 +66,21 @@ class PokerGame {
         console.log(player.name, 'perd : ' , amount , ' jetons')
     }
 
+    getNbChips(player) {
+        return player.getNbChips
+    }
+    resetPot() {
+        this.pot = 0
+    }
+    //Donne le pot à un joueur et remet le pot à 0
+    winPot(player) {
+        player.winChips(this.pot)
+        var potGagne = this.pot
+        this.resetPot()
+        return potGagne
+    }
+
+
     // Tour de jeu : passe au joueur suivant
     nextTurn() {
         this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.length;

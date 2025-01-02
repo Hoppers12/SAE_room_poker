@@ -51,6 +51,10 @@ class Player {
         this.hand.push(card);
     }
 
+    getNbChips() {
+        return this.chips
+    }
+
     // Parier des jetons
     bet(amount) {
         if (amount > this.chips) {
@@ -75,6 +79,11 @@ class Player {
     // Récupérer sa main sous forme de texte
     showHand() {
         return this.hand.map(card => card.toString()).join(', ');
+    }
+
+    //Permet de faire gagner des jetons au joueur
+    winChips(value) {
+        this.chips += value
     }
 }
 

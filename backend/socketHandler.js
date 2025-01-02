@@ -11,7 +11,7 @@ var idQuiOntFold = [] ;
 // 0 si préflop, 1 : flop, 2 : Turn, 3 : River
 var streetCourante = 0 ;
 //Le "pot secondaire" càd le pot du tour actuel qui sera ajouté au pot global à la fin du tour
-
+var potCourant = 0;
 function getPlayers() {
     return gameController.getPlayers()
 }
@@ -135,7 +135,7 @@ function socketHandler(io) {
             console.log("players id : ", players_id)
 
             //On envoie l'id du joueur qui doit jouer maintenant
-            io.emit('tourJoueur',players_id[index_current_player])
+            io.emit('tourJoueur',players_id[index_current_player],players[index_current_player].name,potCourant)
             
             
         });
@@ -145,7 +145,8 @@ function socketHandler(io) {
             var playersListe = gameController.getPlayers();
             //On extrait les données 
             var {action, amount,allin} = data
-            const playerActuel = playersListe.find(player => player.id === player_finish_play_id);      
+            const playerActuel = playersListe.find(player => player.id === player_finish_play_id);   
+              
             if(action == "fold") {
                 //On ajoute l'id du joueur qui a fold dans le tableau des joueurs qui ont fold
                 idQuiOntFold.push(player_finish_play_id)
@@ -161,11 +162,23 @@ function socketHandler(io) {
                     amount = gameController.getPot() * (amount)
                      }
                 //Mise en place de la mise du joueur
+                potCourant+=amount
                 gameController.getGame().bet(playerActuel,amount)
                 console.log("Le joueur a decider de raise (miser) " , amount)
                 // On envoie les nouvelles infos au front
                 io.emit("updatePot&Stack", gameController.getPlayers(), gameController.getPot());
         
+            }else if (action == "call") {
+                console.log("NB CHIPS : ",gameController.getGame().getNbChips(playerActuel))
+                if (gameController.getGame().getNbChips(playerActuel) >= potCourant) {
+                    gameController.getGame().bet(playerActuel,potCourant)
+                    console.log("Le joueur a call un montant de : ", potCourant)
+                }else {
+                    console.log("Le joueur n'a pas assez de jeton pour call ! Choisir une autre option")
+                }
+
+                // On envoie les nouvelles infos au front
+                io.emit("updatePot&Stack", gameController.getPlayers(), gameController.getPot());
             }
 
             console.log("JOUEUR SUIVANT 2 :")
@@ -190,18 +203,33 @@ function socketHandler(io) {
                 {
                 console.log("Joueur qui doit jouer mtn ", players_id[index_current_player])
                 //On envoie l'id du joueur qui doit jouer maintenant
-                io.emit('tourJoueur',players_id[index_current_player],players[index_current_player].name)
+                io.emit('tourJoueur',players_id[index_current_player],players[index_current_player].name,potCourant)
             }
             else if (players_id != []) 
                 //Si des joueurs n'ont pas fold au tour d'avant, on recommence au début du tableau pr les faire rejoeur
+                //si il y a eu une mise
                 {
+                //On remet le potCourant à 0 car tlm l'a comblé ou a fold
+                potCourant = 0
                 console.log("Des joueurs qui ne se sont pas couchés peuvent rejouer")
                 index_current_player = 0
-                io.emit('tourJoueur',players_id[index_current_player],players[index_current_player].name)
-            }
+                // Si il ne reste que un joueur ça veut dire que c'est le seul à ne pas avoir fold donc il gagne
+                if (players_id.length == 1) {
+                    console.log("Des joueurs qui ne se sont pas couchés peuvent rejouer")
+                    console.log(players[index_current_player].name, " a gagné le coup")
+                    potCourant = 0
+                    //On fait gagner le coup au joueur restant en lui donnant le pot
+                    nbJetonsGagnes = gameController.winChips(players[index_current_player])
+                    io.emit("updatePot&Stack", gameController.getPlayers(), gameController.getPot());
+                } else {
+                    io.emit('tourJoueur',players_id[index_current_player],players[index_current_player].name,potCourant)
+                }
+
+                 }
             else
              {
                 console.log("Main terminé, on redistribue pour passer au prochain tour")
+                potCourant = 0
                 index_current_player = 0
             }
 

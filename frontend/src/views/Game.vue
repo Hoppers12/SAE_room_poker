@@ -10,9 +10,10 @@
       <PokerTable ref="pokerTableRef" :players="players" :notification="notification"/>
       <button @click="next" class="w-25 h-10">TOUR SUIVANT</button>
       <button @click="nextPlayer" class="w-25 h-10">PLAYER SUIVANT</button>
-      <button  @click="handleAction('fold')" class="w-25 h-10 action-buttons">FOLD</button>
+      <button  @click="handleAction('fold')" id = "foldButton" class="w-25 h-10 action-buttons">FOLD</button>
       <button  @click="handleAction('check')" class="w-25 h-10 action-buttons">CHECK</button>
-  
+      <button  @click="handleAction('call')" id="callButton" class="w-25 h-10 action-buttons">CALL</button>
+
       <fieldset class="bg-white">
           <legend>Choisir le % du pot à relancer</legend>
 
@@ -147,13 +148,13 @@ export default {
     const playerLocalId = await this.getLocalPlayerId();
     if (this.raiseAmount == "all") {
       allin = true
-      const canvas = document.getElementById('pokerTable');
-      const ctx = canvas.getContext('2d');
+    } 
+    if (action == "call") {
       const li = document.createElement('li');
-      li.className = 'list-group-item bg-error text-white';
-      li.innerText = `Un joueur a fait ALL-IN`;
-      document.getElementById('chat_connexion').appendChild(li);
+      li.className = 'list-group-item bg-success text-white';
+      li.innerText = `Le joueur a call`;
     }
+
     // Affiche un message dans la console pour le debug
     console.log(`Action effectuée : ${action} par le joueur ${playerLocalId}, montant: ${this.raiseAmount || 0}`);
  
@@ -240,6 +241,7 @@ export default {
       }
     });
 
+
     this.socket.on('quitterJoueur', (player, players, pot) => {
       const li = document.createElement('li');
       li.className = 'list-group-item bg-danger text-white';
@@ -264,14 +266,25 @@ export default {
     });
 
     //Affiche les boutons pour que le joueur d'id current turn joue et efface sur l'écran de l'ancien joueur actif
-    this.socket.on('tourJoueur', async (currentTurn, PlayerCurrentName) => {
+    this.socket.on('tourJoueur', async (currentTurn, PlayerCurrentName, montantACall) => {
 
       var playerLocalId = await this.getLocalPlayerId()
       console.log("playerLOcalId et currentTurn", playerLocalId, currentTurn)
       this.playerActifName = PlayerCurrentName
       // Si le joueur connecté correspond au joueur qui doit jouer alors on lui affiche ses boutons
       if (playerLocalId == currentTurn) {
-        showActionButtons()
+        console.log("Montant à call : " , montantACall)
+        const li = document.createElement('li');
+        li.className = 'list-group-item bg-orange text-green';
+        li.innerText = `Vous devez suivre : ${montantACall}`;
+        document.getElementById('chat_connexion').appendChild(li);
+
+        // Si un joueur n'a pas misé avant alors on affiche tt les boutons sinon on oblige à call or fold
+        if (montantACall == 0) {
+          showActionButtons()
+        }else {
+          showCallOrFoldButtons()
+        }
       }else {
         hideActionButtons()
       }
@@ -294,7 +307,15 @@ function showActionButtons() {
         button.style.display = "block";
     });
 }
+//Affiche seulement le bouton call et fold
+function showCallOrFoldButtons() {
+  const buttonCall = document.getElementById('callButton'); 
+  const buttonFold = document.getElementById('foldButton'); 
 
+  buttonCall.style.display = "block";
+  buttonFold.style.display = "block";
+
+}
 function hideActionButtons() {
   const buttons = document.querySelectorAll(".action-buttons"); // Retourne un NodeList
     buttons.forEach(button => {

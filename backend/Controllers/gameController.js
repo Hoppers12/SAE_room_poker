@@ -29,6 +29,9 @@ function getPot() {
 function getGame() {
     return game;
 }
+function getNbChips(player) {
+    return player.getNbChips()
+}
 
 function ajoutNouveauJoueurDansPartie(newPlayer,io)
 {
@@ -54,6 +57,12 @@ function setPlayers(new_players) {
     players = new_players
 }
 
+//Fais gagner un pot à un joueur donné
+function winChips(player) {
+    nbJetonsGagnes = game.winPot(player)
+    return nbJetonsGagnes
+}
+
 module.exports = {
     gestionPartie,
     ajoutNouveauJoueurDansPartie,
@@ -62,6 +71,8 @@ module.exports = {
     getGame,
     setPlayers,
     getPot,
+    winChips,
+    getNbChips
 };
 
 
