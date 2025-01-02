@@ -10,7 +10,11 @@ let playerSockets = {}; // Associer chaque socket.id au joueur
 var idQuiOntFold = [] ;
 // 0 si préflop, 1 : flop, 2 : Turn, 3 : River
 var streetCourante = 0 ;
+//Le "pot secondaire" càd le pot du tour actuel qui sera ajouté au pot global à la fin du tour
 
+function getPlayers() {
+    return gameController.getPlayers()
+}
 
 function socketHandler(io) {
     io.on('connection', (socket) => {
@@ -105,6 +109,8 @@ function socketHandler(io) {
         // Fais changer les places réelles pour passer au tour suivant (btn devient SB etc.)
         socket.on('nextTour', () => {
             var players = gameController.getPlayers();
+
+            potTourCourant = gameController.getPot()
             gameController.getGame().changeBlind(players);
             io.emit('updatePositionReelle', players, gameController.getPot());
 
@@ -135,9 +141,11 @@ function socketHandler(io) {
         });
 
 
-        socket.on('tourTermine',(player_finish_play_id,action)=> {
-            console.log("Le tour est terminé, le joueur : ", player_finish_play_id, " a choisi de : ", action)
-
+        socket.on('tourTermine',(player_finish_play_id,data)=> {
+            var playersListe = gameController.getPlayers();
+            //On extrait les données 
+            var {action, amount,allin} = data
+            const playerActuel = playersListe.find(player => player.id === player_finish_play_id);      
             if(action == "fold") {
                 //On ajoute l'id du joueur qui a fold dans le tableau des joueurs qui ont fold
                 idQuiOntFold.push(player_finish_play_id)
@@ -145,8 +153,21 @@ function socketHandler(io) {
             }else if(action == "check") {
                 console.log("Le joueur a check, il attend de voir les actions des autres joueurs") 
             }else if(action == "raise") {
-                console.log("Le joueur a decider de raise (miser)")
+                //Si tapis on mise tout le stack sinon juste la valeur choisie
+                if(allin) {
+                    amount = playerActuel.chips
+                }else {
+                    // Transformation du pourcentage entrée en montant réel
+                    amount = gameController.getPot() * (amount)
+                     }
+                //Mise en place de la mise du joueur
+                gameController.getGame().bet(playerActuel,amount)
+                console.log("Le joueur a decider de raise (miser) " , amount)
+                // On envoie les nouvelles infos au front
+                io.emit("updatePot&Stack", gameController.getPlayers(), gameController.getPot());
+        
             }
+
             console.log("JOUEUR SUIVANT 2 :")
             index_current_player += 1
 
@@ -163,11 +184,6 @@ function socketHandler(io) {
             } else {
                 players_id = players.map(player = player.id)
             }
-
-            console.log("playersid : ", players_id)
-            console.log("players : ", players)
-            console.log("index_current_player : ", index_current_player)
-            console.log("players.length : ", players.length)
 
             // Si il reste des joueurs qui doivent jouer 
             if (players_id.length >= index_current_player +1) 
@@ -196,5 +212,6 @@ function socketHandler(io) {
 }
 
 module.exports = {
-    socketHandler
+    socketHandler,
+    getPlayers
 };

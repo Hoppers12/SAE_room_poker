@@ -12,8 +12,38 @@
       <button @click="nextPlayer" class="w-25 h-10">PLAYER SUIVANT</button>
       <button  @click="handleAction('fold')" class="w-25 h-10 action-buttons">FOLD</button>
       <button  @click="handleAction('check')" class="w-25 h-10 action-buttons">CHECK</button>
-      <button  @click="handleAction('raise')" class="w-25 h-10 action-buttons">RAISE</button>
-      </div>  
+  
+      <fieldset class="bg-white">
+          <legend>Choisir le % du pot à relancer</legend>
+
+          <div>
+            <input type="radio" id="amount25" name="amount" value="0.25" v-model="raiseAmount" />
+            <label for="amount25">25%</label>
+          </div>
+
+          <div>
+            <input type="radio" id="amount50" name="amount" value="0.50" v-model="raiseAmount" />
+            <label for="amount50">50%</label>
+          </div>
+
+          <div>
+            <input type="radio" id="amount75" name="amount" value="0.75" v-model="raiseAmount" />
+            <label for="amount75">75%</label>
+          </div>
+
+          <div>
+            <input type="radio" id="amount100" name="amount" value="1" v-model="raiseAmount" />
+            <label for="amount100">100%</label>
+          </div>
+
+          <div>
+            <input type="radio" id="amountAllIn" name="amount" value="all" v-model="raiseAmount" />
+            <label for="amountAllIn">All-in</label>
+          </div>
+
+          <button @click="handleAction('raise')" class="w-25 h-10 action-buttons">RAISE</button>
+      </fieldset>
+  </div>  
       <div class="col-md-4">
         <div class="mb-3">
           <h2 class="h4 text-light">Connexion</h2>
@@ -43,6 +73,7 @@ import axios from "../axios";
 import PokerTable from "../components/PokerTable.vue";
 import { nextTick } from "vue";
 import NavBar from '../components/Navbar.vue'; // Import du composant NavBar
+
 export default {
   name: 'GamePlay',
   components: {
@@ -57,7 +88,8 @@ export default {
       user: [],
       errorMessage: '',
       players: [],
-      playerActifName : ''
+      playerActifName : '',
+      raiseAmount : null 
     };
   },
   methods: {
@@ -100,19 +132,37 @@ export default {
     getPlayers() {
       return this.players
     },
+    //Retourne l'objet player d'id id
+    getPlayerFromId(idATrouver) {
+      const players = this.getPlayers()
+      console.log("players : " , players)
+      const playerActuel = players.find(player => player.id === idATrouver);
+      return playerActuel
+    },
 
   // Nouvelle méthode pour gérer les actions, elle valide au serveur que le joueur a bien joué (tourTermine)
   async handleAction(action) {
+    //AllIn = true si le joueur a fait tapis
+    var allin = false
     const playerLocalId = await this.getLocalPlayerId();
-
+    if (this.raiseAmount == "all") {
+      allin = true
+      const canvas = document.getElementById('pokerTable');
+      const ctx = canvas.getContext('2d');
+      const li = document.createElement('li');
+      li.className = 'list-group-item bg-error text-white';
+      li.innerText = `Un joueur a fait ALL-IN`;
+      document.getElementById('chat_connexion').appendChild(li);
+    }
     // Affiche un message dans la console pour le debug
-    console.log(`Action effectuée : ${action} par le joueur ${playerLocalId}`);
-
+    console.log(`Action effectuée : ${action} par le joueur ${playerLocalId}, montant: ${this.raiseAmount || 0}`);
  
-    //this.socket.emit("tourTermine", playerLocalId, action);
-    this.socket.emit("tourTermine", playerLocalId,action);
-    console.log("Événement tourTermine émis :", playerLocalId);
 
+    //J'envoie au backend l'action qu'a chooisi le joueur et le montant du raise si il y en a un
+    this.socket.emit("tourTermine", playerLocalId, { action, amount: this.raiseAmount || 0,allin });
+    console.log("Événement tourTermine émis :", playerLocalId);
+    this.isRaise = false; // Cache l'input après validation
+    this.raiseAmount = null; // Réinitialise le montant après envoi
 
     // Cache les boutons après l'action
     hideActionButtons();
@@ -178,7 +228,7 @@ export default {
 
       const li = document.createElement('li');
       li.className = 'list-group-item bg-info text-white';
-      li.innerText = `Une blinde a été posée, le pot est maintenant de : ${pot}`;
+      li.innerText = `le pot est maintenant de : ${pot}`;
       document.getElementById('chat_connexion').appendChild(li);
     });
 
@@ -295,6 +345,11 @@ canvas {
   height:100vh;
   top:0;
 }
+
+input {
+  margin-top: 10px;
+}
+
 </style>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
