@@ -149,6 +149,7 @@ export default {
     if (this.raiseAmount == "all") {
       allin = true
     } 
+    //Affichage à titre informatif sur le front
     if (action == "call") {
       const li = document.createElement('li');
       li.className = 'list-group-item bg-success text-white';

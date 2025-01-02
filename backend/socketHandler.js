@@ -170,6 +170,7 @@ function socketHandler(io) {
         
             }else if (action == "call") {
                 console.log("NB CHIPS : ",gameController.getGame().getNbChips(playerActuel))
+                //Si le joueur a assez de jeton pour call on le fait call sinon message
                 if (gameController.getGame().getNbChips(playerActuel) >= potCourant) {
                     gameController.getGame().bet(playerActuel,potCourant)
                     console.log("Le joueur a call un montant de : ", potCourant)
