@@ -11,10 +11,10 @@
       <button @click="next" class="w-25 h-10">TOUR SUIVANT</button>
       <button @click="nextPlayer" class="w-25 h-10">PLAYER SUIVANT</button>
       <button  @click="handleAction('fold')" id = "foldButton" class="w-25 h-10 action-buttons">FOLD</button>
-      <button  @click="handleAction('check')" class="w-25 h-10 action-buttons">CHECK</button>
+      <button  @click="handleAction('check')" id="checkButton" class="w-25 h-10 action-buttons">CHECK</button>
       <button  @click="handleAction('call')" id="callButton" class="w-25 h-10 action-buttons">CALL</button>
 
-      <fieldset class="bg-white">
+      <fieldset id ="raiseButton" class="bg-white  action-buttons">
           <legend>Choisir le % du pot à relancer</legend>
 
           <div>
@@ -42,7 +42,7 @@
             <label for="amountAllIn">All-in</label>
           </div>
 
-          <button @click="handleAction('raise')" class="w-25 h-10 action-buttons">RAISE</button>
+          <button @click="handleAction('raise')" class="w-25 h-10">RAISE</button>
       </fieldset>
   </div>  
       <div class="col-md-4">
@@ -164,7 +164,7 @@ export default {
     this.socket.emit("tourTermine", playerLocalId, { action, amount: this.raiseAmount || 0,allin });
     console.log("Événement tourTermine émis :", playerLocalId);
     this.isRaise = false; // Cache l'input après validation
-    this.raiseAmount = null; // Réinitialise le montant après envoi
+    this.raiseAmount = 0; // Réinitialise le montant après envoi
 
     // Cache les boutons après l'action
     hideActionButtons();
@@ -312,9 +312,14 @@ function showActionButtons() {
 function showCallOrFoldButtons() {
   const buttonCall = document.getElementById('callButton'); 
   const buttonFold = document.getElementById('foldButton'); 
+  const buttonRaise = document.getElementById('raiseButton'); 
+  const buttonCheck = document.getElementById('checkButton'); 
 
   buttonCall.style.display = "block";
   buttonFold.style.display = "block";
+  buttonRaise.style.display = "none";
+  buttonCheck.style.display = "none";
+
 
 }
 function hideActionButtons() {

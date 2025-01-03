@@ -8,6 +8,7 @@ const Card = require("./classesJeu/Card");
 var index_current_player = 0
 let playerSockets = {}; // Associer chaque socket.id au joueur
 var idQuiOntFold = [] ;
+var idQuiARaise ; ;
 // 0 si préflop, 1 : flop, 2 : Turn, 3 : River
 var streetCourante = 0 ;
 //Le "pot secondaire" càd le pot du tour actuel qui sera ajouté au pot global à la fin du tour
@@ -148,10 +149,12 @@ function socketHandler(io) {
             const playerActuel = playersListe.find(player => player.id === player_finish_play_id);   
               
             if(action == "fold") {
+                amount=0
                 //On ajoute l'id du joueur qui a fold dans le tableau des joueurs qui ont fold
                 idQuiOntFold.push(player_finish_play_id)
                 console.log("Le joueur a passé son tour, il est donc exclu jusqu'à la prochaine main")
             }else if(action == "check") {
+                amount=0
                 console.log("Le joueur a check, il attend de voir les actions des autres joueurs") 
             }else if(action == "raise") {
                 //Si tapis on mise tout le stack sinon juste la valeur choisie
@@ -162,16 +165,19 @@ function socketHandler(io) {
                     amount = gameController.getPot() * (amount)
                      }
                 //Mise en place de la mise du joueur
-                potCourant+=amount
+                potCourant=amount
+                console.log("nouveau pot courant : " , potCourant)
                 gameController.getGame().bet(playerActuel,amount)
                 console.log("Le joueur a decider de raise (miser) " , amount)
+                idQuiARaise = player_finish_play_id
+
                 // On envoie les nouvelles infos au front
                 io.emit("updatePot&Stack", gameController.getPlayers(), gameController.getPot());
         
             }else if (action == "call") {
-                console.log("NB CHIPS : ",gameController.getGame().getNbChips(playerActuel))
+                console.log("NB CHIPS : ",playerActuel.getNbChips())
                 //Si le joueur a assez de jeton pour call on le fait call sinon message
-                if (gameController.getGame().getNbChips(playerActuel) >= potCourant) {
+                if (playerActuel.getNbChips()>= potCourant) {
                     gameController.getGame().bet(playerActuel,potCourant)
                     console.log("Le joueur a call un montant de : ", potCourant)
                 }else {
@@ -191,7 +197,7 @@ function socketHandler(io) {
             if (idQuiOntFold != []) {
 
                 players_id = players
-                .filter(player => !idQuiOntFold.includes(player.id)) // Exclure les joueurs dont l'ID est dans idQuiOntFold
+                .filter(player => !idQuiOntFold.includes(player.id)) // Exclure les joueurs dont l'ID est dans idQuiOntFold 
                 .map(player => player.id); // Extraire les ID restants
               
             //Sinon on ajoute tous les joueurs
@@ -204,38 +210,44 @@ function socketHandler(io) {
                 {
                 console.log("Joueur qui doit jouer mtn ", players_id[index_current_player])
                 //On envoie l'id du joueur qui doit jouer maintenant
-                io.emit('tourJoueur',players_id[index_current_player],players[index_current_player].name,potCourant)
-            }
+                if (players_id[index_current_player] != idQuiARaise) {
+                    io.emit('tourJoueur',players_id[index_current_player],players[index_current_player].name,potCourant)
+                }else {
+                    //Passage au prochain tour
+                }
+                    }
             else if (players_id != []) 
                 //Si des joueurs n'ont pas fold au tour d'avant, on recommence au début du tableau pr les faire rejoeur
                 //si il y a eu une mise
                 {
-                //On remet le potCourant à 0 car tlm l'a comblé ou a fold
-                potCourant = 0
-                console.log("Des joueurs qui ne se sont pas couchés peuvent rejouer")
-                index_current_player = 0
                 // Si il ne reste que un joueur ça veut dire que c'est le seul à ne pas avoir fold donc il gagne
                 if (players_id.length == 1) {
                     console.log("Des joueurs qui ne se sont pas couchés peuvent rejouer")
-                    console.log(players[index_current_player].name, " a gagné le coup")
+                    console.log(players[index_current_player], " a gagné le coup")
                     potCourant = 0
                     //On fait gagner le coup au joueur restant en lui donnant le pot
                     nbJetonsGagnes = gameController.winChips(players[index_current_player])
-                    io.emit("updatePot&Stack", gameController.getPlayers(), gameController.getPot());
-                } else {
-                    io.emit('tourJoueur',players_id[index_current_player],players[index_current_player].name,potCourant)
-                }
-
+                    io.emit("updatePot&Stack", gameController.getPlayers(), gameController.getPot())
                  }
-            else
-             {
-                console.log("Main terminé, on redistribue pour passer au prochain tour")
-                potCourant = 0
-                index_current_player = 0
+                 //Sinon si il ne reste rien à call alors on passe au prochain tour
+                else if (potCourant == 0) {
+                    console.log("passage à la prochaine street")
+                    potCourant = 0
+                    index_current_player = 0
+                //Sinon si il reste des joueurs qui doivent call alors on les fait jouer
+                }else {
+                    console.log("Des joueurs qui ne se sont pas couchés peuvent rejouer pour combler une mise")
+                    index_current_player = 0
+                    io.emit('tourJoueur',players_id[index_current_player],players[index_current_player].name,potCourant)
+
+                }
+              
+
+
+
             }
-
-
         })
+    
     });
 
 }
