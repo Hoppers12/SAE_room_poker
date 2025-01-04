@@ -9,7 +9,6 @@
     <div class="row mt-4">
       <PokerTable ref="pokerTableRef" :players="players" :notification="notification"/>
       <button @click="next" class="w-25 h-10">TOUR SUIVANT</button>
-      <button @click="nextPlayer" class="w-25 h-10">PLAYER SUIVANT</button>
       <button  @click="handleAction('fold')" id = "foldButton" class="w-25 h-10 action-buttons">FOLD</button>
       <button  @click="handleAction('check')" id="checkButton" class="w-25 h-10 action-buttons">CHECK</button>
       <button  @click="handleAction('call')" id="callButton" class="w-25 h-10 action-buttons">CALL</button>
@@ -118,7 +117,7 @@ export default {
     async next() {
 
       this.socket.emit('nextTour');
-
+      this.socket.emit('nextPlayer');
 
 
     },
