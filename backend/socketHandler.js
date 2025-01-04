@@ -17,7 +17,22 @@ function getPlayers() {
     return gameController.getPlayers()
 }
 
+//Fais les modifications nécessaires pour passer à la prochaien street (Afficage des cartes communes)
+//Remise du pot courant à 0
+function passageALaProchaineStreet (io, gameController) {
+    console.log("Passage à la prochaine street ")
+    streetCourante += 1
+    io.emit("nouvelleStreet",streetCourante)
+    //On ajoute les nouvelles cartes communes
+    console.log("Street Courantes : " , streetCourante)
+    sharedCards = gameController.printSharedCards(streetCourante)
+    console.log("Cartes communes : " , sharedCards)
+    io.emit("cartesCommunes",sharedCards)
+    potCourant = 0
+}
+
 function socketHandler(io) {
+
     io.on('connection', (socket) => {
         console.log('A user connected', socket.id);
 
@@ -27,7 +42,7 @@ function socketHandler(io) {
                 // On vérifie si le pseudo du joueur n'est pas déjà autour de la table
                 gameController.getPlayers().forEach((player) => {
                     if (player.getName === pseudo) {
-                        throw new Error('Le joueur a déjà rejoint la partie.');
+                        throw new Error('Le joueur a déjàa rejoint la partie.');
                     }
                 });
 
@@ -218,7 +233,8 @@ function socketHandler(io) {
                 if (players_id[index_current_player] != idQuiARaise) {
                     io.emit('tourJoueur',players_id[index_current_player],players[index_current_player].name,potCourant)
                 }else {
-                    //Passage au prochain tour
+                    
+                    passageALaProchaineStreet(io,gameController)             
                 }
                     }
             else if (players_id != []) 
@@ -240,15 +256,8 @@ function socketHandler(io) {
                  }
                  //Sinon si il ne reste rien à call alors on passe au prochain tour
                 else if (potCourant == 0) {
+                    passageALaProchaineStreet(io, gameController)
 
-                    console.log("passage à la prochaine street RIEN A CALL")
-                    streetCourante += 1
-                    io.emit("nouvelleStreet",streetCourante)
-                    //On ajoute les nouvelles cartes communes
-                    console.log("Street Courante : " , streetCourante)
-                    sharedCards = gameController.printSharedCards(streetCourante)
-                    console.log("Cartes communes : " , sharedCards)
-                    io.emit("cartesCommunes",sharedCards)
                     
 
                     potCourant = 0

@@ -222,8 +222,8 @@ export default {
           const cardCode1 = `${carte1Rank}${suitMap[carte1Suit]}`;
           const cardCode2 = `${carte2Rank}${suitMap[carte2Suit]}`;
           // On dessine les nouvelles cartes du joueur sur la table
-          this.$refs.pokerTableRef.drawCard(player.x+30,player.y+30,cardCode1)
-          this.$refs.pokerTableRef.drawCard(player.x+70,player.y+30,cardCode2)
+          this.$refs.pokerTableRef.drawCardWithAnimation(player.x+30,player.y+30,cardCode1)
+          this.$refs.pokerTableRef.drawCardWithAnimation(player.x+70,player.y+30,cardCode2)
       });
 
 
@@ -292,7 +292,7 @@ export default {
       const canvas = document.getElementById('pokerTable');
       //Je pars des coordonées du centre de la table
       var x = canvas.width / 2
-      var y = canvas.height / 2 +25
+      var y = canvas.height / 2 
       var indexSharedCard = 0
 
       //On choisit la position des cartes du board en fonction de leur indice (la cbème qui tombe)
@@ -328,18 +328,19 @@ export default {
         var commonCard = `${cardRank}${suitMap[cardSuit]}`
 
         // On dessine les nouvelles cartes du joueur sur la table
-        this.$refs.pokerTableRef.drawCard(x,y,commonCard)
+        this.$refs.pokerTableRef.drawCardWithAnimation(x,y,commonCard)
+        this.socket.emit("nextPlayer")
       })
 
 
 
-    })
+    }),
 
     //Affiche les boutons pour que le joueur d'id current turn joue et efface sur l'écran de l'ancien joueur actif
     this.socket.on('tourJoueur', async (currentTurn, PlayerCurrentName, montantACall) => {
 
       var playerLocalId = await this.getLocalPlayerId()
-      console.log("playerLOcalId et currentTurn", playerLocalId, currentTurn)
+      console.log("playerLOcalId et currentTurns", playerLocalId, currentTurn)
       this.playerActifName = PlayerCurrentName
       // Si le joueur connecté correspond au joueur qui doit jouer alors on lui affiche ses boutons
       if (playerLocalId == currentTurn) {
