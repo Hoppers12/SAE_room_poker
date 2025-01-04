@@ -103,6 +103,10 @@ class PokerGame {
         // Logique simplifiée, retour du premier joueur par défaut pour l'instant
         return this.players[0];
     }
+    
+    getCommunityCards() {
+        return this.communityCards
+    }
 }
 
 // Export de la classe PokerGame

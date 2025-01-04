@@ -265,6 +265,76 @@ export default {
       });
     });
 
+    //Passage à la prochaine street (initialisation des nouvelles cartes etc)
+    this.socket.on('nouvelleStreet', (streetCourante) => {
+      console.log("streetCourante = ", streetCourante)
+      //1 = Flop ; 2 = Turn ; 3 = River
+      if (streetCourante == 1) {
+        console.log("Affichage des cartes communes du flop")
+      }else if (streetCourante == 2) {
+        console.log("Affichage des cartes communes de la turn ")
+      }else if (streetCourante == 3) {
+        console.log("Affichage des cartes communes de la river")
+      }
+    })
+
+    this.socket.on("cartesCommunes", (sharedCards) => {
+            // on fait la conversion pr transformer la forme de la carte en la premeire lettre en anglais pr 
+      // que ça corresponde à l'url de l'API
+      const suitMap = {
+          'coeur': 'H',   // Hearts
+          'carreau': 'D', // Diamonds
+          'pique': 'S',   // Spades
+          'trèfle': 'C'   // Clubs
+      };
+
+      console.log("Cartes communes reçues : " , sharedCards)
+      const canvas = document.getElementById('pokerTable');
+      //Je pars des coordonées du centre de la table
+      var x = canvas.width / 2
+      var y = canvas.height / 2 +25
+      var indexSharedCard = 0
+
+      //On choisit la position des cartes du board en fonction de leur indice (la cbème qui tombe)
+      sharedCards.forEach(card => {
+        console.log("Carte analysé : " , card)
+        indexSharedCard +=1
+        switch (indexSharedCard) {
+        case 1 :
+          x = canvas.width / 2 - 150;
+          break
+        case 2 :
+          x = canvas.width / 2 - 75;
+          break
+        case 3 : 
+          x = canvas.width / 2 ;
+          break
+        case 4 : 
+          x = canvas.width / 2 + 75;
+          break
+        case 5 : 
+          x = canvas.width / 2 + 150;
+          break
+          default:
+            console.log("nb cartes communes invalide")
+      }
+        var cardRank = card.rank
+        var cardSuit = card.suit
+        //on transforme pr éviter le pb avec l'url du 10
+          if (cardRank == '10') {
+            cardRank = '0' ;
+          }
+
+        var commonCard = `${cardRank}${suitMap[cardSuit]}`
+
+        // On dessine les nouvelles cartes du joueur sur la table
+        this.$refs.pokerTableRef.drawCard(x,y,commonCard)
+      })
+
+
+
+    })
+
     //Affiche les boutons pour que le joueur d'id current turn joue et efface sur l'écran de l'ancien joueur actif
     this.socket.on('tourJoueur', async (currentTurn, PlayerCurrentName, montantACall) => {
 

@@ -23,6 +23,7 @@ function socketHandler(io) {
 
         socket.on('joinGame', (pseudo, id) => {
             try {
+                streetCourante = 0
                 // On vérifie si le pseudo du joueur n'est pas déjà autour de la table
                 gameController.getPlayers().forEach((player) => {
                     if (player.getName === pseudo) {
@@ -176,13 +177,13 @@ function socketHandler(io) {
         
             }else if (action == "call") {
                 console.log("NB CHIPS : ",playerActuel.getNbChips())
-                //Si le joueur a assez de jeton pour call on le fait call sinon message
+                //Si le joueur a assez de jeton pour call  on le fait call et prochaine street sinon message
                 if (playerActuel.getNbChips()>= potCourant) {
                     gameController.getGame().bet(playerActuel,potCourant)
                     console.log("Le joueur a call un montant de : ", potCourant)
                     potCourant = 0 
                     io.emit("updatePot&Stack", gameController.getPlayers(), gameController.getPot());
-                    console.log("Passage à la prochaine street")
+                    //Passage à la street suivante
                 }else {
                     console.log("Le joueur n'a pas assezz de jeton pour call ! Choisir une autre option")
                 }
@@ -224,20 +225,32 @@ function socketHandler(io) {
                 //Si des joueurs n'ont pas fold au tour d'avant, on recommence au début du tableau pr les faire rejoeur
                 //si il y a eu une mise
                 {
-                // Si il ne reste que un joueur ça veut dire que c'est le seul à ne pas avoir fold donc il gagne
+                // Si il ne reste que un joueur ça veut dire que c'est le seul à ne pas avoir fold donc il  et passage prochaine street
                 if (players_id.length == 1) {
                     const player_winner = players.find(player => player.id === players_id[0]);
                     console.log("Voici players_id pour ce tour : ", players_id)
                     console.log(player_winner.name, " a gagnée le coup")
-                    potCourant = 0
-                    console.log("passage à la prochaine street")
+                    potCourant = 0                    
+                    console.log("WINNER")
+       
+
                     //On fait gagner le coup au joueur restant en lui donnant le pot
                     nbJetonsGagnes = gameController.winChips(player_winner)
                     io.emit("updatePot&Stack", gameController.getPlayers(), gameController.getPot())
                  }
                  //Sinon si il ne reste rien à call alors on passe au prochain tour
                 else if (potCourant == 0) {
-                    console.log("passage à la prochaine street")
+
+                    console.log("passage à la prochaine street RIEN A CALL")
+                    streetCourante += 1
+                    io.emit("nouvelleStreet",streetCourante)
+                    //On ajoute les nouvelles cartes communes
+                    console.log("Street Courante : " , streetCourante)
+                    sharedCards = gameController.printSharedCards(streetCourante)
+                    console.log("Cartes communes : " , sharedCards)
+                    io.emit("cartesCommunes",sharedCards)
+                    
+
                     potCourant = 0
                     index_current_player = 0
                 //Sinon si il reste des joueurs qui doivent call alors on les fait jouer

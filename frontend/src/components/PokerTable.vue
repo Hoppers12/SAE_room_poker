@@ -49,7 +49,7 @@ export default {
       ctx.font = "24px Arial";       // Taille et style de la police
       ctx.textAlign = "center";      // Alignement horizontal centré
       ctx.textBaseline = "middle";   // Alignement vertical centré
-      ctx.fillText(`Pot : ${pot}`, canvas.width / 2, canvas.height / 2); // Texte centré
+      ctx.fillText(`Pot : ${pot}`, canvas.width / 2, canvas.height / 2 - 30); // Texte centré
 
       // Restauration du contexte après avoir dessiné le texte du pot
       ctx.restore();

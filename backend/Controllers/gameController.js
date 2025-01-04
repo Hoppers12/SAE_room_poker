@@ -63,6 +63,19 @@ function winChips(player) {
     return nbJetonsGagnes
 }
 
+//Ajoute le nombre de cartes communes correspondantes à chaque street dans le tab game.communityCards
+function printSharedCards(streetCourante) {
+    if (streetCourante == 1) {
+        game.revealCommunityCards(3)
+    }else if (streetCourante == 2) {
+        game.revealCommunityCards(1)
+    }else if (streetCourante == 3) {
+        game.revealCommunityCards(1)
+    }
+
+    return game.getCommunityCards()
+}
+
 module.exports = {
     gestionPartie,
     ajoutNouveauJoueurDansPartie,
@@ -72,7 +85,8 @@ module.exports = {
     setPlayers,
     getPot,
     winChips,
-    getNbChips
+    getNbChips,
+    printSharedCards
 };
 
 
