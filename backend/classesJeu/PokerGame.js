@@ -1,6 +1,7 @@
 const Deck = require('./Deck');
 const Card = require('./Card');
 const Player = require("./Player");
+const HandEvaluator = require('../utils/HandEvaluator'); // Hypothèse d'un module pour évaluer les mains
 
 class PokerGame {
     constructor(players) {
@@ -16,6 +17,36 @@ class PokerGame {
     getGame() {
         return this
     }
+
+    getWinner(player1, player2, communityCards) {
+        // Combiner la main du joueur et les cartes communes
+        const hand1 = [...player1.hand, ...communityCards];
+        const hand2 = [...player2.hand, ...communityCards];
+
+        // Évaluer les deux mains
+        const evalHand1 = HandEvaluator.evaluate(hand1);
+        const evalHand2 = HandEvaluator.evaluate(hand2);
+
+        // Comparer les deux mains
+        const result = HandEvaluator.compareHands(evalHand1, evalHand2);
+
+        // Retourner les informations sur le gagnant et les combinaisons
+        return {
+            winner: result.winner,
+            player1: {
+                name: player1.getName,
+                combination: result.player1.combination,
+                kickers: result.player1.kickers
+            },
+            player2: {
+                name: player2.getName,
+                combination: result.player2.combination,
+                kickers: result.player2.kickers
+            },
+            winningCombination: result.winningCombination
+        };
+    }
+    
 
     getPot() {
         return this.pot

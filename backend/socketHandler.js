@@ -8,11 +8,12 @@ const Card = require("./classesJeu/Card");
 var index_current_player = 0
 let playerSockets = {}; // Associer chaque socket.id au joueur
 var idQuiOntFold = [] ;
-var idQuiARaise ; ;
+var idQuiARaise ; 
 // 0 si préflop, 1 : flop, 2 : Turn, 3 : River
 var streetCourante = 0 ;
 //Le "pot secondaire" càd le pot du tour actuel qui sera ajouté au pot global à la fin du tour
 var potCourant = 0;
+var winner = null;
 function getPlayers() {
     return gameController.getPlayers()
 }
@@ -233,8 +234,39 @@ function socketHandler(io) {
                 if (players_id[index_current_player] != idQuiARaise) {
                     io.emit('tourJoueur',players_id[index_current_player],players[index_current_player].name,potCourant)
                 }else {
+                    //Si on est deja à la river on determine le gagnant
+                    if(streetCourante == 3) {
+                        player1 = gameController.getPlayers()[0]
+                        player2 = gameController.getPlayers()[1]
+                        console.log("Player 1 name", player1.getName,"Player 1 namee", player2.getName)
+                        result = gameController.getGame().getWinner(player1,player2,sharedCards)
+                        console.log(result.player1.name," a : ",result.player1.combination, result.player2.name," a : ", result.player2.combination, result.winner, " a donc remporté le coup avec : " , result.winningCombination )
                     
-                    passageALaProchaineStreet(io,gameController)             
+                        //On fait gagner le coup au joueur restant en lui donnant le pot
+                        if (result.winner == "Player 1") {
+                            winnerName = result.player1.name
+                        }else if (result.winner == "Player 2") {
+                            winnerName = result.player2.name
+                        }else {
+                            console.log("Egalité, partage du pot")
+                            winnerName = "Egalité"
+                        }
+                        //On va chercher l'attribut du player gagnant en fonction du pseudo retourné
+                        gameController.getPlayers().forEach(player => {
+                            if (player.getName === winnerName) {
+                                playerWinner = player;  // On assigne le joueur correspondant à playerWinner
+                            }
+                        });
+
+                        nbJetonsGagnes = gameController.winChips(playerWinner)
+                        io.emit("updatePot&Stack", gameController.getPlayers(), gameController.getPot())
+                    
+                    
+                    
+                    }else if (winner == null) {
+                        passageALaProchaineStreet(io,gameController)
+                    }
+             
                 }
                     }
             else if (players_id != []) 
@@ -256,8 +288,37 @@ function socketHandler(io) {
                  }
                  //Sinon si il ne reste rien à call alors on passe au prochain tour
                 else if (potCourant == 0) {
-                    passageALaProchaineStreet(io, gameController)
+                    //Si on est deja à la rivero n determine le gagnant
+                    if(streetCourante == 3) {
+                        player1 = gameController.getPlayers()[0]
+                        player2 = gameController.getPlayers()[1]
+                        console.log("Player 1 name", player1.getName,"Player 1 namee", player2.getName)
+                        result = gameController.getGame().getWinner(player1,player2,sharedCards)
+                        console.log(result.player1.name," a : ",result.player1.combination, result.player2.name," a : ", result.player2.combination, result.winner, " a donc remporté le coup avec : " , result.winningCombination )
+                    
+                        //On fait gagner le coup au joueur restant en lui donnant le pot
+                        if (result.winner == "Player 1") {
+                            winnerName = result.player1.name
+                        }else if (result.winner == "Player 2") {
+                            winnerName = result.player2.name
+                        }else {
+                            console.log("Egalité, partage du pot")
+                            winnerName = "Egalité"
+                        }
+                        //On va chercher l'attribut du player gagnant en fonction du pseudo retourné
+                        gameController.getPlayers().forEach(player => {
+                            if (player.getName === winnerName) {
+                                playerWinner = player;  // On assigne le joueur correspondant à playerWinner
+                            }
+                        });
 
+                        nbJetonsGagnes = gameController.winChips(playerWinner)
+                        io.emit("updatePot&Stack", gameController.getPlayers(), gameController.getPot())
+                    
+                    
+                    }else if (winner == null) {
+                        passageALaProchaineStreet(io,gameController)
+                    }
                     
 
                     potCourant = 0
