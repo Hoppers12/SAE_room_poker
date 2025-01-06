@@ -60,10 +60,29 @@
         </div>
       </div>
     </div>
-
-
+    <div v-if="showModal" class="modal-overlay show">
+      <div class="modal-content">
+      <h2>Félicitations au gagnant !</h2>
+      <p><strong>Nom du gagnant :</strong> {{ winnerName }}</p>
+      
+      <!-- Afficher la combinaison gagnante seulement si winnerHand n'est pas vide -->
+      <p v-if="winnerHand !== ''"><strong>Combinaison gagnante :</strong> {{ winnerHand }}</p>
+      
+      <h3>Malheureusement, le perdant...</h3>
+      
+      <!-- Afficher la combinaison du perdant seulement si loserHand n'est pas vide -->
+      <p v-if="loserHand !== ''"><strong>Combinaison du perdant :</strong> {{ loserHand }}</p>
+      
+      <p><strong>Jetons gagnés :</strong> {{ nbChipsGagnes }}</p>
+      
+      <button @click="closeModal" class="btn btn-primary">Fermer</button>
+      <button @click="send" class="btn btn-success">Rejouer</button>
   </div>
-  
+
+</div>
+  </div>
+
+
   
 </template>
 
@@ -90,10 +109,18 @@ export default {
       players: [],
       playerActifName : '',
       raiseAmount : null ,
-      sharedCards : []
+      sharedCards : [],
+      winnerName: '',      // Variable pour le nom du gagnant
+      winnerHand: '',      // Variable pour la combinaison gagnante
+      loserHand: '',
+      nbChipsGagnes:null,
+      showModal: false     // Variable pour contrôler l'affichage de la modale
     };
   },
   methods: {
+    closeModal() {
+      this.showModal = false
+    },
     async send() {
       try {
         const id = await this.getLocalPlayerId()
@@ -108,6 +135,9 @@ export default {
       if (this.$refs.pokerTableRef) {
         this.$refs.pokerTableRef.renderTable();
       }
+    },
+    async replay() {
+      console.log("Relancement d'une partie")
     },
     async begin() {
       this.socket.emit('beginGame');
@@ -136,6 +166,15 @@ export default {
     //Methode qui s'occupe de dessiner les cartes communes
     drawSharedCards(canvas) {
         
+      // on fait la conversion pr transformer la forme de la carte en la premeire lettre en anglais pr 
+      // que ça corresponde à l'url de l'API
+      const suitMap = {
+          'coeur': 'H',   // Hearts
+          'carreau': 'D', // Diamonds
+          'pique': 'S',   // Spades
+          'trèfle': 'C'   // Clubs
+      };
+
         //Je pars des coordonées du centre de la table
         var x = canvas.width / 2
         var y = canvas.height / 2 
@@ -233,7 +272,63 @@ export default {
       }
     });
 
-    this.socket.on()
+    //UpdatePotEtStack utilisé lors de la win d'un joueur
+    this.socket.on("updatePot&StackWin", (players, pot, winnerName, nbJetonsGagnes,mainGagnante, mainPerdante) => {
+      const canvas = document.getElementById('pokerTable');
+      const ctx = canvas.getContext('2d');
+      console.log(winnerName, " a gagné avec : " ,mainGagnante, " face à : " , mainPerdante, "et a gagné : " , nbJetonsGagnes)
+      if (this.$refs.pokerTableRef) {
+        this.$refs.pokerTableRef.cleanPlayersOverride(ctx, players, pot);
+      }
+
+      // on fait la conversion pr transformer la forme de la carte en la premeire lettre en anglais pr 
+      // que ça corresponde à l'url de l'API
+      const suitMap = {
+          'coeur': 'H',   // Hearts
+          'carreau': 'D', // Diamonds
+          'pique': 'S',   // Spades
+          'trèfle': 'C'   // Clubs
+      };
+
+      // Pour chaque joueur on va cherche la carte, on la traduit et on l'ajoute dans l'url de l'api
+      // Puis on la dessine à côté de lui
+      players.forEach(player => {
+          var carte1Rank = player.hand[0].rank
+          var carte2Rank = player.hand[1].rank
+          var carte1Suit = player.hand[0].suit
+          var carte2Suit = player.hand[1].suit
+          //Si la carte est un 10 on transf en 0 car l'API le veut pr son url 
+          if (carte1Rank == '10') {
+            carte1Rank = '0' ;
+          }
+          if (carte2Rank == '10') {
+            carte2Rank = '0' ;
+          }
+
+          const cardCode1 = `${carte1Rank}${suitMap[carte1Suit]}`;
+          const cardCode2 = `${carte2Rank}${suitMap[carte2Suit]}`;
+          // On dessine les nouvelles cartes du joueur sur la table
+          this.$refs.pokerTableRef.drawCardWithAnimation(player.x+30,player.y+30,cardCode1)
+          this.$refs.pokerTableRef.drawCardWithAnimation(player.x+70,player.y+30,cardCode2)
+         // Affichage de la modale
+         this.winnerName = winnerName
+         this.winnerHand = mainGagnante
+         this.nbChipsGagnes = nbJetonsGagnes
+         this.loserHand = mainPerdante
+         this.showModal = true
+      });
+
+
+      console.log("this.sharedCards : " , this.sharedCards)
+      const li = document.createElement('li');
+      li.className = 'list-group-item bg-info text-white';
+      li.innerText = `le pot est maintenant de : ${pot}`;
+      document.getElementById('chat_connexion').appendChild(li);
+    });
+
+
+
+
 
     this.socket.on("updatePot&Stack", (players, pot) => {
       const canvas = document.getElementById('pokerTable');
@@ -271,6 +366,8 @@ export default {
           // On dessine les nouvelles cartes du joueur sur la table
           this.$refs.pokerTableRef.drawCardWithAnimation(player.x+30,player.y+30,cardCode1)
           this.$refs.pokerTableRef.drawCardWithAnimation(player.x+70,player.y+30,cardCode2)
+
+
       });
 
       if (this.sharedCards != []) {
@@ -332,15 +429,6 @@ export default {
 
     this.socket.on("cartesCommunes", (sharedCards) => {
       this.sharedCards = sharedCards
-            // on fait la conversion pr transformer la forme de la carte en la premeire lettre en anglais pr 
-      // que ça corresponde à l'url de l'API
-      const suitMap = {
-          'coeur': 'H',   // Hearts
-          'carreau': 'D', // Diamonds
-          'pique': 'S',   // Spades
-          'trèfle': 'C'   // Clubs
-      };
-
       console.log("Cartes communes reçues : " , sharedCards)
       const canvas = document.getElementById('pokerTable');
   
@@ -457,6 +545,198 @@ canvas {
 input {
   margin-top: 10px;
 }
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  width: 400px;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modal-header {
+  padding: 16px;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f5f5f5;
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 18px;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.modal-body {
+  padding: 16px;
+  font-size: 14px;
+  color: #333;
+}
+
+.modal-footer {
+  padding: 16px;
+  border-top: 1px solid #ddd;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-primary {
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Style pour l'overlay de la modale */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7); /* Ombre de fond noir semi-transparente */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease-in-out;
+}
+
+/* Activer la visibilité de la modale avec la classe .show */
+.modal-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Style pour le contenu de la modale */
+.modal-content {
+  background-color: #2c2c2c;  /* Fond noir */
+  color: #fff;  /* Texte en blanc */
+  padding: 2rem;
+  border-radius: 10px;
+  width: 80%;
+  max-width: 500px;
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  animation: modalIn 0.4s ease-out;
+}
+
+/* Animation d'entrée pour la modale */
+@keyframes modalIn {
+  0% {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Style pour le titre principal */
+.modal-content h2 {
+  color: #f44336; /* Rouge vif pour le titre */
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  font-family: 'Arial', sans-serif;
+}
+
+/* Style pour les sous-titres */
+.modal-content h3 {
+  color: #f44336;
+  font-size: 1.5rem;
+  margin-top: 1.5rem;
+  font-family: 'Arial', sans-serif;
+}
+
+/* Style pour le texte général */
+.modal-content p {
+  font-size: 1.2rem;
+  margin: 0.5rem 0;
+  font-family: 'Arial', sans-serif;
+}
+
+/* Mise en valeur des textes avec strong */
+.modal-content strong {
+  font-weight: bold;
+  color: #ffeb3b; /* Jaune pour mettre en évidence */
+}
+
+/* Style pour le bouton de fermeture */
+.modal-content button {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  font-size: 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 2rem;
+}
+
+.modal-content button:hover {
+  background-color: #d32f2f; /* Changer de couleur au survol */
+}
+
+.modal-content button:focus {
+  outline: none;
+}
+
+/* Style spécifique au texte de la modale */
+.modal-content p:last-child {
+  font-size: 1.3rem;
+  font-weight: bold;
+}
+
+/* Animation de l'apparition de la modale (lorsque showModal devient true) */
+@keyframes modalIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 
 </style>
 

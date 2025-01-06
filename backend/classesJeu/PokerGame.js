@@ -36,12 +36,14 @@ class PokerGame {
             player1: {
                 name: player1.getName,
                 combination: result.player1.combination,
-                kickers: result.player1.kickers
+                kickers: result.player1.kickers,
+                hand: hand1
             },
             player2: {
                 name: player2.getName,
                 combination: result.player2.combination,
-                kickers: result.player2.kickers
+                kickers: result.player2.kickers,
+                hand: hand2
             },
             winningCombination: result.winningCombination
         };

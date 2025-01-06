@@ -277,7 +277,10 @@ function socketHandler(io) {
                 // Si il ne reste que un joueur ça veut dire que c'est le seul à ne pas avoir fold donc il  et passage prochaine street
                 if (players_id.length == 1) {
                     const player_winner = players.find(player => player.id === players_id[0]);
-                    console.log("Voici players_id pour ce tour : ", players_id)
+                    // Trouver le joueur perdant qui n'est pas le gagnant
+                    const player_loser = players.find(player => player.id !== player_winner.id);
+                    loserName = player_loser.name
+                    console.log("Voici players_id pour ce toure : ", players_id)
                     console.log(player_winner.name, " a gagnée le coup")
                     potCourant = 0                    
                     console.log("WINNER")
@@ -285,7 +288,8 @@ function socketHandler(io) {
 
                     //On fait gagner le coup au joueur restant en lui donnant le pot
                     nbJetonsGagnes = gameController.winChips(player_winner)
-                    io.emit("updatePot&Stack", gameController.getPlayers(), gameController.getPot())
+                    io.emit("updatePot&StackWin", gameController.getPlayers(), gameController.getPot(),player_winner.name,nbJetonsGagnes,'', '')
+                    
                  }
                  //Sinon si il ne reste rien à call alors on passe au prochain tour
                 else if (potCourant == 0) {
@@ -299,11 +303,16 @@ function socketHandler(io) {
                     
                         //On fait gagner le coup au joueur restant en lui donnant le pot
                         if (result.winner == "Player 1") {
+                            mainGagnante = result.player1.combination
+                            mainPerdante = result.player2.combination
                             winnerName = result.player1.name
                         }else if (result.winner == "Player 2") {
+                            mainGagnante = result.player2.combination
                             winnerName = result.player2.name
+                            mainPerdante = result.player1.combination
                         }else {
                             console.log("Egalité, partage du pot")
+                            mainGagnante = "Aucune"
                             winnerName = "Egalité"
                         }
                         //On va chercher l'attribut du player gagnant en fonction du pseudo retourné
@@ -314,7 +323,7 @@ function socketHandler(io) {
                         });
 
                         nbJetonsGagnes = gameController.winChips(playerWinner)
-                        io.emit("updatePot&Stack", gameController.getPlayers(), gameController.getPot())
+                        io.emit("updatePot&StackWin", gameController.getPlayers(), gameController.getPot(),winnerName,nbJetonsGagnes,result.winningCombination, mainPerdante)
                     
                     
                     }else if (winner == null) {
