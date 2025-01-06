@@ -10,7 +10,7 @@ function gestionPartie(newPlayer,io)
     if (players.length === 0)
     {
         players.push(newPlayer);
-        game = new PokerGame(players); // Initialiser la partie
+        game = new PokerGame(players); // Initialiser la partiee
         game.setPlayers(players); // Mettre à jour la liste des joueurs
         var NbPlayer = getNbPlayers();
         // Envoi d'un message à tous les clients pour informer de l'arrivée d'un nouveau joueur

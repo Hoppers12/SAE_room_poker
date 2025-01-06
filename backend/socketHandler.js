@@ -5,8 +5,9 @@ const blinds = require('./utils/blind');
 const playerController = require('./Controllers/playerController');
 const Card = require("./classesJeu/Card");
 
+
 var index_current_player = 0
-let playerSockets = {}; // Associer chaque socket.id au joueur
+let playerSockets = {}; // Associer chaque socket.id au joueurs
 var idQuiOntFold = [] ;
 var idQuiARaise ; 
 // 0 si préflop, 1 : flop, 2 : Turn, 3 : River
@@ -119,7 +120,7 @@ function socketHandler(io) {
 
             // SB et BB posent leurs blindes
             blinds.putBlinds(amount_SB, amount_BB, gameController.getPlayers(), gameController.getGame());
-
+            
             // J'envoie au front la liste des joueurs et le nouveau pot
             io.emit("updatePot&Stack", gameController.getPlayers(), gameController.getPot());
         });
@@ -259,7 +260,7 @@ function socketHandler(io) {
                         });
 
                         nbJetonsGagnes = gameController.winChips(playerWinner)
-                        io.emit("updatePot&Stack", gameController.getPlayers(), gameController.getPot())
+                        io.emit("updatePot&Stack", gameController.getPlayers(), gameController.getPot(),winnerName,nbJetonsGagnes)
                     
                     
                     

@@ -89,7 +89,8 @@ export default {
       errorMessage: '',
       players: [],
       playerActifName : '',
-      raiseAmount : null 
+      raiseAmount : null ,
+      sharedCards : []
     };
   },
   methods: {
@@ -131,6 +132,50 @@ export default {
     },
     getPlayers() {
       return this.players
+    },
+    //Methode qui s'occupe de dessiner les cartes communes
+    drawSharedCards(canvas) {
+        
+        //Je pars des coordonées du centre de la table
+        var x = canvas.width / 2
+        var y = canvas.height / 2 
+        var indexSharedCard = 0
+          //On choisit la position des cartes du board en fonction de leur indice (la cbème qui tombe)
+          this.sharedCards.forEach(card => {
+            console.log("Carte analysé : " , card)
+            indexSharedCard +=1
+            switch (indexSharedCard) {
+            case 1 :
+              x = canvas.width / 2 - 150;
+              break
+            case 2 :
+              x = canvas.width / 2 - 75;
+              break
+            case 3 : 
+              x = canvas.width / 2 ;
+              break
+            case 4 : 
+              x = canvas.width / 2 + 75;
+              break
+            case 5 : 
+              x = canvas.width / 2 + 150;
+              break
+              default:
+                console.log("nb cartes communes invalide")
+          }
+            var cardRank = card.rank
+            var cardSuit = card.suit
+            //on transforme pr éviter le pb avec l'url du 10
+              if (cardRank == '10') {
+                cardRank = '0' ;
+              }
+
+            var commonCard = `${cardRank}${suitMap[cardSuit]}`
+
+            // On dessine les nouvelles cartes du joueur sur la table
+            this.$refs.pokerTableRef.drawCardWithAnimation(x,y,commonCard)
+            this.socket.emit("nextPlayer")
+      })
     },
     //Retourne l'objet player d'id id
     getPlayerFromId(idATrouver) {
@@ -188,6 +233,8 @@ export default {
       }
     });
 
+    this.socket.on()
+
     this.socket.on("updatePot&Stack", (players, pot) => {
       const canvas = document.getElementById('pokerTable');
       const ctx = canvas.getContext('2d');
@@ -226,7 +273,12 @@ export default {
           this.$refs.pokerTableRef.drawCardWithAnimation(player.x+70,player.y+30,cardCode2)
       });
 
+      if (this.sharedCards != []) {
+        this.drawSharedCards(canvas)
+      }
+      
 
+      console.log("this.sharedCards : " , this.sharedCards)
       const li = document.createElement('li');
       li.className = 'list-group-item bg-info text-white';
       li.innerText = `le pot est maintenant de : ${pot}`;
@@ -279,6 +331,7 @@ export default {
     })
 
     this.socket.on("cartesCommunes", (sharedCards) => {
+      this.sharedCards = sharedCards
             // on fait la conversion pr transformer la forme de la carte en la premeire lettre en anglais pr 
       // que ça corresponde à l'url de l'API
       const suitMap = {
@@ -290,50 +343,8 @@ export default {
 
       console.log("Cartes communes reçues : " , sharedCards)
       const canvas = document.getElementById('pokerTable');
-      //Je pars des coordonées du centre de la table
-      var x = canvas.width / 2
-      var y = canvas.height / 2 
-      var indexSharedCard = 0
-
-      //On choisit la position des cartes du board en fonction de leur indice (la cbème qui tombe)
-      sharedCards.forEach(card => {
-        console.log("Carte analysé : " , card)
-        indexSharedCard +=1
-        switch (indexSharedCard) {
-        case 1 :
-          x = canvas.width / 2 - 150;
-          break
-        case 2 :
-          x = canvas.width / 2 - 75;
-          break
-        case 3 : 
-          x = canvas.width / 2 ;
-          break
-        case 4 : 
-          x = canvas.width / 2 + 75;
-          break
-        case 5 : 
-          x = canvas.width / 2 + 150;
-          break
-          default:
-            console.log("nb cartes communes invalide")
-      }
-        var cardRank = card.rank
-        var cardSuit = card.suit
-        //on transforme pr éviter le pb avec l'url du 10
-          if (cardRank == '10') {
-            cardRank = '0' ;
-          }
-
-        var commonCard = `${cardRank}${suitMap[cardSuit]}`
-
-        // On dessine les nouvelles cartes du joueur sur la table
-        this.$refs.pokerTableRef.drawCardWithAnimation(x,y,commonCard)
-        this.socket.emit("nextPlayer")
-      })
-
-
-
+  
+      this.drawSharedCards(canvas)
     }),
 
     //Affiche les boutons pour que le joueur d'id current turn joue et efface sur l'écran de l'ancien joueur actif
