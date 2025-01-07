@@ -17,12 +17,12 @@
         <button @click="handleAction('call')" id="callButton" class="btn-action btn-primary action-buttons">CALL</button>
       </div>
       <div v-if="timer > 0" class="timer-container">
-      <div class="timer-clock">
-        <div class="hand"></div>
-      </div>
-      <div class="timer-text">
-        Temps restant : {{ timer }} s
-      </div>
+        <div class="timer-clock">
+          <div class="hand" ref="hand"></div> <!-- La main de l'horloge qui va tourner -->
+        </div>
+        <div class="timer-text">
+          Temps restant : {{ timer }} s
+        </div>
     </div>
       <!-- Formulaire Raise -->
       <fieldset id="raiseButton" class="raise-container mt-4 p-3 action-buttons">
@@ -130,6 +130,22 @@ export default {
       isTimerActive: false // Flag pour savoir si le timer est actif
     };
   },
+  watch: {
+    timer(newValue) {
+      const maxTime = 15; // Durée totale du chronomètre
+      const rotation = (360 * (maxTime - newValue)) / maxTime; // Calcul de l'angle pour la main
+
+      // Utilisation de $nextTick pour s'assurer que le DOM est prêt avant de manipuler l'élément
+      this.$nextTick(() => {
+        const handElement = this.$refs.hand;
+        if (handElement) {
+          handElement.style.transform = `rotate(${rotation}deg)`; // Tourner la main selon le temps restant
+        }
+      });
+    },
+  }
+,
+
   methods: {
     //Donne des jetons au joueurs
     async giveMoney() {
@@ -908,39 +924,33 @@ input {
   font-size: 16px;
   color: white;
 }
-.timer-container {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 18px;
-  font-weight: bold;
-  color: #ff4500;
-}
-
 .timer-clock {
-  width: 40px;
-  height: 40px;
-  border: 2px solid #ff4500;
-  border-radius: 50%;
   position: relative;
+  width: 100px;
+  height: 100px;
+  border: 5px solid #000;
+  border-radius: 50%;
+  margin: auto;
 }
 
 .hand {
-  width: 2px;
-  height: 18px;
-  background-color: #ff4500;
   position: absolute;
-  top: 50%;
+  width: 2px;
+  height: 45%;
+  background-color: red;
+  top: 10%;
   left: 50%;
   transform-origin: bottom center;
+  transition: transform 1s linear; /* Animation de la main */
   transform: rotate(0deg);
-  transition: transform 1s linear;
 }
 
 .timer-text {
-  color: #ff4500;
+  text-align: center;
+  font-size: 18px;
+  margin-top: 10px;
+  color: #000;
 }
-
 
 </style>
 
