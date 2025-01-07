@@ -121,14 +121,16 @@ export default {
     closeModal() {
       this.showModal = false
     },
-    async send() {
+    resetGame() {
       this.closeModal()
       this.sharedCards = []
       this.winnerName = ''
       this.winnerHand=''
       this.loserHand=''
       this.nbChipsGagnes=null
-
+    },
+    async send() {
+      this.resetGame()
       try {
         const id = await this.getLocalPlayerId()
         const userData = await axios.get(`/api/users/${id}`)
