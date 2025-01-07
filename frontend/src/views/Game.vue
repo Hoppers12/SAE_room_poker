@@ -123,6 +123,12 @@ export default {
     },
     async send() {
       this.closeModal()
+      this.sharedCards = []
+      this.winnerName = ''
+      this.winnerHand=''
+      this.loserHand=''
+      this.nbChipsGagnes=null
+
       try {
         const id = await this.getLocalPlayerId()
         const userData = await axios.get(`/api/users/${id}`)
