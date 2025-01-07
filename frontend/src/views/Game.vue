@@ -1,12 +1,14 @@
 <template>
   <NavBar/>
   <div class="back">
+    
     <div class="container mt-5" v-if="isLogged">
     <div class="row">
       <div class="col-12 text-center">
       </div>
     </div>
     <div class="row mt-4">
+      <button @click="giveMoney()" class="btn-action btn-primary action-buttons">FREE JETONS</button>
       <PokerTable ref="pokerTableRef" :players="players" :notification="notification"/>
       <div class="action-buttons-container mt-3 d-flex justify-content-center align-items-center gap-3">
         <button @click="next" class="btn-action">TOUR SUIVANT</button>
@@ -14,6 +16,14 @@
         <button @click="handleAction('check')" id="checkButton" class="btn-action btn-secondary action-buttons">CHECK</button>
         <button @click="handleAction('call')" id="callButton" class="btn-action btn-primary action-buttons">CALL</button>
       </div>
+      <div v-if="timer > 0" class="timer-container">
+      <div class="timer-clock">
+        <div class="hand"></div>
+      </div>
+      <div class="timer-text">
+        Temps restant : {{ timer }} s
+      </div>
+    </div>
       <!-- Formulaire Raise -->
       <fieldset id="raiseButton" class="raise-container mt-4 p-3 action-buttons">
         <legend class="raise-legend">Choisir le % du pot à relancer</legend>
@@ -113,14 +123,70 @@ export default {
       winnerName: '',      // Variable pour le nom du gagnant
       winnerHand: '',      // Variable pour la combinaison gagnante
       loserHand: '',
+      timer:15,
+      timeInterval:null,
       nbChipsGagnes:null,
-      showModal: false     // Variable pour contrôler l'affichage de la modale
+      showModal: false,     // Variable pour contrôler l'affichage de la modale
+      isTimerActive: false // Flag pour savoir si le timer est actif
     };
   },
   methods: {
+    //Donne des jetons au joueurs
+    async giveMoney() {
+        const id = await this.getLocalPlayerId()
+        const userData = await axios.get(`/api/users/${id}`)
+        this.user = userData.data;
+          //Requête PUT pour modifier l'argent sur le compte
+          await axios.put(`/api/users/${id}`, {
+            money: this.user.money + 1000
+          });
+    },
     closeModal() {
       this.showModal = false
     },
+    // Fonctions pour afficher/masquer les boutons de jeu
+    showActionButtons() {
+      const buttons = document.querySelectorAll(".action-buttons"); // Retourne un NodeList
+        buttons.forEach(button => {
+            button.style.display = "block";
+        });
+        this.startTimer()
+  },
+  //Affiche seulement le bouton call et fold
+   showCallOrFoldButtons() {
+      this.startTimer()
+      const buttonCall = document.getElementById('callButton'); 
+      const buttonFold = document.getElementById('foldButton'); 
+      const buttonRaise = document.getElementById('raiseButton'); 
+      const buttonCheck = document.getElementById('checkButton'); 
+
+      buttonCall.style.display = "block";
+      buttonFold.style.display = "block";
+      buttonRaise.style.display = "none";
+      buttonCheck.style.display = "none";
+
+
+    } ,
+    startTimer() {
+      this.timer = 15; // Réinitialise le timer à 15 secondes
+      clearInterval(this.timerInterval); // Assure qu'aucun autre intervalle ne tourne
+      this.isTimerActive = true; // Active le flag
+      this.timerInterval = setInterval(() => {
+        if (this.timer > 0) {
+          this.timer -= 1;
+          console.log(this.timer)
+        } else {
+          clearInterval(this.timerInterval); // Arrête l'intervalle à 0
+          this.handleTimeout(); // Appelle une méthode si le temps est écoulé
+        }
+      }, 1000);
+  }
+,
+  handleTimeout() {
+    console.log("Le temps est écoulé !");
+    // Tu peux appeler une autre action ici, comme "fold" automatique
+    this.handleAction('fold');
+  },
     resetGame() {
       this.closeModal()
       this.sharedCards = []
@@ -252,10 +318,19 @@ export default {
       const playerActuel = players.find(player => player.id === idATrouver);
       return playerActuel
     },
+    stopTimer() {
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval); // Arrête l'intervalle en cours
+      this.timerInterval = null;
+      this.isTimerActive = false; // Désactive le flag pour éviter handleTimeout
+    }
+  },
 
   // Nouvelle méthode pour gérer les actions, elle valide au serveur que le joueur a bien joué (tourTermine)
   async handleAction(action) {
     //AllIn = true si le joueur a fait tapis
+    this.stopTimer(); // Arrête le timer lorsqu'une action est réalisée
+    this.timer = 15
     var allin = false
     const playerLocalId = await this.getLocalPlayerId();
     if (this.raiseAmount == "all") {
@@ -502,9 +577,9 @@ export default {
 
         // Si un joueur n'a pas misé avant alors on affiche tt les boutons sinon on oblige à call or fold
         if (montantACall == 0) {
-          showActionButtons()
+          this.showActionButtons()
         }else {
-          showCallOrFoldButtons()
+          this.showCallOrFoldButtons()
         }
       }else {
         hideActionButtons()
@@ -521,27 +596,8 @@ export default {
   }
 };
 
-// Fonctions pour afficher/masquer les boutons de jeu
-function showActionButtons() {
-  const buttons = document.querySelectorAll(".action-buttons"); // Retourne un NodeList
-    buttons.forEach(button => {
-        button.style.display = "block";
-    });
-}
-//Affiche seulement le bouton call et fold
-function showCallOrFoldButtons() {
-  const buttonCall = document.getElementById('callButton'); 
-  const buttonFold = document.getElementById('foldButton'); 
-  const buttonRaise = document.getElementById('raiseButton'); 
-  const buttonCheck = document.getElementById('checkButton'); 
-
-  buttonCall.style.display = "block";
-  buttonFold.style.display = "block";
-  buttonRaise.style.display = "none";
-  buttonCheck.style.display = "none";
 
 
-}
 function hideActionButtons() {
   const buttons = document.querySelectorAll(".action-buttons"); // Retourne un NodeList
     buttons.forEach(button => {
@@ -797,6 +853,12 @@ input {
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
+.timer-display {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #ff4500; /* Rouge/orange pour correspondre au thème poker */
+}
 
 .btn-action:hover {
   opacity: 0.9;
@@ -845,6 +907,38 @@ input {
   gap: 5px;
   font-size: 16px;
   color: white;
+}
+.timer-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #ff4500;
+}
+
+.timer-clock {
+  width: 40px;
+  height: 40px;
+  border: 2px solid #ff4500;
+  border-radius: 50%;
+  position: relative;
+}
+
+.hand {
+  width: 2px;
+  height: 18px;
+  background-color: #ff4500;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-origin: bottom center;
+  transform: rotate(0deg);
+  transition: transform 1s linear;
+}
+
+.timer-text {
+  color: #ff4500;
 }
 
 
