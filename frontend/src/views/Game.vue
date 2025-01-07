@@ -8,40 +8,40 @@
     </div>
     <div class="row mt-4">
       <PokerTable ref="pokerTableRef" :players="players" :notification="notification"/>
-      <button @click="next" class="w-25 h-10">TOUR SUIVANT</button>
-      <button  @click="handleAction('fold')" id = "foldButton" class="w-25 h-10 action-buttons">FOLD</button>
-      <button  @click="handleAction('check')" id="checkButton" class="w-25 h-10 action-buttons">CHECK</button>
-      <button  @click="handleAction('call')" id="callButton" class="w-25 h-10 action-buttons">CALL</button>
-
-      <fieldset id ="raiseButton" class="bg-white  action-buttons">
-          <legend>Choisir le % du pot à relancer</legend>
-
-          <div>
+      <div class="action-buttons-container mt-3 d-flex justify-content-center align-items-center gap-3">
+        <button @click="next" class="btn-action">TOUR SUIVANT</button>
+        <button @click="handleAction('fold')" id="foldButton" class="btn-action btn-danger action-buttons">FOLD</button>
+        <button @click="handleAction('check')" id="checkButton" class="btn-action btn-secondary action-buttons">CHECK</button>
+        <button @click="handleAction('call')" id="callButton" class="btn-action btn-primary action-buttons">CALL</button>
+      </div>
+      <!-- Formulaire Raise -->
+      <fieldset id="raiseButton" class="raise-container mt-4 p-3 action-buttons">
+        <legend class="raise-legend">Choisir le % du pot à relancer</legend>
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="raise-option">
             <input type="radio" id="amount25" name="amount" value="0.25" v-model="raiseAmount" />
             <label for="amount25">25%</label>
           </div>
-
-          <div>
+          <div class="raise-option">
             <input type="radio" id="amount50" name="amount" value="0.50" v-model="raiseAmount" />
             <label for="amount50">50%</label>
           </div>
-
-          <div>
+          <div class="raise-option">
             <input type="radio" id="amount75" name="amount" value="0.75" v-model="raiseAmount" />
             <label for="amount75">75%</label>
           </div>
-
-          <div>
+          <div class="raise-option">
             <input type="radio" id="amount100" name="amount" value="1" v-model="raiseAmount" />
             <label for="amount100">100%</label>
           </div>
-
-          <div>
+          <div class="raise-option">
             <input type="radio" id="amountAllIn" name="amount" value="all" v-model="raiseAmount" />
             <label for="amountAllIn">All-in</label>
           </div>
-
-          <button @click="handleAction('raise')" class="w-25 h-10">RAISE</button>
+        </div>
+        <div class="text-center mt-3">
+          <button @click="handleAction('raise')" class="btn-action btn-raise">RAISE</button>
+        </div>
       </fieldset>
   </div>  
       <div class="col-md-4">
@@ -135,15 +135,31 @@ export default {
         const id = await this.getLocalPlayerId()
         const userData = await axios.get(`/api/users/${id}`)
         this.user = userData.data;
-        this.socket.emit('joinGame', this.user.pseudo,id);
-      } catch (e) {
-        this.errorMessage = "Vous devez être connecté pour rejoindre";
-      }
+        //Verification de si le joueur a assez de jetons pour rejoindre (1000)
+        if (this.user.money >= 1000) {
+      
+          //Requête PUT pour modifier l'argent sur le compte
+          await axios.put(`/api/users/${id}`, {
+            money: this.user.money - 1000
+          });
+            console.log("user : " ,this.user)
+            this.socket.emit('joinGame', this.user.pseudo,id);
+        }else {
+          console.log("Vous n'avez pas assez de jetons pour rejoindre cette partie (1000)")
+          const li = document.createElement('li');
+          li.className = 'list-group-item bg-danger text-white';
+          li.innerText = `Vous n'avez pas assez de jetons pour rejoindre (1000 nécessaires)`;
+          document.getElementById('chat_connexion').appendChild(li);
+        }
+        } catch (e) {
+            this.errorMessage = "Vous devez être connecté pour rejoindre";
+          }
 
-      // Attempt to call renderTable() only after confirming the ref is set
-      if (this.$refs.pokerTableRef) {
-        this.$refs.pokerTableRef.renderTable();
-      }
+          // Attempt to call renderTable() only after confirming the ref is set
+          if (this.$refs.pokerTableRef) {
+            this.$refs.pokerTableRef.renderTable();
+          }
+        
     },
     async replay() {
       console.log("Relancement d'une partie")
@@ -286,9 +302,23 @@ export default {
     });
 
     //UpdatePotEtStack utilisé lors de la win d'un joueur
-    this.socket.on("updatePot&StackWin", (players, pot, winnerName, nbJetonsGagnes,mainGagnante, mainPerdante) => {
+    this.socket.on("updatePot&StackWin",  async (players, pot, winnerName, nbJetonsGagnes,mainGagnante, mainPerdante) => {
+      //On va chercher le joueur correspondant sur l'api
+      const id = await this.getLocalPlayerId()
+      const userData = await axios.get(`/api/users/${id}`)
       const canvas = document.getElementById('pokerTable');
       const ctx = canvas.getContext('2d');
+      this.user = userData.data;
+
+      //Si le joueur est le gagnant alors on lui ajoute des jetons sinon on lui retire
+      if(winnerName == this.user.pseudo) {
+        this.user.money += nbJetonsGagnes + 1000 // On ajoute 1000 pour redonner le prix d'entrée
+      }
+      //Requête PUT pour modifier l'argent sur le compte
+      await axios.put(`/api/users/${id}`, {
+        money: this.user.money
+      });
+      console.log("Argent sur le compte : ", this.user.money )
       console.log(winnerName, " a gagné avec : " ,mainGagnante, " face à : " , mainPerdante, "et a gagné : " , nbJetonsGagnes)
       if (this.$refs.pokerTableRef) {
         this.$refs.pokerTableRef.cleanPlayersOverride(ctx, players, pot);
@@ -756,6 +786,65 @@ input {
     opacity: 1;
     transform: scale(1);
   }
+}
+/* Style général pour les boutons */
+.btn-action {
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-action:hover {
+  opacity: 0.9;
+}
+
+.btn-danger {
+  background-color: #d9534f;
+}
+
+.btn-secondary {
+  background-color: #5a6268;
+}
+
+.btn-primary {
+  background-color: #007bff;
+}
+
+.btn-raise {
+  background-color: #ff4500;
+}
+
+/* Conteneur pour les boutons */
+.action-buttons-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+/* Formulaire de raise */
+.raise-container {
+  background-color: #222;
+  border: 2px solid #ff4500;
+  border-radius: 10px;
+  color: white;
+}
+
+.raise-legend {
+  padding: 0 10px;
+  color: #ff4500;
+  font-weight: bold;
+}
+
+.raise-option {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 16px;
+  color: white;
 }
 
 

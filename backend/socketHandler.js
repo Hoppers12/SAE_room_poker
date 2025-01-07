@@ -36,7 +36,7 @@ function passageALaProchaineStreet (io, gameController) {
 function socketHandler(io) {
 
     io.on('connection', (socket) => {
-        console.log('A user connected', socket.id);
+        console.log('A user connectedd', socket.id);
 
         socket.on('joinGame', (pseudo, id) => {
             try {
