@@ -32,6 +32,10 @@ function getGame() {
 function getNbChips(player) {
     return player.getNbChips()
 }
+function resetGame() {
+    players = []
+    game.resetGame()
+}
 
 function ajoutNouveauJoueurDansPartie(newPlayer,io)
 {
@@ -86,7 +90,8 @@ module.exports = {
     getPot,
     winChips,
     getNbChips,
-    printSharedCards
+    printSharedCards,
+    resetGame
 };
 
 

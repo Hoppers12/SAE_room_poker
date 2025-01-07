@@ -154,7 +154,10 @@ function socketHandler(io) {
             console.log("playerss id : ", players_id)
             console.log("Pot Courant next Player : " , potCourant)
             //On envoie l'id du joueur qui doit jouer maintenant
-            io.emit('tourJoueur',players_id[index_current_player],players[index_current_player].name,potCourant)
+            if (players[index_current_player] != undefined) {
+                io.emit('tourJoueur',players_id[index_current_player],players[index_current_player].name,potCourant)
+            }
+
             
             
         });
@@ -193,16 +196,35 @@ function socketHandler(io) {
                 io.emit("updatePot&Stack", gameController.getPlayers(), gameController.getPot());
         
             }else if (action == "call") {
-                console.log("NB CHIPS : ",playerActuel.getNbChips())
+                nbJetonsJoueurActuel = playerActuel.getNbChips()
+                console.log("NB CHIPS : ",nbJetonsJoueurActuel)
                 //Si le joueur a assez de jeton pour call  on le fait call et prochaine street sinon message
-                if (playerActuel.getNbChips()>= potCourant) {
+                if (nbJetonsJoueurActuel >= potCourant) {
                     gameController.getGame().bet(playerActuel,potCourant)
                     console.log("Le joueur a call un montant de : ", potCourant)
                     potCourant = 0 
-                    io.emit("updatePot&Stack", gameController.getPlayers(), gameController.getPot());
-                    //Passage à la street suivante
                 }else {
-                    console.log("Le joueur n'a pas assezz de jeton pour call ! Choisir une autre option")
+                    //Le joueur part à tapis directement si il n'a pas le montant requis
+                    console.log("Le joueur n'a pas assezz de jeton pour call ! Il part donc à tapis directement")
+                    gameController.getGame().bet(playerActuel,nbJetonsJoueurActuel)
+                    potCourant += nbJetonsJoueurActuel
+                    //En fonction de street courante on passe plus ou moins de fois à la prochaine street
+                    switch (streetCourante) {
+                        case 0 : 
+                            passageALaProchaineStreet(io,gameController)
+                            passageALaProchaineStreet(io,gameController)
+                            passageALaProchaineStreet(io,gameController)
+                            break;
+                        case 1:
+                            passageALaProchaineStreet(io,gameController)
+                            passageALaProchaineStreet(io,gameController)
+                            break;
+                        case 2:
+                            passageALaProchaineStreet(io,gameController)
+                            break;
+                        default:
+                            console.log(`Pas de passage à la prochaine street nécessaie`);
+                    }
                 }
                 
                 // On envoie les nouvelles infos au front
@@ -289,7 +311,11 @@ function socketHandler(io) {
                     //On fait gagner le coup au joueur restant en lui donnant le pot
                     nbJetonsGagnes = gameController.winChips(player_winner)
                     io.emit("updatePot&StackWin", gameController.getPlayers(), gameController.getPot(),player_winner.name,nbJetonsGagnes,'', '')
-                    
+                    gameController.resetGame()
+                    idQuiOntFold = [] ;
+                    streetCourante = 0 ;
+                    potCourant = 0;
+                    winner = null;
                  }
                  //Sinon si il ne reste rien à call alors on passe au prochain tour
                 else if (potCourant == 0) {
@@ -324,7 +350,11 @@ function socketHandler(io) {
 
                         nbJetonsGagnes = gameController.winChips(playerWinner)
                         io.emit("updatePot&StackWin", gameController.getPlayers(), gameController.getPot(),winnerName,nbJetonsGagnes,result.winningCombination, mainPerdante)
-                    
+                        gameController.resetGame()
+                        idQuiOntFold = [] ;
+                        streetCourante = 0 ;
+                        potCourant = 0;
+                        winner = null;
                     
                     }else if (winner == null) {
                         passageALaProchaineStreet(io,gameController)

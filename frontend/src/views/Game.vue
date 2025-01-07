@@ -122,6 +122,7 @@ export default {
       this.showModal = false
     },
     async send() {
+      this.closeModal()
       try {
         const id = await this.getLocalPlayerId()
         const userData = await axios.get(`/api/users/${id}`)
@@ -179,6 +180,8 @@ export default {
         var x = canvas.width / 2
         var y = canvas.height / 2 
         var indexSharedCard = 0
+                    // On dessine les nouvelles cartes sur la table
+
           //On choisit la position des cartes du board en fonction de leur indice (la cbème qui tombe)
           this.sharedCards.forEach(card => {
             console.log("Carte analysé : " , card)
@@ -211,10 +214,12 @@ export default {
 
             var commonCard = `${cardRank}${suitMap[cardSuit]}`
 
-            // On dessine les nouvelles cartes du joueur sur la table
+
+    
+
             this.$refs.pokerTableRef.drawCardWithAnimation(x,y,commonCard)
             this.socket.emit("nextPlayer")
-      })
+      })          
     },
     //Retourne l'objet player d'id id
     getPlayerFromId(idATrouver) {
@@ -315,7 +320,11 @@ export default {
          this.winnerHand = mainGagnante
          this.nbChipsGagnes = nbJetonsGagnes
          this.loserHand = mainPerdante
-         this.showModal = true
+         //On ajoute 1,5s de délai à la modale
+         setTimeout(() => {
+            this.showModal = true
+          }, 1500);
+
       });
 
 
@@ -426,14 +435,18 @@ export default {
         console.log("Affichage des cartes communes de la river")
       }
     })
-
     this.socket.on("cartesCommunes", (sharedCards) => {
-      this.sharedCards = sharedCards
-      console.log("Cartes communes reçues : " , sharedCards)
+      this.sharedCards = sharedCards;
+      console.log("Cartes communes reçues : ", sharedCards);
+      
       const canvas = document.getElementById('pokerTable');
-  
-      this.drawSharedCards(canvas)
-    }),
+      this.drawSharedCards(canvas);
+
+      setTimeout(() => {
+        console.log("1 seconde s'est écoulée après le dessin des cartes.");
+        // Place ici le code à exécuter après 1 seconde
+      }, 1000);
+    });
 
     //Affiche les boutons pour que le joueur d'id current turn joue et efface sur l'écran de l'ancien joueur actif
     this.socket.on('tourJoueur', async (currentTurn, PlayerCurrentName, montantACall) => {

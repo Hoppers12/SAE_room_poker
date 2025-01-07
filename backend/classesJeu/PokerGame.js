@@ -71,6 +71,16 @@ class PokerGame {
         })
     }
 
+    resetGame() {
+        this.deck = new Deck();
+        this.deck.shuffle();  // Mélange le deck au début du jeu
+        this.communityCards = [];  // Cartes communes au centre de la table
+        this.pot = 0;  // Pot central pour les mises
+        this.currentPlayerIndex = 0;  // Index du joueur actuel
+        this.dealerIndex = 0;  // Index du donneur
+        this.players = [];  // Liste des joueurs
+    }
+
     // Getter pour récupérer la liste des joueurs
     getPlayers() {
         return this.players;
