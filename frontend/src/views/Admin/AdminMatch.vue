@@ -1,4 +1,6 @@
 <template>
+  <NavBar/>
+  <div class="back">
   <div id="admin-match-page">
     <h1>Admin - Manage Matches</h1>
 
@@ -38,13 +40,16 @@
       </ul>
     </div>
   </div>
+  </div>
 </template>
 
 <script>
 import axios from '../../axios';
+import NavBar from "@/components/Navbar.vue";
 
 export default {
   name: 'AdminMatch',
+  components: {NavBar},
   data() {
     return {
       newMatch: {

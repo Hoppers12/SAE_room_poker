@@ -1,4 +1,6 @@
 <template>
+  <div class="back">
+  <NavBar/>
   <div id="admin-account">
     <h1 style="color: white">Gestion des comptes utilisateurs</h1>
     <table>
@@ -67,13 +69,16 @@
       </tbody>
     </table>
   </div>
+  </div>
 </template>
 
 <script>
 import axios from "../../axios";
+import NavBar from "@/components/Navbar.vue";
 
 export default {
   name: 'AdminAccount',
+  components: {NavBar},
   data() {
     return {
       users: [],

@@ -1,4 +1,7 @@
 <template>
+  <div class="back">
+  <NavBar />
+
   <div class="bet-resume">
     <div class="title">
       <h1>Résumé des paris</h1>
@@ -35,11 +38,7 @@
             {{ getStatus(bet.status) }}
           </td>
           <td>
-            <button
-                v-if="bet.status === 'Pending'"
-                @click="deleteBet(bet._id)"
-                class="delete-btn"
-            >
+            <button v-if="bet.status === 'Pending' || bet.status === 'Attente'" @click="deleteBet(bet._id)" class="delete-btn">
               Supprimer
             </button>
           </td>
@@ -48,23 +47,69 @@
       </table>
     </div>
   </div>
+  </div>
 </template>
 
 <script>
 import axios from "../axios";
+import NavBar from "@/components/Navbar.vue";
 
 export default {
   name: "BetResume",
+  components: {NavBar},
   data() {
     return {
+      id: localStorage.getItem("id"),
       bets: [],
       loading: true,
     };
   },
   methods: {
+    async checkBetResults() {
+      try {
+        for (const bet of this.bets) {
+          if (bet.status === 'Pending' || bet.status === 'Attente') {
+            const matchResults = await axios.get(`/api/matches/${bet.bets[0].matchId}`);
+            const results = matchResults.data.result;
+            let statusChanged = false;
+            if (results === 'Win' && bet.bets.selectedType === 'Win') {
+              bet.status = 'Won';
+              statusChanged = true;
+              const user = await axios.get(`/api/users/${this.id}`);
+              user.data.money += bet.potentialGain;
+              await axios.put(`/api/users/${this.id}`, user.data);
+            } else if (results === 'Lose' && bet.bets.selectedType === 'Lose') {
+              bet.status = 'Won';
+              statusChanged = true;
+              const user = await axios.get(`/api/users/${this.id}`);
+              user.data.money += bet.potentialGain;
+              await axios.put(`/api/users/${this.id}`, user.data);
+            } else if (results === 'Draw' && bet.bets.selectedType === 'Draw') {
+              bet.status = 'Won';
+              statusChanged = true;
+              const user = await axios.get(`/api/users/${this.id}`);
+              user.data.money += bet.potentialGain;
+              await axios.put(`/api/users/${this.id}`, user.data);
+            } else if (results == null) {
+              bet.status = 'Pending';
+              statusChanged = true;
+            } else {
+              bet.status = "Lost";
+              statusChanged = true;
+            }
+            if (statusChanged) {
+              await axios.put(`/api/betUser/${bet._id}`, { status: bet.status });
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Erreur lors de la vérification des résultats des paris:", error);
+      }
+    }
+    ,
     async fetchBets() {
       try {
-        const userId = localStorage.getItem("id");
+        const userId = this.id;
         const response = await axios.get(`/api/betUser/${userId}`);
         this.bets = response.data;
       } catch (error) {
@@ -72,6 +117,7 @@ export default {
       } finally {
         this.loading = false;
       }
+      await this.checkBetResults();
     },
     async deleteBet(betId) {
       try {
@@ -99,8 +145,8 @@ export default {
     getStatus(status) {
       const statusMap = {
         Pending: "En attente",
-        Win: "Gagné",
-        Lose: "Perdu",
+        Won: "Gagné",
+        Lost: "Perdu",
       };
       return statusMap[status] || "Inconnu";
     },
@@ -121,7 +167,6 @@ export default {
 <style>
 .bet-resume {
   padding: 20px;
-  background-color: #1b1b1b;
   color: #f4f4f4;
   min-height: 100vh;
   font-family: Arial, sans-serif;

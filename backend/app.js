@@ -71,6 +71,23 @@ app.delete('/api/betUser/:id', async (req, res) => {
         res.status(500).json({ message: 'Erreur interne du serveur' });
     }
 });
+
+app.put('/api/betUser/:id', async (req, res) => {
+    try {
+        const betUserId = req.params.id;
+        const updateData = req.body;
+        const options = { new: true, runValidators: true };
+        const result = await BetUser.findByIdAndUpdate(betUserId, updateData, options);
+        if (!result) {
+        return res.status(404).json({ message: 'Pari utilisateur non trouvé' });
+        }
+        res.status(200).json({ message: 'Pari utilisateur modifié avec succès' });
+    } catch (error) {
+        console.error('Erreur lors de la modification du pari utilisateur:', error);
+        res.status(500).json({ message: 'Erreur interne du serveur' });
+    }
+});
+
 app.post('/api/betUser', async (req, res) => {
   try {
     const { userId, bets, stake, totalOdds } = req.body;
@@ -224,6 +241,20 @@ app.post('/api/matches', async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 
+});
+
+app.get('/api/matches/:id', async (req, res) => {
+    try {
+        const matchId = req.params.id;
+        const match = await Match.findById(matchId);
+        if (!match) {
+            return res.status(404).json({ message: 'Match non trouvé' });
+        }
+        res.json(match);
+    } catch (error) {
+        console.error('Erreur lors de la recherche du match:', error);
+        res.status(500).json({ message: 'Erreur serveur' });
+    }
 });
 
 app.post('/api/bets', async (req, res) => {

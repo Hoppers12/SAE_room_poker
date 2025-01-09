@@ -1,7 +1,5 @@
 <template>
   <div class="back">
-
-
   <NavBar/>
   <div id="bet-page" v-if="isLoggedIn">
     <div class="header">
@@ -67,7 +65,7 @@
 
 <script>
 import axios from '../axios';
-import NavBar from '../components/Navbar.vue'; // Import du composant NavBar
+import NavBar from '../components/Navbar.vue';
 
 export default {
   name: 'ShowBet',
@@ -106,9 +104,7 @@ export default {
         alert("Mise invalide ou solde insuffisant !");
         return;
       }
-
       try {
-
         const userId = localStorage.getItem('id');
         const userBetsResponse = await axios.get(`/api/betUser/${userId}`);
         const userBets = userBetsResponse.data;
@@ -206,7 +202,6 @@ export default {
       const currentDate = new Date();
       return this.bets.filter((bet) => {
         const match = this.matches.find((m) => m._id === bet.matches[0]._id);
-        console.log(match);
         return bet.sport[0].name === sport && match && new Date(match.match_date) > currentDate;
       });
     },

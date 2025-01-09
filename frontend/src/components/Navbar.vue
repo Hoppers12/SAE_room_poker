@@ -2,7 +2,16 @@
     <nav>
       <router-link to="/" class="nav-link">ACCUEIL</router-link>
       <router-link to="/game" class="nav-link">JEU</router-link>
-      <router-link to="/bet" class="nav-link">PARIER</router-link>
+      <div class="dropdown">
+        <button class="nav-link dropdown-btn" name="Paris">
+          PARIS
+        </button>
+        <div class="dropdown-content">
+          <router-link to="/bet" class="nav-link">PARIER</router-link>
+          <router-link to="/betresume" class="nav-link">MES PARIS</router-link>
+        </div>
+
+      </div>
 
 
       <p id="solde">Solde : {{user.money}}</p>

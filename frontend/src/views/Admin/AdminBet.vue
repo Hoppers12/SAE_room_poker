@@ -1,4 +1,7 @@
 <template>
+  <div class="back">
+  <NavBar/>
+
   <div id="admin-bets">
     <div class="title">
       <h1 style="color: white">Gestion des Paris Sportifs</h1>
@@ -111,13 +114,16 @@
 
     </table>
   </div>
+</div>
 </template>
 
 <script>
 import axios from "../../axios";
+import NavBar from "@/components/Navbar.vue";
 
 export default {
   name: 'AdminBets',
+  components: {NavBar},
   data() {
     return {
       bets: [],

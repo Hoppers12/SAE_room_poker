@@ -15,8 +15,6 @@ const matchSchema = new mongoose.Schema({
 
 const Match = mongoose.models.Match || mongoose.model('Match', matchSchema);
 
-
-
 async function insertDefaultMatches() {
     const count = await Match.countDocuments();
     if (count === 0) {
@@ -94,8 +92,15 @@ async function insertDefaultMatches() {
                 match_date: new Date('2025-10-05'),
                 odds: [{ home: 1.5, draw: null, away: 2.7 }]
             },
+            {
+                home_team: teamMap['FC Barcelone Handball'],
+                away_team: teamMap['Paris Saint-Germain Handball'],
+                match_name: 'Barça-PSG',
+                result: null,
+                id_sport: sportMap['Handball'],
+                match_date: new Date('2025-01-01'),
+            }
         ];
-
         await Match.insertMany(defaultMatches);
         console.log("Les matchs par défaut ont été insérés !");
     } else {
