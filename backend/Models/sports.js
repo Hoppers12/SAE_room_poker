@@ -5,7 +5,7 @@ const sportSchema = new mongoose.Schema({
     name:{type:String},
 });
 
-const Sport = mongoose.model('Sport', sportSchema);
+const Sport = mongoose.models.Sport || mongoose.model('Sport', sportSchema);
 async function insertDefaultSports() {
     const count = await Sport.countDocuments();
     if (count === 0) {

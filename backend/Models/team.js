@@ -9,7 +9,8 @@ const teamSchema = new mongoose.Schema({
     sport: {type: mongoose.Schema.Types.ObjectId, ref: 'Sport'},
 });
 
-const Team = mongoose.model('Team', teamSchema);
+const Team =   mongoose.models.Team || mongoose.model('Team', teamSchema);
+
 
 async function insertDefaultTeams() {
     const count = await Team.countDocuments();

@@ -26,13 +26,7 @@
 
       <div class="stake-input">
         <label for="stake">Mise (en €) :</label>
-        <input
-            type="number"
-            id="stake"
-            v-model.number="stake"
-            placeholder="Entrez votre mise"
-            min="1"
-        />
+        <input type="number" id="stake" v-model.number="stake" placeholder="Entrez votre mise" min="1"/>
       </div>
 
       <div class="total-gains" v-if="stake > 0">
@@ -47,17 +41,10 @@
     <div v-if="bets.length" class="bet-sections">
       <div class="bet-column" v-for="sport in uniqueSports" :key="sport">
         <h2 class="sport-title">{{ sport }}</h2>
-        <div
-            v-for="bet in filteredBetsBySport(sport)"
-            :key="bet._id"
-            class="bet-item"
-        >
+        <div v-for="bet in filteredBetsBySport(sport)" :key="bet._id" class="bet-item">
           <div class="match-info">
             <h3>{{ getTeamNameById(bet.team._id) }} vs {{ getOpponentTeamName(bet) }}</h3>
           </div>
-          <p class="bet-dates">
-            Début: {{ formatDate(bet.bet_date) }} | Fin: {{ formatDate(bet.bet_expire_date) }}
-          </p>
           <div class="bet-odds">
             <button
                 v-for="(value, type) in { Win: bet.matches[0].odds[0].home, Draw: bet.matches[0].odds[0].draw !== null ? bet.matches[0].odds[0].draw : 0 , Lose: bet.matches[0].odds[0].away }"
@@ -216,7 +203,12 @@ export default {
       return 'Inconnu';
     },
     filteredBetsBySport(sport) {
-      return this.bets.filter((bet) => bet.sport[0].name === sport);
+      const currentDate = new Date();
+      return this.bets.filter((bet) => {
+        const match = this.matches.find((m) => m._id === bet.matches[0]._id);
+        console.log(match);
+        return bet.sport[0].name === sport && match && new Date(match.match_date) > currentDate;
+      });
     },
     selectBet(selectedOdd) {
       if (selectedOdd.value === undefined || selectedOdd.value === 'N/A') {

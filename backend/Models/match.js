@@ -13,7 +13,7 @@ const matchSchema = new mongoose.Schema({
 
 });
 
-const Match = mongoose.model('Match', matchSchema);
+const Match = mongoose.models.Match || mongoose.model('Match', matchSchema);
 
 
 
@@ -38,6 +38,15 @@ async function insertDefaultMatches() {
                 result: null,
                 id_sport: sportMap['Football'],
                 match_date: new Date('2025-10-01'),
+                odds: [{ home: 1.8, draw: 3.5, away: 4.0 }]
+            },
+            {
+                home_team: teamMap['PSG'],
+                away_team: teamMap['OL'],
+                match_name: 'PSG-OL',
+                result: null,
+                id_sport: sportMap['Football'],
+                match_date: new Date('2024-10-12'),
                 odds: [{ home: 1.8, draw: 3.5, away: 4.0 }]
             },
             {
