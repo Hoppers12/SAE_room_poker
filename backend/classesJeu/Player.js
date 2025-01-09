@@ -3,8 +3,8 @@ const Card = require('./Card');
 
 class Player {
     static nextId = 1; // Compteur statique pour générer des ID unique
-    constructor(name, chips,p_x,p_y,p_partie) {
-        this.id = Player.nextId++; // Assigner un ID unique à chaque nouveau joueur crée
+    constructor(id,name, chips,p_x,p_y,p_partie) {
+        this.id = id // Assigner un ID unique à chaque nouveau joueur crée
         this.chips = chips; // Jetons du joueur
         this.hand = []; // Cartes du joueur
         this.currentBet = 0; // Mise courante du joueur
@@ -51,6 +51,10 @@ class Player {
         this.hand.push(card);
     }
 
+    getNbChips() {
+        return this.chips
+    }
+
     // Parier des jetons
     bet(amount) {
         if (amount > this.chips) {
@@ -75,6 +79,11 @@ class Player {
     // Récupérer sa main sous forme de texte
     showHand() {
         return this.hand.map(card => card.toString()).join(', ');
+    }
+
+    //Permet de faire gagner des jetons au joueur
+    winChips(value) {
+        this.chips += value
     }
 }
 

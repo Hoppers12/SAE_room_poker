@@ -1,6 +1,7 @@
 const Deck = require('./Deck');
 const Card = require('./Card');
 const Player = require("./Player");
+const HandEvaluator = require('../utils/HandEvaluator'); // Hypothèse d'un module pour évaluer les mains
 
 class PokerGame {
     constructor(players) {
@@ -16,6 +17,38 @@ class PokerGame {
     getGame() {
         return this
     }
+
+    getWinner(player1, player2, communityCards) {
+        // Combiner la main du joueur et les cartes communes
+        const hand1 = [...player1.hand, ...communityCards];
+        const hand2 = [...player2.hand, ...communityCards];
+
+        // Évaluer les deux mains
+        const evalHand1 = HandEvaluator.evaluate(hand1);
+        const evalHand2 = HandEvaluator.evaluate(hand2);
+
+        // Comparer les deux mains
+        const result = HandEvaluator.compareHands(evalHand1, evalHand2);
+
+        // Retourner les informations sur le gagnant et les combinaisons
+        return {
+            winner: result.winner,
+            player1: {
+                name: player1.getName,
+                combination: result.player1.combination,
+                kickers: result.player1.kickers,
+                hand: hand1
+            },
+            player2: {
+                name: player2.getName,
+                combination: result.player2.combination,
+                kickers: result.player2.kickers,
+                hand: hand2
+            },
+            winningCombination: result.winningCombination
+        };
+    }
+    
 
     getPot() {
         return this.pot
@@ -36,6 +69,16 @@ class PokerGame {
             }
 
         })
+    }
+
+    resetGame() {
+        this.deck = new Deck();
+        this.deck.shuffle();  // Mélange le deck au début du jeu
+        this.communityCards = [];  // Cartes communes au centre de la table
+        this.pot = 0;  // Pot central pour les mises
+        this.currentPlayerIndex = 0;  // Index du joueur actuel
+        this.dealerIndex = 0;  // Index du donneur
+        this.players = [];  // Liste des joueurs
     }
 
     // Getter pour récupérer la liste des joueurs
@@ -66,6 +109,21 @@ class PokerGame {
         console.log(player.name, 'perd : ' , amount , ' jetons')
     }
 
+    getNbChips(player) {
+        return player.getNbChips
+    }
+    resetPot() {
+        this.pot = 0
+    }
+    //Donne le pot à un joueur et remet le pot à 0
+    winPot(player) {
+        player.winChips(this.pot)
+        var potGagne = this.pot
+        this.resetPot()
+        return potGagne
+    }
+
+
     // Tour de jeu : passe au joueur suivant
     nextTurn() {
         this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.length;
@@ -87,6 +145,10 @@ class PokerGame {
     determineWinner() {
         // Logique simplifiée, retour du premier joueur par défaut pour l'instant
         return this.players[0];
+    }
+    
+    getCommunityCards() {
+        return this.communityCards
     }
 }
 

@@ -10,7 +10,7 @@ function gestionPartie(newPlayer,io)
     if (players.length === 0)
     {
         players.push(newPlayer);
-        game = new PokerGame(players); // Initialiser la partie
+        game = new PokerGame(players); // Initialiser la partiee
         game.setPlayers(players); // Mettre à jour la liste des joueurs
         var NbPlayer = getNbPlayers();
         // Envoi d'un message à tous les clients pour informer de l'arrivée d'un nouveau joueur
@@ -28,6 +28,13 @@ function getPot() {
 }
 function getGame() {
     return game;
+}
+function getNbChips(player) {
+    return player.getNbChips()
+}
+function resetGame() {
+    players = []
+    game.resetGame()
 }
 
 function ajoutNouveauJoueurDansPartie(newPlayer,io)
@@ -54,6 +61,25 @@ function setPlayers(new_players) {
     players = new_players
 }
 
+//Fais gagner un pot à un joueur donné
+function winChips(player) {
+    nbJetonsGagnes = game.winPot(player)
+    return nbJetonsGagnes
+}
+
+//Ajoute le nombre de cartes communes correspondantes à chaque street dans le tab game.communityCards
+function printSharedCards(streetCourante) {
+    if (streetCourante == 1) {
+        game.revealCommunityCards(3)
+    }else if (streetCourante == 2) {
+        game.revealCommunityCards(1)
+    }else if (streetCourante == 3) {
+        game.revealCommunityCards(1)
+    }
+
+    return game.getCommunityCards()
+}
+
 module.exports = {
     gestionPartie,
     ajoutNouveauJoueurDansPartie,
@@ -62,4 +88,10 @@ module.exports = {
     getGame,
     setPlayers,
     getPot,
+    winChips,
+    getNbChips,
+    printSharedCards,
+    resetGame
 };
+
+

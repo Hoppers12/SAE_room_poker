@@ -1,34 +1,6 @@
 
 <template>
   <div id="app">
-
-    <nav>
-      <router-link to="/" class="nav-link">Accueil</router-link>
-      <router-link to="/game" class="nav-link">Jeu</router-link>
-      <div class="dropdown">
-        <button class="nav-link dropdown-btn" name="Compte">
-          Paris
-        </button>
-        <div class="dropdown-content">
-          <router-link to="/bet" class="dropdown-link">Parier</router-link>
-          <router-link to="/betresume" class="dropdown-link" v-if="isLoggedIn">Mes paris</router-link>
-        </div>
-      </div>
-      <div class="dropdown">
-        <button class="nav-link dropdown-btn" name="Compte">
-          {{isLoggedIn ? user.pseudo : 'Compte'}}
-        </button>
-        <div class="dropdown-content">
-          <router-link to="/signup" class="dropdown-link" v-if="!isLoggedIn">S'inscrire</router-link>
-          <router-link to="/login" class="dropdown-link" v-if="!isLoggedIn">Se connecter</router-link>
-          <router-link to="/profile" class="dropdown-link" v-if="isLoggedIn">Mon profil</router-link>
-          <router-link to="/admin/account" class="dropdown-link" v-if="isLoggedIn && isAdmin">Gestion des comptes</router-link>
-          <router-link to="/admin/adminbet" class="dropdown-link" v-if="isLoggedIn && isAdmin">Gestion des paris</router-link>
-          <router-link to="/admin/adminmatch" class="dropdown-link" v-if="isLoggedIn && isAdmin">Gestion des matchs</router-link>
-          <button class="dropdown-link logout-btn" @click="logout" v-if="isLoggedIn ">Se déconnecter</button>
-        </div>
-      </div>
-    </nav>
     <router-view/>
 
   </div>

@@ -3,6 +3,9 @@
       <router-link to="/" class="nav-link">ACCUEIL</router-link>
       <router-link to="/game" class="nav-link">JEU</router-link>
       <router-link to="/bet" class="nav-link">PARIER</router-link>
+
+
+      <p id="solde">Solde : {{user.money}}</p>
   
       <div class="dropdown">
         <button class="nav-link dropdown-btn" name="Compte">
@@ -18,6 +21,7 @@
           <button class="dropdown-link logout-btn" @click="logout" v-if="isLoggedIn">Se déconnecter</button>
         </div>
       </div>
+
     </nav>
   </template>
   
@@ -68,8 +72,8 @@
   align-items: center;
     background: linear-gradient(
         to right, 
-        rgba(0, 0, 0, 0.3), 
-        rgba(230, 57, 70, 0.3)
+        rgba(0, 0, 0, 0),
+        rgba(230, 57, 70, 0)
     ); /* Dégradé noir à rouge avec transparence */
   padding: 15px 20px;
   position: sticky;
@@ -151,7 +155,15 @@
   .logout-btn:hover {
     background-color: #e63946;
   }
-  
+
+  #solde {
+    color: #ffc107;
+    font-weight: bold;
+    font-size: 15px;
+    border-radius: 25px;
+    margin:0;
+
+  }
   /* Navigation links */
   .nav-link {
     color: #f7f8fc;
