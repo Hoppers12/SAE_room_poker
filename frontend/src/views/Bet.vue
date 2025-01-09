@@ -1,4 +1,7 @@
 <template>
+  <div class="back">
+
+
   <NavBar/>
   <div id="bet-page" v-if="isLoggedIn">
     <div class="header">
@@ -70,6 +73,7 @@
     <div v-else>
       <p>Aucun pari disponible pour le moment.</p>
     </div>
+  </div>
   </div>
 </template>
 
@@ -257,7 +261,6 @@ export default {
 #bet-page {
   padding: 20px;
   font-family: 'Inter', sans-serif;
-  background-color: #0e121a;
   color: #fff;
   display: flex;
   flex-direction: column;
@@ -302,6 +305,7 @@ export default {
   background-color: #6c757d;
   cursor: not-allowed;
 }
+
 
 .header h1 {
   text-align: center;
@@ -511,6 +515,18 @@ export default {
     opacity: 1;
     transform: translateX(0);
   }
+}
+
+.back {
+  background-image: url(../img/background.png);
+  background-repeat: no-repeat;
+  background-size: 100vw, 100vh;
+  position:fixed;
+  z-index: 0; /* Gardez-le derrière le contenu */
+  width:100vw;
+  height:100vh;
+  top:0;
+  background-color: rgba(0, 0, 0, 0.5); /* Fond noir avec 50% de transparence */
 }
 
 </style>
