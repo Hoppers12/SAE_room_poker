@@ -3,8 +3,6 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const User = require('./Models/user');
 const Bet = require('./Models/bet')
-const Bet_history = require('./Models/bet_history')
-const Notification = require('./Models/notifications')
 const Sport = require('./Models/sports')
 const Team = require('./Models/team')
 const Players = require('./Models/player')
@@ -138,23 +136,7 @@ app.get('/api/bets',async (req, res) => {
   }
 })
 
-app.get('/api/betHistory',async (req, res) => {
-  try {
-    const bets = await Bet_history.find();
-    res.json(bets);
-  } catch (err) {
-    res.status(500).json({error: err.message});
-  }
-})
 
-app.get('/api/notifications',async (req,res)=>{
-  try{
-    const notifications = await Notification.find();
-    res.json(notifications)
-  } catch(err){
-    res.status(500).json({error : err.message})
-  }
-})
 
 
 
