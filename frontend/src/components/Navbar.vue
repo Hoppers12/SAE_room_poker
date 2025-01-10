@@ -14,7 +14,7 @@
       </div>
 
 
-      <p id="solde">Solde : {{user.money}}</p>
+      <p v-if="isLoggedIn" id="solde">Solde : {{user.money}}</p>
   
       <div class="dropdown">
         <button class="nav-link dropdown-btn" name="Compte">

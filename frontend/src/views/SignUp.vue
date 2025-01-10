@@ -99,7 +99,6 @@ export default {
   background-repeat: no-repeat;
   background-color: black;
   background-size: cover;
-  width: auto;
   height: fit-content;
   display: flex;
   justify-content: center;

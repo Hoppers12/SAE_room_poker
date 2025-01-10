@@ -8,6 +8,7 @@ const Team = require('./Models/team')
 const Players = require('./Models/player')
 const BetUser = require('./Models/bet_user');
 const {createServer} = require('./server');
+const bcrypt = require('bcrypt');
 require('./scheduler');
 
 
@@ -41,6 +42,26 @@ app.get('/api/betUser', async (req, res) => {
         res.status(500).json({ message: 'Erreur interne du serveur' });
     }
 });
+
+app.get('/api/hashedPassword/:email/:password', async (req, res) => {
+    try {
+        const { email, password } = req.params;
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: 'Utilisateur non trouvé' });
+        }
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (isMatch) {
+            return res.status(200).json({message: 'True'});
+        } else {
+            return res.status(401).json({message: 'False'});
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Erreur interne du serveur' });
+    }
+});
+
 
 app.get('/api/betUser/:id', async (req, res) => {
     try {
@@ -179,8 +200,11 @@ app.delete('/api/bets/:id', async (req, res) => {
 })
 
 
+
 app.post('/api/users', async (req, res) => {
   const { firstname,name,birthdate,city,address,postCode,nationality,phone,pseudo, email, password,isAdmin } = req.body;
+  const saltRounds = 10;
+  const hashedpassword = await bcrypt.hash(password, saltRounds);
   const newUser = new User({
     firstname,
     name,
@@ -192,7 +216,7 @@ app.post('/api/users', async (req, res) => {
     phone,
     pseudo,
     email,
-    password,
+    password : hashedpassword,
     isAdmin,
   });
 
