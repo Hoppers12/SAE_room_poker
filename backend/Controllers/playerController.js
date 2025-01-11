@@ -11,8 +11,8 @@ function findCoord(players) {
             y = 100;
             break;
         case 2:
-            x = 400;
-            y = 35;
+            x = 500;
+            y = 100;
             break;
         case 3:
             x = 700;

@@ -37,7 +37,7 @@ export default {
       ctx.strokeStyle = "#000";   // Couleur du contour
       ctx.lineWidth = 10;
       ctx.beginPath();
-      ctx.ellipse(canvas.width / 2, canvas.height / 2, 250, 200, 0, 0, Math.PI * 2);
+      ctx.ellipse(canvas.width / 2, canvas.height / 2, 250, 150, 0, 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
 
@@ -61,19 +61,23 @@ export default {
     // Dessine le joueur sur la table avec son pseudo, sa position et ses jetons et ses cartes
     drawPlayer(ctx, player, x, y) {
       ctx.beginPath();
-      ctx.arc(x, y, 30, 0, Math.PI * 2);
-      ctx.fillStyle = "black";
-      ctx.fillText(this.givePosition(player.p_reelle), x - 15, y - 5);
-      ctx.fillText(player.name, x - 15, y + 5);
-      ctx.fillText(`${player.chips} jetons`, x - 25, y + 50);
+      ctx.arc(x, y - 25, 30, 0, Math.PI * 2); // Cercle du joueur
+      ctx.fillStyle = "black"; // Remplissage noir
+      ctx.fill(); // Remplit le cercle
+      ctx.stroke(); // Dessine le contour du cercle
 
-      if (player.hand.length > 0) {
-        // Vérifie si player.hand contient des cartes avant de dessiner
-        ctx.fillText(`${player.hand[0].rank} de ${player.hand[0].suit}`, x - 25, y + 60);
-        if (player.hand.length > 1) {
-          ctx.fillText(`${player.hand[1].rank} de ${player.hand[1].suit}`, x - 25, y + 70);
-        }
-      }
+      // Style du texte
+      ctx.fillStyle = "white"; // Couleur du texte en blanc
+      ctx.font = "bold 10px Arial"; // Texte en gras, taille 14px
+
+      // Affiche la position réelle (en majuscule)
+      ctx.fillText(this.givePosition(player.p_reelle).toUpperCase(), x - 10, y - 80);
+
+      // Affiche les jetons du joueur
+      ctx.fillText(`${player.chips}`.toUpperCase(), x - 10, y - 65);
+
+      // Affiche le pseudo du joueur en blanc et en majuscule
+      ctx.fillText(player.name.toUpperCase(), x-25, y - 20);
 
       ctx.stroke();
     },
@@ -115,8 +119,8 @@ export default {
   img.src = `https://deckofcardsapi.com/static/img/${card}.png`; // URL de l'image de la carte
 
   img.onload = () => {
-    const cardWidth = 50;  // Largeur de la carte
-    const cardHeight = 70; // Hauteur de la carte
+    const cardWidth = 40;  // Largeur de la carte
+    const cardHeight = 60; // Hauteur de la carte
     const startTime = performance.now(); // Heure de début de l’animation
 
     const animate = (currentTime) => {

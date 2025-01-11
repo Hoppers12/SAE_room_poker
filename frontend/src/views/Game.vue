@@ -461,8 +461,8 @@ export default {
           const cardCode1 = `${carte1Rank}${suitMap[carte1Suit]}`;
           const cardCode2 = `${carte2Rank}${suitMap[carte2Suit]}`;
           // On dessine les nouvelles cartes du joueur sur la table
-          this.$refs.pokerTableRef.drawCardWithAnimation(player.x+30,player.y+30,cardCode1)
-          this.$refs.pokerTableRef.drawCardWithAnimation(player.x+70,player.y+30,cardCode2)
+          this.$refs.pokerTableRef.drawCardWithAnimation(player.x+10,player.y,cardCode1)
+          this.$refs.pokerTableRef.drawCardWithAnimation(player.x+50,player.y,cardCode2)
          // Affichage de la modale
          this.winnerName = winnerName
          this.winnerHand = mainGagnante
@@ -521,8 +521,8 @@ export default {
           const cardCode1 = `${carte1Rank}${suitMap[carte1Suit]}`;
           const cardCode2 = `${carte2Rank}${suitMap[carte2Suit]}`;
           // On dessine les nouvelles cartes du joueur sur la table
-          this.$refs.pokerTableRef.drawCardWithAnimation(player.x+30,player.y+30,cardCode1)
-          this.$refs.pokerTableRef.drawCardWithAnimation(player.x+70,player.y+30,cardCode2)
+          this.$refs.pokerTableRef.drawCardWithAnimation(player.x+10,player.y,cardCode1)
+          this.$refs.pokerTableRef.drawCardWithAnimation(player.x+50,player.y,cardCode2)
 
 
       });
