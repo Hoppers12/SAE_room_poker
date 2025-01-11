@@ -1,5 +1,5 @@
 <template>
-  <NavBar/>
+  <NavBar  ref="navbar"/>
   <div class="back">
     
     <div class="container mt-5" v-if="isLogged">
@@ -8,61 +8,74 @@
       </div>
     </div>
     <div class="row mt-4">
-      <button @click="giveMoney()" class="btn-action btn-primary action-buttons">FREE JETONS</button>
+
       <PokerTable ref="pokerTableRef" :players="players" :notification="notification"/>
       <div class="action-buttons-container mt-3 d-flex justify-content-center align-items-center gap-3">
+        <div v-if="timer > 0" class="timer-container">
+          <div class="timer-clock">
+            <div class="hand" ref="hand"></div> <!-- La main de l'horloge qui va tourner -->
+          </div>
+        </div>
         <button @click="next" class="btn-action">TOUR SUIVANT</button>
         <button @click="handleAction('fold')" id="foldButton" class="btn-action btn-danger action-buttons">FOLD</button>
         <button @click="handleAction('check')" id="checkButton" class="btn-action btn-secondary action-buttons">CHECK</button>
         <button @click="handleAction('call')" id="callButton" class="btn-action btn-primary action-buttons">CALL</button>
-      </div>
-      <div v-if="timer > 0" class="timer-container">
-        <div class="timer-clock">
-          <div class="hand" ref="hand"></div> <!-- La main de l'horloge qui va tourner -->
-        </div>
-        <div class="timer-text">
-          Temps restant : {{ timer }} s
-        </div>
-    </div>
+        <div class="d-flex justify-content-around">
       <!-- Formulaire Raise -->
-      <fieldset id="raiseButton" class="raise-container mt-4 p-3 action-buttons">
+      <fieldset id="raiseButton" class="raise-container mt-4 p-1 action-buttons">
         <legend class="raise-legend">Choisir le % du pot à relancer</legend>
         <div class="d-flex justify-content-between align-items-center">
           <div class="raise-option">
             <input type="radio" id="amount25" name="amount" value="0.25" v-model="raiseAmount" />
-            <label for="amount25">25%</label>
+            <label for="amount25" class="amount">25%</label>
           </div>
           <div class="raise-option">
             <input type="radio" id="amount50" name="amount" value="0.50" v-model="raiseAmount" />
-            <label for="amount50">50%</label>
+            <label for="amount50" class="amount">50%</label>
           </div>
           <div class="raise-option">
             <input type="radio" id="amount75" name="amount" value="0.75" v-model="raiseAmount" />
-            <label for="amount75">75%</label>
+            <label for="amount75" class="amount">75%</label>
           </div>
           <div class="raise-option">
             <input type="radio" id="amount100" name="amount" value="1" v-model="raiseAmount" />
-            <label for="amount100">100%</label>
+            <label for="amount100" class="amount">100%</label>
           </div>
           <div class="raise-option">
             <input type="radio" id="amountAllIn" name="amount" value="all" v-model="raiseAmount" />
-            <label for="amountAllIn">All-in</label>
+            <label for="amountAllIn" class="amount">All-in</label>
           </div>
         </div>
         <div class="text-center mt-3">
           <button @click="handleAction('raise')" class="btn-action btn-raise">RAISE</button>
         </div>
       </fieldset>
+
+    </div>
+
+      </div>
+      
+
+
   </div>  
       <div class="col-md-4">
         <div class="mb-3">
           <h2 class="h4 text-light">Connexion</h2>
           <ul id="chat_connexion" class="list-group bg-secondary text-white border-light"></ul>
         </div>
-        <div class="mb-3">
-          <button @click="send" class="btn btn-primary mt-2 w-100">Rejoindre la partie</button>
-          <p v-if="errorMessage" class="error">{{errorMessage}}</p>
+
+      <!-- Modale qui s'affiche au chargement -->
+      <div v-if="showModalJoin" class="modal-overlay show">
+        <div class="modal-content">
+          <h2>Bienvenue !</h2>
+          <p>Vous êtes sur le point de rejoindre la partie.</p>
+          
+          <button @click="send" class="btn btn-primary">Rejoindre la partie</button>
+          <button @click="closeModalJoin" class="btn btn-secondary">Annuler</button>
         </div>
+      </div>
+
+
         <div>
           <p class="bg-white w-3 text-black "> Au tour de : {{playerActifName}}</p>
           <h2 class="h4 text-light">Liste des joueurs présents</h2>
@@ -127,7 +140,8 @@ export default {
       timeInterval:null,
       nbChipsGagnes:null,
       showModal: false,     // Variable pour contrôler l'affichage de la modale
-      isTimerActive: false // Flag pour savoir si le timer est actif
+      isTimerActive: false, // Flag pour savoir si le timer est actif
+      showModalJoin:true
     };
   },
   watch: {
@@ -147,18 +161,15 @@ export default {
 ,
 
   methods: {
-    //Donne des jetons au joueurs
-    async giveMoney() {
-        const id = await this.getLocalPlayerId()
-        const userData = await axios.get(`/api/users/${id}`)
-        this.user = userData.data;
-          //Requête PUT pour modifier l'argent sur le compte
-          await axios.put(`/api/users/${id}`, {
-            money: this.user.money + 1000
-          });
+    closeModalJoin() {
+      this.showModalJoin = false
     },
+ 
     closeModal() {
       this.showModal = false
+      // Appel de la méthode editMoney du composant NavBar
+      this.$refs.navbar.editMoney();
+
     },
     // Fonctions pour afficher/masquer les boutons de jeu
     showActionButtons() {
@@ -212,6 +223,7 @@ export default {
       this.nbChipsGagnes=null
     },
     async send() {
+
       this.resetGame()
       try {
         const id = await this.getLocalPlayerId()
@@ -226,6 +238,8 @@ export default {
           });
             console.log("user : " ,this.user)
             this.socket.emit('joinGame', this.user.pseudo,id);
+            this.$refs.navbar.editMoney()
+            this.closeModalJoin(); // Ferme la modale après avoir rejoint la partie
         }else {
           console.log("Vous n'avez pas assez de jetons pour rejoindre cette partie (1000)")
           const li = document.createElement('li');
@@ -245,6 +259,9 @@ export default {
     },
     async replay() {
       console.log("Relancement d'une partie")
+      // Appel de la méthode editMoney du composant NavBar
+      this.$refs.navbar.editMoney();
+
     },
     async begin() {
       this.socket.emit('beginGame');
@@ -375,6 +392,8 @@ export default {
   },
   async mounted() {
     this.checkStatus();
+    // La modale s'affiche dès que le composant est monté
+    this.showModalJoin = true;
     this.socket = io('http://localhost:5000', { transports: ['websocket'] });
 
     this.socket.on('connect', () => console.log('Connexion réussie au serveur WebSockect'));
@@ -658,13 +677,22 @@ canvas {
   background-image: url(../img/background.png);
   background-repeat: no-repeat;
   background-size: 100vw, 100vh;
-  position:fixed;
+  position: fixed;
   z-index: 0; /* Gardez-le derrière le contenu */
-  width:100vw;
-  height:100vh;
-  top:0;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
 }
-
+.back::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7); /* Overlay sombre */
+  z-index: -1; /* Met l'overlay derrière le contenu */
+}
 input {
   margin-top: 10px;
 }
@@ -915,19 +943,24 @@ input {
   padding: 0 10px;
   color: #ff4500;
   font-weight: bold;
+  font-size: medium;
+}
+
+.amount{
+  font-size: medium;
 }
 
 .raise-option {
   display: flex;
   align-items: center;
-  gap: 5px;
-  font-size: 16px;
+  font-size: 5px;
   color: white;
+  margin-right: 5px;
 }
 .timer-clock {
   position: relative;
-  width: 100px;
-  height: 100px;
+  width: 75px;
+  height: 75px;
   border: 5px solid #000;
   border-radius: 50%;
   margin: auto;

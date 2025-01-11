@@ -14,7 +14,7 @@
       </div>
 
 
-      <p v-if="isLoggedIn" id="solde">Solde : {{user.money}}</p>
+      <p v-if="isLoggedIn" id="solde">Solde : {{this.userMoney}}</p>
   
       <div class="dropdown">
         <button class="nav-link dropdown-btn" name="Compte">
@@ -44,6 +44,7 @@
         isLoggedIn: false,
         isAdmin: false,
         user: [],
+        userMoney: null
       };
     },
     methods: {
@@ -54,8 +55,18 @@
           const userData = await axios.get(`/api/users/${id}`);
           this.user = userData.data;
           this.isAdmin = this.user.isAdmin;
+          this.userMoney = this.user.money
         }
         localStorage.setItem('isAdmin', this.user.isAdmin);
+      },
+      //Fonction qui met à jour le montant du solde dans la navBar
+      async editMoney() {
+        if (this.isLoggedIn) {
+          const id = localStorage.getItem('id');
+          const userData = await axios.get(`/api/users/${id}`);
+          this.user = userData.data;
+          this.userMoney = this.user.money
+        }
       },
       logout() {
         localStorage.removeItem('isLoggedIn');

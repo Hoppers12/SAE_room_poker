@@ -1,6 +1,7 @@
 <template>
-  <NavBar/>
-  <div>
+  <NavBar ref = "navbar"/>
+  <div class="d-flex justify-content-center">
+    <button @click="giveMoney()" class="btn-action btn-primary action-buttons">FREE JETONS</button>
     <div class="content">
       <div class="profile-wrapper" v-if="Object.keys(user).length > 0">
         <div class="profile-header">
@@ -34,6 +35,23 @@ export default {
     };
   },
   methods: {
+       //Donne des jetons au joueurs
+
+    async giveMoney() {
+        const id = await this.getLocalPlayerId()
+        const userData = await axios.get(`/api/users/${id}`)
+        this.user = userData.data;
+          //Requête PUT pour modifier l'argent sur le compte
+          await axios.put(`/api/users/${id}`, {
+            money: this.user.money + 1000
+          });
+      // Appel de la méthode editMoney du composant NavBar
+      this.$refs.navbar.editMoney();
+    },
+        //Obtenir son id local du joueur connecté actuellement
+    async getLocalPlayerId() {
+      return localStorage.getItem('id');
+    },
     async fetchUser() {
       try {
         const id = localStorage.getItem("id");
@@ -54,6 +72,23 @@ export default {
 </script>
 
 <style>
+.btn-custom {
+  background-color: #b50000;  /* Rouge foncé */
+  color: #ffffff;
+  border: 2px solid #000;     /* Bordure noire */
+  padding: 10px 20px;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 25px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.btn-custom:hover {
+  background-color: #ff1a1a;  /* Rouge clair au survol */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+  transform: scale(1.05);     /* Légère mise en avant au survol */
+}
 .content {
   background-image: url(../img/background.png);
   background-repeat: no-repeat;

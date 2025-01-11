@@ -1,7 +1,7 @@
 <template>
   <div class="table-container">
     <div class="bloc_canva position-relative">
-      <canvas id="pokerTable" width="800" height="600" class="border border-light rounded"></canvas>
+      <canvas id="pokerTable" width="600" height="450" class="border border-light rounded"></canvas>
       <div
         class="position-absolute top-50 start-50 translate-middle text-white fw-bold"
         v-if="notification"
@@ -37,7 +37,7 @@ export default {
       ctx.strokeStyle = "#000";   // Couleur du contour
       ctx.lineWidth = 10;
       ctx.beginPath();
-      ctx.ellipse(canvas.width / 2, canvas.height / 2, 350, 200, 0, 0, Math.PI * 2);
+      ctx.ellipse(canvas.width / 2, canvas.height / 2, 250, 200, 0, 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
 
@@ -191,14 +191,16 @@ export default {
 </script>
 
 <style scoped>
+
 .table-container {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 canvas {
-  border: 2px solid #28a745;
-  background-color: white;
+  border: 2px solid #28a745; /* Bordure verte */
+  background-color: rgba(255, 255, 255, 0.3); /* Fond vert à moitié transparent */
+
 }
 .bloc_canva {
   position: relative;
