@@ -613,11 +613,13 @@ export default {
         // Si un joueur n'a pas misé avant alors on affiche tt les boutons sinon on oblige à call or fold
         if (montantACall == 0) {
           this.showActionButtons()
+          hideCallButton()
         }else {
           this.showCallOrFoldButtons()
         }
       }else {
         hideActionButtons()
+
       }
 
 
@@ -638,6 +640,10 @@ function hideActionButtons() {
     buttons.forEach(button => {
         button.style.display = "none";
     });
+}
+function hideCallButton() {
+  const button = document.getElementById('callButton'); // Retourne un NodeList
+  button.style.display = "none";
 }
 </script>
 
