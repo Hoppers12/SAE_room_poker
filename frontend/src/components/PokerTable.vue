@@ -57,6 +57,7 @@ export default {
       // Restauration du contexte après avoir dessiné le texte du pot
       ctx.restore();
     },
+  
 
     // Dessine le joueur sur la table avec son pseudo, sa position et ses jetons et ses cartes
     drawPlayer(ctx, player, x, y) {

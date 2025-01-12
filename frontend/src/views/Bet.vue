@@ -508,11 +508,11 @@ export default {
   background-image: url(../img/background.png);
   background-repeat: no-repeat;
   background-size: 100vw, 100vh;
-  position:fixed;
+  position: fixed;
   z-index: 0; /* Gardez-le derrière le contenu */
-  width:100vw;
-  height:100vh;
-  top:0;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
   background-color: rgba(0, 0, 0, 0.5); /* Fond noir avec 50% de transparence */
 }
 

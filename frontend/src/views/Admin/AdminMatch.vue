@@ -147,7 +147,26 @@ export default {
   list-style: none;
   padding: 0;
 }
-
+.back {
+  background-image: url(../../img/background.png);
+  background-repeat: no-repeat;
+  background-size: 100vw, 100vh;
+  position: fixed;
+  z-index: 0; /* Gardez-le derrière le contenu */
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+}
+.back::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7); /* Overlay sombre */
+  z-index: -1; /* Met l'overlay derrière le contenu */
+}
 .match-list li {
   background-color: #242a35;
   padding: 10px;

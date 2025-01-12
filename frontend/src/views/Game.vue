@@ -16,7 +16,7 @@
             <div class="hand" ref="hand"></div> <!-- La main de l'horloge qui va tourner -->
           </div>
         </div>
-        <button @click="next" class="btn-action">TOUR SUIVANT</button>
+        <button @click="next" id="beginGame" class="btn-action">LANCER</button>
         <button @click="handleAction('fold')" id="foldButton" class="btn-action btn-danger action-buttons">FOLD</button>
         <button @click="handleAction('check')" id="checkButton" class="btn-action btn-secondary action-buttons">CHECK</button>
         <button @click="handleAction('call')" id="callButton" class="btn-action btn-primary action-buttons">CALL</button>
@@ -141,7 +141,8 @@ export default {
       nbChipsGagnes:null,
       showModal: false,     // Variable pour contrôler l'affichage de la modale
       isTimerActive: false, // Flag pour savoir si le timer est actif
-      showModalJoin:true
+      showModalJoin:true,
+      notifications: []
     };
   },
   watch: {
@@ -161,6 +162,45 @@ export default {
 ,
 
   methods: {
+    showNotification(message, duration = 3000) {
+      // Créer un élément div pour la notification
+      const notification = document.createElement('div');
+      notification.textContent = message;
+
+      // Appliquer des styles à la notification
+      notification.style.position = 'fixed';
+      notification.style.right = '20px';
+      notification.style.padding = '10px 20px';
+      notification.style.backgroundColor = '#333';
+      notification.style.color = '#fff';
+      notification.style.borderRadius = '5px';
+      notification.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.2)';
+      notification.style.fontSize = '14px';
+      notification.style.opacity = '0';
+      notification.style.transition = 'opacity 0.5s';
+
+      // Calculer la position verticale en fonction des notifications déjà affichées
+      const offset = 20 + this.notifications.length * 60; // Espacement de 60px entre les notifications
+      notification.style.bottom = `${offset}px`;
+
+      // Ajouter la notification au document
+      document.body.appendChild(notification);
+      this.notifications.push(notification); // Ajouter la notification au tableau
+
+      // Activer la transition d'apparition
+      setTimeout(() => {
+        notification.style.opacity = '1';
+      }, 10);
+
+      // Supprimer la notification après la durée spécifiée
+      setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => {
+          document.body.removeChild(notification);
+          this.notifications = this.notifications.filter((n) => n !== notification); // Retirer la notification du tableau
+        }, 500); // Attendre la fin de la transition avant de supprimer
+      }, duration);
+    },
     closeModalJoin() {
       this.showModalJoin = false
     },
@@ -169,6 +209,7 @@ export default {
       this.showModal = false
       // Appel de la méthode editMoney du composant NavBar
       this.$refs.navbar.editMoney();
+      showBeginGameButton()
 
     },
     // Fonctions pour afficher/masquer les boutons de jeu
@@ -178,6 +219,7 @@ export default {
             button.style.display = "block";
         });
         this.startTimer()
+
   },
   //Affiche seulement le bouton call et fold
    showCallOrFoldButtons() {
@@ -223,7 +265,6 @@ export default {
       this.nbChipsGagnes=null
     },
     async send() {
-
       this.resetGame()
       try {
         const id = await this.getLocalPlayerId()
@@ -270,7 +311,7 @@ export default {
       this.isLogged = localStorage.getItem('isLoggedIn') === 'true';
     },
     async next() {
-
+      hideBeginGameButton()
       this.socket.emit('nextTour');
       this.socket.emit('nextPlayer');
 
@@ -361,19 +402,34 @@ export default {
 
   // Nouvelle méthode pour gérer les actions, elle valide au serveur que le joueur a bien joué (tourTermine)
   async handleAction(action) {
+    hideBeginGameButton()
     //AllIn = true si le joueur a fait tapis
     this.stopTimer(); // Arrête le timer lorsqu'une action est réalisée
     this.timer = 15
     var allin = false
     const playerLocalId = await this.getLocalPlayerId();
+    console.log("action : ", action)
+    if (action == "raise") {
+      this.showNotification(`Mise de : ${this.raiseAmount*100} % du pot`);
+    }
     if (this.raiseAmount == "all") {
+      this.showNotification(`ALL-IN`);
       allin = true
     } 
     //Affichage à titre informatif sur le front
     if (action == "call") {
+      this.showNotification(`Mise suivie`);
       const li = document.createElement('li');
       li.className = 'list-group-item bg-success text-white';
       li.innerText = `Le joueur a call`;
+    }
+
+    if (action == "fold") {
+      this.showNotification(`Le joueur a passé son tour`);
+    }
+
+    if (action == "check") {
+      this.showNotification(`Le joueur a check`);
     }
 
     // Affiche un message dans la console pour le debug
@@ -644,6 +700,15 @@ function hideActionButtons() {
 function hideCallButton() {
   const button = document.getElementById('callButton'); // Retourne un NodeList
   button.style.display = "none";
+}
+function hideBeginGameButton() {
+  const button = document.getElementById('beginGame'); // Retourne un NodeList
+  button.style.display = "none";
+}
+
+function showBeginGameButton() {
+  const button = document.getElementById('beginGame'); // Retourne un NodeList
+  button.style.display = "block";
 }
 </script>
 

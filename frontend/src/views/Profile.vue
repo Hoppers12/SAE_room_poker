@@ -92,11 +92,13 @@ export default {
 .content {
   background-image: url(../img/background.png);
   background-repeat: no-repeat;
-  background-size: cover;
-  position: absolute;
-  z-index: -1;
+  background-size: 100vw, 100vh;
+  position: fixed;
+  z-index: 0; /* Gardez-le derrière le contenu */
   width: 100vw;
   height: 100vh;
+  top: 0;
+  z-index: -1;
   display: flex;
   justify-content: center;
   align-items: center;
