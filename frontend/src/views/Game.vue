@@ -9,7 +9,7 @@
     </div>
     <div class="row mt-4">
 
-      <PokerTable ref="pokerTableRef" :players="players" :notification="notification"/>
+      <PokerTable class="pokerTable" ref="pokerTableRef" :players="players" :notification="notification"/>
       <div class="action-buttons-container mt-3 d-flex justify-content-center align-items-center gap-3">
         <div v-if="timer > 0" class="timer-container">
           <div class="timer-clock">
@@ -99,7 +99,7 @@
       <p><strong>Jetons gagnés :</strong> {{ nbChipsGagnes }}</p>
       
       <button @click="closeModal" class="btn btn-primary">Fermer</button>
-      <button @click="send" class="btn btn-success">Rejouer</button>
+      <button @click="send" class="btn btn-success">Continuer</button>
   </div>
 
 </div>
@@ -124,6 +124,7 @@ export default {
   },
   data() {
     return {
+      nbPlayers:0,
       isLogged: false,
       notification: '',
       socket: null,
@@ -352,19 +353,19 @@ export default {
             indexSharedCard +=1
             switch (indexSharedCard) {
             case 1 :
-              x = canvas.width / 2 - 150;
+              x = canvas.width / 2 - 175;
               break
             case 2 :
-              x = canvas.width / 2 - 75;
+              x = canvas.width / 2 - 100;
               break
             case 3 : 
-              x = canvas.width / 2 ;
+              x = canvas.width / 2 - 25;
               break
             case 4 : 
-              x = canvas.width / 2 + 75;
+              x = canvas.width / 2 + 50;
               break
             case 5 : 
-              x = canvas.width / 2 + 150;
+              x = canvas.width / 2 + 125;
               break
               default:
                 console.log("nb cartes communes invalide")
@@ -456,6 +457,7 @@ export default {
     this.socket.on('connect_error', (err) => console.error('Connection failed:', err));
 
     this.socket.on('recevoirJoueur', (player, players, pot) => {
+      this.nbPlayers +=1
       const canvas = document.getElementById('pokerTable');
       const ctx = canvas.getContext('2d');
       const li = document.createElement('li');
@@ -464,6 +466,11 @@ export default {
       document.getElementById('chat_connexion').appendChild(li);
       if (this.$refs.pokerTableRef) {
         this.$refs.pokerTableRef.cleanPlayersOverride(ctx, players, pot);
+      }
+      //Si il y a 2 joueur alors on lance la partie directement
+      if (this.nbPlayers == 2) {
+        this.next()
+        this.showNotification("La partie commence")
       }
     });
 
@@ -527,6 +534,8 @@ export default {
          //On ajoute 1,5s de délai à la modale
          setTimeout(() => {
             this.showModal = true
+            //On remet le nombre de joueur à 0 car le coup est terminé
+            this.nbPlayers = 0
           }, 1500);
 
       });
@@ -605,6 +614,7 @@ export default {
 
 
     this.socket.on('quitterJoueur', (player, players, pot) => {
+      this.nbPlayers -=1
       const li = document.createElement('li');
       li.className = 'list-group-item bg-danger text-white';
       li.innerText = `${player.name} a quitté la partie. Il emporte avec lui ${player.chips} jeton(s)`;
@@ -866,6 +876,10 @@ input {
   pointer-events: auto;
 }
 
+.pokerTable {
+  margin-top:1em;
+}
+
 /* Style pour le contenu de la modale */
 .modal-content {
   background-color: #2c2c2c;  /* Fond noir */
@@ -1032,7 +1046,7 @@ input {
   position: relative;
   width: 75px;
   height: 75px;
-  border: 5px solid #000;
+  border: 5px solid #FFFF;
   border-radius: 50%;
   margin: auto;
 }
