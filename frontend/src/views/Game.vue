@@ -16,7 +16,6 @@
             <div class="hand" ref="hand"></div> <!-- La main de l'horloge qui va tourner -->
           </div>
         </div>
-        <button @click="next" id="beginGame" class="btn-action">LANCER</button>
         <button @click="handleAction('fold')" id="foldButton" class="btn-action btn-danger action-buttons">FOLD</button>
         <button @click="handleAction('check')" id="checkButton" class="btn-action btn-secondary action-buttons">CHECK</button>
         <button @click="handleAction('call')" id="callButton" class="btn-action btn-primary action-buttons">CALL</button>
@@ -210,7 +209,7 @@ export default {
       this.showModal = false
       // Appel de la méthode editMoney du composant NavBar
       this.$refs.navbar.editMoney();
-      showBeginGameButton()
+
 
     },
     // Fonctions pour afficher/masquer les boutons de jeu
@@ -312,7 +311,6 @@ export default {
       this.isLogged = localStorage.getItem('isLoggedIn') === 'true';
     },
     async next() {
-      hideBeginGameButton()
       this.socket.emit('nextTour');
       this.socket.emit('nextPlayer');
 
@@ -403,7 +401,6 @@ export default {
 
   // Nouvelle méthode pour gérer les actions, elle valide au serveur que le joueur a bien joué (tourTermine)
   async handleAction(action) {
-    hideBeginGameButton()
     //AllIn = true si le joueur a fait tapis
     this.stopTimer(); // Arrête le timer lorsqu'une action est réalisée
     this.timer = 15
@@ -711,15 +708,8 @@ function hideCallButton() {
   const button = document.getElementById('callButton'); // Retourne un NodeList
   button.style.display = "none";
 }
-function hideBeginGameButton() {
-  const button = document.getElementById('beginGame'); // Retourne un NodeList
-  button.style.display = "none";
-}
 
-function showBeginGameButton() {
-  const button = document.getElementById('beginGame'); // Retourne un NodeList
-  button.style.display = "block";
-}
+
 </script>
 
 

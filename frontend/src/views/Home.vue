@@ -1,4 +1,5 @@
 <template>
+  <NavBar  ref="navbar"/>
   <body>
 
     <div :class="{'content': isLoggedIn,'logged-in': isLoggedIn, 'not-logged-in': !isLoggedIn} ">
@@ -25,11 +26,12 @@
 
 
 <script>
-
+import NavBar from '../components/Navbar.vue'; // Import du composant NavBar
 
 export default {
   name: 'HomePage',
   components: {
+    NavBar
   },
   data(){
     return {
