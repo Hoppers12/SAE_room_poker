@@ -9,6 +9,7 @@ import AdminBet from "@/views/Admin/AdminBet.vue";
 import Profile from "@/views/Profile.vue";
 import BetResume from "@/views/BetResume.vue";
 import AdminMatch from "@/views/Admin/AdminMatch.vue";
+import LobbyChoice from './components/LobbyChoice.vue';
 const routes = [
     ...['/','/HomePage','/accueil', '/maison'].map(path => ({ path, component: Home })),
     {
@@ -26,10 +27,22 @@ const routes = [
         component: SignUp,
     },
     {
+        path: '/lobbyChoice',
+        name: 'lobbyChoice',
+        component: LobbyChoice,
+    },
+
+    {
         path: '/login',
         name: 'login',
         component: LogIn,
     },
+
+    { 
+        path: '/game/:id', 
+        name: 'Game',
+        component: Game 
+        },
     {
         path: '/admin/account',
         name: 'AdminAccount',

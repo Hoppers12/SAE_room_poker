@@ -90,8 +90,8 @@ export default {
       img.src = `https://deckofcardsapi.com/static/img/${card}.png`; // URL de l'image de la carte souhaitée
 
       img.onload = () => {
-        const cardWidth = 50; // Largeur de la carte
-        const cardHeight = 70; // Hauteur de la carte
+        const cardWidth = 50// Largeur de la carte
+        const cardHeight = 70; 
         ctx.drawImage(img, x, y, cardWidth, cardHeight);
       };
 

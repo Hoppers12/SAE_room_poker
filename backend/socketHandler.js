@@ -44,7 +44,7 @@ function socketHandler(io) {
                 // On vérifie si le pseudo du joueur n'est pas déjà autour de la table
                 gameController.getPlayers().forEach((player) => {
                     if (player.getName === pseudo) {
-                        throw new Error('Le joueur a déjàa rejoint la partie.');
+                        throw new Error('Le joueur a déjà rejoint la partie.');
                     }
                 });
 

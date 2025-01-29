@@ -123,6 +123,7 @@ export default {
   width: 100vw;
   height: 100vh;
   top: 0;
+  background-color:black;
 }
 .logged-in::after {
   content: '';

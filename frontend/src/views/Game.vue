@@ -379,8 +379,10 @@ export default {
 
 
     
+            if (this.$refs.pokerTableRef != null )  {
+              this.$refs.pokerTableRef.drawCardWithAnimation(x,y,commonCard)
+            }
 
-            this.$refs.pokerTableRef.drawCardWithAnimation(x,y,commonCard)
             this.socket.emit("nextPlayer")
       })          
     },
@@ -521,8 +523,10 @@ export default {
           const cardCode1 = `${carte1Rank}${suitMap[carte1Suit]}`;
           const cardCode2 = `${carte2Rank}${suitMap[carte2Suit]}`;
           // On dessine les nouvelles cartes du joueur sur la table
-          this.$refs.pokerTableRef.drawCardWithAnimation(player.x+10,player.y,cardCode1)
-          this.$refs.pokerTableRef.drawCardWithAnimation(player.x+50,player.y,cardCode2)
+          if (this.$refs.pokerTableRef != null )  {
+            this.$refs.pokerTableRef.drawCardWithAnimation(player.x+10,player.y,cardCode1)
+            this.$refs.pokerTableRef.drawCardWithAnimation(player.x+50,player.y,cardCode2)
+          }
          // Affichage de la modale
          this.winnerName = winnerName
          this.winnerHand = mainGagnante
@@ -582,9 +586,11 @@ export default {
 
           const cardCode1 = `${carte1Rank}${suitMap[carte1Suit]}`;
           const cardCode2 = `${carte2Rank}${suitMap[carte2Suit]}`;
-          // On dessine les nouvelles cartes du joueur sur la table
-          this.$refs.pokerTableRef.drawCardWithAnimation(player.x+10,player.y,cardCode1)
-          this.$refs.pokerTableRef.drawCardWithAnimation(player.x+50,player.y,cardCode2)
+          if (this.$refs.pokerTableRef != null )  {
+            // On dessine les nouvelles cartes du joueur sur la table
+            this.$refs.pokerTableRef.drawCardWithAnimation(player.x+10,player.y,cardCode1)
+            this.$refs.pokerTableRef.drawCardWithAnimation(player.x+50,player.y,cardCode2)
+          }
 
 
       });
@@ -743,17 +749,22 @@ canvas {
 .error {
   color: red;
 }
-
+/*
 .back {
   background-image: url(../img/background.png);
   background-repeat: no-repeat;
   background-size: 100vw, 100vh;
   position: fixed;
-  z-index: 0; /* Gardez-le derrière le contenu */
+  z-index: 0; 
   width: 100vw;
   height: 100vh;
   top: 0;
+} */
+
+.back {
+  background-color: black;
 }
+/*
 .back::after {
   content: '';
   position: absolute;
@@ -761,9 +772,9 @@ canvas {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7); /* Overlay sombre */
-  z-index: -1; /* Met l'overlay derrière le contenu */
-}
+  background-color: rgba(0, 0, 0, 0.7); 
+  z-index: -1; 
+}*/
 input {
   margin-top: 10px;
 }

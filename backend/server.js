@@ -1,19 +1,34 @@
-// server.js
-
 const express = require('express');
 const cors = require('cors');
 const http = require('http');
 const socketIo = require('socket.io');
-const {socketHandler,getPlayers}
-    = require('./socketHandler');
+const { socketHandler, getPlayers } = require('./socketHandler');
 
+let games = {}; // Stocke les parties
 
-//Fonction qui crée le serveur de socket
+// Fonction qui crée 3 parties au démarrage
+function createPredefinedGames(io) {
+    const predefinedGames = [
+        { id: "game-1", name: "PARTIE 1", players: [], pot: 0 },
+        { id: "game-2", name: "PARTIE 2", players: [], pot: 0 },
+        { id: "game-3", name: "PARTIE 3", players: [], pot: 0 }
+    ];
+
+    predefinedGames.forEach(game => {
+        games[game.id] = game;
+    });
+
+    console.log("Trois parties créées au démarrage:", Object.values(games));
+
+    // Envoyer les parties aux joueurs connectés
+    io.emit("update-lobby", Object.values(games));
+}
+
+// Fonction qui crée le serveur de socket
 function createServer() {
     const app = express();
     const server = http.createServer(app);
 
-    // Configuration de Socket.io avec CORS
     const io = socketIo(server, {
         cors: {
             origin: '*',
@@ -24,15 +39,22 @@ function createServer() {
         transports: ['websocket']
     });
 
-    // Activer CORS pour toutes les requêtes
     app.use(cors());
 
-    // Appel du fichier qui gère les sockets
-    socketHandler(io);
+    // Gestion des sockets
+    socketHandler(io, games);
+
+    // Créer les parties préexistantes
+    createPredefinedGames(io);
 
     // Route d'accueil
     app.get('/', (req, res) => {
         res.json("Bienvenue dans le serveur");
+    });
+
+    // Route pour récupérer les parties existantes
+    app.get('/games', (req, res) => {
+        res.json(Object.values(games));
     });
 
     // Démarrer le serveur
@@ -44,4 +66,9 @@ function createServer() {
     return server;
 }
 
-module.exports ={ createServer } ;
+//redirige vers /game/id
+function joinGame(gameId) {
+    this.$router.push({ name: "Game", params: { id: gameId } });
+  }
+
+module.exports = { createServer,joinGame };
