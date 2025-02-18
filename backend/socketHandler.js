@@ -4,7 +4,7 @@ const gameController = require('./Controllers/gameController');
 const blinds = require('./utils/blind');
 const playerController = require('./Controllers/playerController');
 const Card = require("./classesJeu/Card");
-
+let games = {}; // Un objet pour stocker les données des parties
 
 var index_current_player = 0
 let playerSockets = {}; // Associer chaque socket.id au joueurs
@@ -36,38 +36,44 @@ function passageALaProchaineStreet (io, gameController) {
 function socketHandler(io) {
 
     io.on('connection', (socket) => {
-        console.log('A user connectedd', socket.id);
+        console.log('A user connected', socket.id);
 
-        socket.on('joinGame', (pseudo, id) => {
+        socket.on('joinGame', (user, id,gameId) => {
+            pseudo =user   
+            //Rejoint une partie spécifique
+            if (!games[gameId]) {
+                games[gameId] = new PokerGame(gameId,[]); // Si la partie n'existe pas, crée-la
+              }
+
+            currentGame = games[gameId]
+            console.log("partie courante : " , currentGame, gameId)
             try {
                 streetCourante = 0
                 // On vérifie si le pseudo du joueur n'est pas déjà autour de la table
-                gameController.getPlayers().forEach((player) => {
+                currentGame.getPlayers().forEach((player) => {
                     if (player.getName === pseudo) {
                         throw new Error('Le joueur a déjà rejoint la partie.');
                     }
                 });
 
                 // On va chercher les coordonnées de là où sera placé le joueur en fonction du nb joueurs restant
-                const [x, y] = playerController.findCoord(gameController.getPlayers());
-
-
-
+                const [x, y] = playerController.findCoord(currentGame.getPlayers());
 
                 // Retourne la position réelle que va occuper le joueur rentrant lors de son 1er tour de table
                 // (0 = BTN, 1 = SB, 2 = BB, 3 = HJ, 4 = LJ, 5 = CO)
-                const p_reelle = playerController.findPositionReelle(gameController.getPlayers().length);
+                const p_reelle = playerController.findPositionReelle(currentGame.getNbPlayers());
 
+                console.log("pseudo :: " , pseudo)
                 // On donne au joueur l'id correspondant à son ID local
                 const newPlayer = new Player(id, pseudo, 1000, x, y, p_reelle);
-
+                console.log("New player : ", newPlayer)
                 // Associer le socket.id au joueur nouvellement créé
                 playerSockets[socket.id] = newPlayer;
 
-                gameController.gestionPartie(newPlayer, io);
+                gameController.ajoutNouveauJoueurDansPartie(newPlayer, currentGame,io);
 
             } catch (error) {
-                console.error('Erreur :', error.message); // Affiche le message d'erreur
+                console.error('Erreur :', error.message); // Affich e le message d'erreur
             }
 
             // Gestion de la déconnexion des joueurs

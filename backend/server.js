@@ -9,9 +9,9 @@ let games = {}; // Stocke les parties
 // Fonction qui crée 3 parties au démarrage
 function createPredefinedGames(io) {
     const predefinedGames = [
-        { id: "game-1", name: "PARTIE 1", players: [], pot: 0 },
-        { id: "game-2", name: "PARTIE 2", players: [], pot: 0 },
-        { id: "game-3", name: "PARTIE 3", players: [], pot: 0 }
+        { id: "0", name: "PARTIE 1", players: [], pot: 0 },
+        { id: "1", name: "PARTIE 2", players: [], pot: 0 },
+        { id: "2", name: "PARTIE 3", players: [], pot: 0 }
     ];
 
     predefinedGames.forEach(game => {

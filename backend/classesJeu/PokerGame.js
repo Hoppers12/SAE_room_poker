@@ -4,7 +4,8 @@ const Player = require("./Player");
 const HandEvaluator = require('../utils/HandEvaluator'); // Hypothèse d'un module pour évaluer les mains
 
 class PokerGame {
-    constructor(players) {
+    constructor(id,players) {
+        this.id = id ;
         this.deck = new Deck();
         this.deck.shuffle();  // Mélange le deck au début du jeu
         this.communityCards = [];  // Cartes communes au centre de la table
@@ -52,6 +53,10 @@ class PokerGame {
 
     getPot() {
         return this.pot
+    }
+
+    getNbPlayers() {
+        return this.players.length
     }
     //Fonction qui s'occupe de changer les position des joueurs en décalant vers la gauche (le LJ devient BTN etc ...)
     changeBlind(players) {

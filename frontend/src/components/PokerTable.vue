@@ -66,20 +66,21 @@ export default {
       ctx.fillStyle = "black"; // Remplissage noir
       ctx.fill(); // Remplit le cercle
       ctx.stroke(); // Dessine le contour du cercle
-
+      console.log("player : " , player)
       // Style du texte
       ctx.fillStyle = "white"; // Couleur du texte en blanc
       ctx.font = "bold 10px Arial"; // Texte en gras, taille 14px
 
+      console.log("p reelle : ", this.givePosition(player.p_reelle).toUpperCase())
       // Affiche la position réelle (en majuscule)
       ctx.fillText(this.givePosition(player.p_reelle).toUpperCase(), x - 10, y - 80);
 
       // Affiche les jetons du joueur
       ctx.fillText(`${player.chips}`.toUpperCase(), x - 10, y - 65);
-
+      console.log("playerrrrrrrrr : " ,player)
       // Affiche le pseudo du joueur en blanc et en majuscule
       ctx.fillText(player.name.toUpperCase(), x-25, y - 20);
-
+    
       ctx.stroke();
     },
 

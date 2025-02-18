@@ -17,7 +17,7 @@
   
   <script>
   import { io } from "socket.io-client";
-  
+  import axios from "../axios";
   export default {
     data() {
       return {
@@ -28,7 +28,7 @@
     mounted() {
       // Connexion au serveur socket
       this.socket = io("http://localhost:5000");
-  
+      
       // Écoute la mise à jour du lobby
       this.socket.on("update-lobby", (games) => {
         this.games = games;
@@ -36,6 +36,7 @@
   
       // Récupère les parties existantes au chargement
       this.fetchGames();
+
     },
     methods: {
       fetchGames() {
@@ -43,11 +44,43 @@
           .then((res) => res.json())
           .then((data) => {
             this.games = data;
+            console.log("games : " , this.games)
           })
           .catch((err) => console.error("Erreur lors de la récupération des parties :", err));
+
       },
-      joinGame(gameId) {
-        this.socket.emit("join-game", gameId);
+      async joinGame(gameId) {
+
+        try {
+        const id = await this.getLocalPlayerId()
+        const userData = await axios.get(`/api/users/${id}`)
+        this.user = userData.data;
+        //Verification de si le joueur a assez de jetons pour rejoindre (1000)
+        if (this.user.money >= 1000) {
+      
+          //Requête PUT pour modifier l'argent sur le compte
+          await axios.put(`/api/users/${id}`, {
+            money: this.user.money - 1000
+          });
+            console.log("game id : " , gameId)
+            this.socket.emit('joinGame', this.user,id,gameId);
+            this.$refs.navbar.editMoney()
+            this.closeModalJoin(); // Ferme la modale après avoir rejoint la partie
+        }else {
+          console.log("Vous n'avez pas assez de jetons pour rejoindre cette partie (1000)")
+          const li = document.createElement('li');
+          li.className = 'list-group-item bg-danger text-white';
+          li.innerText = `Vous n'avez pas assez de jetons pour rejoindre (1000 nécessaires)`;
+          document.getElementById('chat_connexion').appendChild(li);
+        }
+        } catch (e) {
+            this.errorMessage = "Vous devez être connecté pour rejoindre";
+          }
+
+          // Attempt to call renderTable() only after confirming the ref is set
+          if (this.$refs.pokerTableRef) {
+            this.$refs.pokerTableRef.renderTable();
+          }
         this.$router.push(`/game/${gameId}`); // Redirection vers la partie
       },
     },
