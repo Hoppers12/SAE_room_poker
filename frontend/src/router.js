@@ -9,6 +9,8 @@ import AdminBet from "@/views/Admin/AdminBet.vue";
 import Profile from "@/views/Profile.vue";
 import BetResume from "@/views/BetResume.vue";
 import AdminMatch from "@/views/Admin/AdminMatch.vue";
+import LobbyChoice from "./components/LobbyChoice.vue";
+
 const routes = [
     ...['/','/HomePage','/accueil', '/maison'].map(path => ({ path, component: Home })),
     {
@@ -49,6 +51,11 @@ const routes = [
         path: '/profile',
         name:'Profile',
         component: Profile,
+    },
+    {
+        path: '/lobby',
+        name:'Lobby',
+        component: LobbyChoice,
     }
 
 ];
