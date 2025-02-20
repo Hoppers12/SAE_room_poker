@@ -1,7 +1,7 @@
 <template>
     <nav>
       <router-link to="/" class="nav-link">ACCUEIL</router-link>
-      <router-link to="/game" class="nav-link">JEU</router-link>
+      <router-link to="/Lobby" class="nav-link">JEU</router-link>
       <div class="dropdown">
         <button class="nav-link dropdown-btn" name="Paris">
           PARIS

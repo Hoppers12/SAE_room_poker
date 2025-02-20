@@ -67,6 +67,7 @@
 
       async joinGame(gameId) {
 
+        //Récupérer le joueur qui veut rejoindre
         const id = await this.getLocalPlayerId()
         console.log("id : " ,id)
         const userData = await axios.get(`http://localhost:3000/api/users/${id}`);
@@ -91,7 +92,7 @@
 
         console.log("Joueur ajouté avec succès !");
       //  await axios.delete(`http://localhost:5000/api/games/${gameId}/players`);
-
+        this.$router.push(`/game${gameId}`);
       },
 
     },
@@ -161,6 +162,9 @@
     width: 100vw;
     height: 100vh;
     top: 0;
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
   }
   </style>
   

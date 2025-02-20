@@ -15,7 +15,7 @@
       <div class="header-inner" v-if="isLoggedIn">
           <ul class="bloc-header">
             <router-link to="/Profile" class="nav-link"> <li>Profil</li></router-link>
-            <router-link to="/game" class="nav-link"> <li>Poker</li></router-link>
+            <router-link to="/Lobby" class="nav-link"> <li>Poker</li></router-link>
             <router-link to="/bet" class="nav-link"> <li>Paris sportifs</li></router-link>
           </ul>
       </div>
