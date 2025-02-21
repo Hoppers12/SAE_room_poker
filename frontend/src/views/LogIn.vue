@@ -40,9 +40,11 @@ export default {
     async loginUser() {
       try {
         const response = await axios.get(`/api/hashedPassword/${this.email}/${this.password}`);
+
         if (response.status === 200 && response.data.message === 'True') {
           localStorage.setItem('isLoggedIn', true);
           localStorage.setItem('email', this.email);
+          localStorage.setItem('id', response.data.userId);
           window.location.href = '/';
         } else {
           this.errorMessage = 'Identifiants incorrects. Veuillez réessayer.';

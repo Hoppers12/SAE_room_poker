@@ -47,20 +47,28 @@ app.get('/api/hashedPassword/:email/:password', async (req, res) => {
     try {
         const { email, password } = req.params;
         const user = await User.findOne({ email });
+
         if (!user) {
             return res.status(404).json({ message: 'Utilisateur non trouvé' });
         }
+
+        // Vérification du mot de passe
         const isMatch = await bcrypt.compare(password, user.password);
         if (isMatch) {
-            return res.status(200).json({message: 'True'});
+            // Si le mot de passe est correct, renvoyer "True" et l'ID de l'utilisateur
+            return res.status(200).json({
+                message: 'True',
+                userId: user._id // Retourne l'ID de l'utilisateur
+            });
         } else {
-            return res.status(401).json({message: 'False'});
+            return res.status(401).json({ message: 'False' });
         }
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Erreur interne du serveur' });
     }
 });
+
 
 
 app.get('/api/betUser/:id', async (req, res) => {
@@ -350,6 +358,29 @@ app.get('/api/users/:id', async (req, res) => {
     res.status(500).json({ message: 'Erreur serveur' });
   }
 });
+
+app.get('/api/users/:email', async (req, res) => {
+    try {
+        const userEmail = req.params.email;
+        if (!userEmail) {
+            return res.status(400).json({ message: "Email requis" });
+        }
+
+        // ✅ Recherche par email sans tenter de caster l'email en ObjectId
+        const user = await User.findOne({userEmail});
+        if (!user) {
+            return res.status(404).json({ message: "Utilisateur non trouvé" });
+        }
+
+        res.json(user); // ✅ Retourne l'utilisateur trouvé
+    } catch (error) {
+        console.error("Erreur lors de la recherche de l'utilisateur :", error);
+        res.status(500).json({ message: "Erreur serveur" });
+    }
+});
+
+
+
 
 app.use(express.static(join(__dirname, '/frontend/dist')));
 
