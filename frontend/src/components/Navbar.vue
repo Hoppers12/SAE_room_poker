@@ -26,7 +26,6 @@
           <router-link to="/profile" class="dropdown-link" v-if="isLoggedIn">Mon profil</router-link>
           <router-link to="/admin/account" class="dropdown-link" v-if="isLoggedIn && isAdmin">Gestion des comptes</router-link>
           <router-link to="/admin/adminbet" class="dropdown-link" v-if="isLoggedIn && isAdmin">Gestion des paris</router-link>
-          <router-link to="/admin/adminmatch" class="dropdown-link" v-if="isLoggedIn && isAdmin">Gestion des matchs</router-link>
           <button class="dropdown-link logout-btn" @click="logout" v-if="isLoggedIn">Se déconnecter</button>
         </div>
       </div>

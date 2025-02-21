@@ -8,16 +8,12 @@ import AdminAccount from "@/views/Admin/Account.vue";
 import AdminBet from "@/views/Admin/AdminBet.vue";
 import Profile from "@/views/Profile.vue";
 import BetResume from "@/views/BetResume.vue";
-import AdminMatch from "@/views/Admin/AdminMatch.vue";
 const routes = [
     ...['/','/HomePage','/accueil', '/maison'].map(path => ({ path, component: Home })),
     {
         path: '/bet',
         name: 'Bet',
         component: Bet,
-    },
-    {
-      path: '/admin/adminmatch', name: 'AdminMatch', component: AdminMatch,
     },
         ...['/game','/play', '/start','/jouer','/jeu'].map(path => ({ path, component: Game })),
     {
